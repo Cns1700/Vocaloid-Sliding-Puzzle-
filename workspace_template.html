@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Puzzle Workspace</title>
+    <link rel="stylesheet" href="style_sheet.css">
+</head>
+<body>
+    <header>
+        <h1 id="game-title">Loading Puzzle...</h1>
+    </header>
+
+    <div class="controls">
+        <a href="index.html" class="back-btn">⬅ Back to Gallery</a>
+        <button class="size-btn" onclick="showModificationModal()">🔧 Grid Settings</button>
+        
+        <!-- Live Stopwatch Timer Display -->
+        <div id="timer-display" class="timer-banner">⏱ 00:00:00</div>
+        
+        <!-- Real-Time Move Counter Display -->
+        <div id="move-display" class="timer-banner">Moves: 0</div>
+        
+        <!-- Interactive Game Control Buttons -->
+        <button id="pause-btn" class="size-btn" onclick="togglePauseGame()">⏸ Pause</button>
+        <button id="hint-btn" class="size-btn" onclick="triggerHint()">💡 Hint (<span id="hints-count">3</span> left)</button>
+        <button id="solve-btn" class="size-btn" onclick="triggerAutoSolve()">🤖 Auto Solve</button>
+    </div>
+
+    <!-- Main expansive sliding tile board container -->
+    <div id="puzzle-container"></div>
+
+    <!-- Custom Grid Modification Modal Overlay (3x3 to 8x8) -->
+    <div id="mod-modal-overlay" class="modal-overlay">
+        <div class="modal-card" id="mod-modal-card">
+            <h2>🔧 Grid Customization</h2>
+            <p>Select the desired dimension for your sliding grid:<br><small>(Choose a size from 3x3 up to 8x8)</small></p>
+            <input type="number" id="grid-size-input" min="3" max="8" value="3">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="hideModificationModal()">Cancel</button>
+                <button class="modal-btn confirm" onclick="submitGridModification()">Apply Grid</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Pause Screen Modal Overlay -->
+    <div id="pause-modal-overlay" class="modal-overlay">
+        <div class="modal-card">
+            <h2>⏸ Game Paused</h2>
+            <p>The sliding puzzle is paused!<br><small>Click below to resume your puzzle adventure!</small></p>
+            <div class="modal-actions">
+                <button class="modal-btn confirm" onclick="togglePauseGame()">▶ Resume Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Victory Celebration Modal Overlay with Upgraded Social Sharing options -->
+    <div id="victory-modal-overlay" class="modal-overlay">
+        <div class="modal-card" id="victory-modal-card">
+            <h2 id="victory-title">🎉 Congratulations!</h2>
+            <p id="victory-message">You have successfully completed the sliding puzzle!</p>
+            
+            <div class="modal-actions">
+                <a href="index.html" class="modal-btn confirm" style="text-decoration: none; text-align: center;">Back to Gallery</a>
+                <button class="modal-btn retry" onclick="restartCurrentPuzzle()">Play Again</button>
+            </div>
+
+            <!-- Integrated Social Media Sharing Links -->
+            <div class="social-share-strip">
+                <h3>📢 Share Your Achievement!</h3>
+                <div class="social-buttons">
+                    <a id="share-fb-btn" href="#" target="_blank" class="share-btn fb">Facebook</a>
+                    <a id="share-x-btn" href="#" target="_blank" class="share-btn tw">X / Twitter</a>
+                    <button onclick="shareInstagram()" class="share-btn ig">Instagram</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Overlay for in-app alert notifications -->
+    <div id="toast-notification" class="toast-container"></div>
+
+    <script src="engine_logic.js"></script>
+</body>
+</html>

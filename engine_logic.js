@@ -27,7 +27,7 @@ const themes = {
     'miku-original': { title: 'Hatsune Miku (Original) 🎼', color: '#00ffcc', img: 'Puzzles/Hatsune-Miku/Hatsune-Miku-images/' },
     'miku-supreme': { title: 'Hatsune Miku (Supreme) 👑', color: '#4da6ff', img: 'Puzzles/Hatsune-Miku/Supreme-images/' },
     'miku-honey': { title: 'Hatsune Miku (Honey Whip) 🦋', color: '#ff007f', img: 'Puzzles/Hatsune-Miku/Honey-Whip-images/' },
-    'miku-25ji': { title: 'Hatsune Miku (25-ji) ⚫⚪', color: '#660066', img: 'Puzzles/Hatsune-Miku/25-ji-images/' },
+    'miku-25ji': { title: 'Hatsune Miku (25-ji) ⚫⚪', color: '#ff00ff', img: 'Puzzles/Hatsune-Miku/25-ji-images/' },
     'vflower': { title: 'VFlower (V3) 🌺', color: '#9933ff', img: 'Puzzles/VFlower-V3/' }
 };
 
@@ -39,10 +39,16 @@ const puzzleFile = urlParams.get('puzzle') || 'Cyber_Miku_1.jpg';
 const currentTheme = themes[activeKey] || themes['miku-original'];
 const fullImageURL = `${currentTheme.img}${puzzleFile}`;
 
+// Helper function to dynamically wrap emojis in a reset span to strip text-effects and preserve natural system colors
+function wrapEmojis(text) {
+    const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+    return text.replace(emojiRegex, '<span class="plain-emoji">$1</span>');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const gameTitleNode = document.getElementById('game-title');
     if (gameTitleNode) {
-        gameTitleNode.textContent = currentTheme.title;
+        gameTitleNode.innerHTML = wrapEmojis(currentTheme.title);
         gameTitleNode.style.textShadow = `0 0 15px ${currentTheme.color}`;
     }
     

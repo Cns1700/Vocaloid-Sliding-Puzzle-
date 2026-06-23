@@ -1,3 +1,6 @@
+/* Import Theme Fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Great+Vibes&family=Cinzel:wght@700;900&family=Rubik+Glitch&family=Metal+Mania&family=Share+Tech+Mono&display=swap');
+
 /* Core Presentation Resets */
 body {
     margin: 0;
@@ -10,36 +13,136 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
+    color: #ffffff;
+    overflow-x: hidden;
 }
 
+/* Emoji Reset - Strips all parent gradients, shadows, and text effects */
+.emoji, .plain-emoji {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", sans-serif !important;
+    -webkit-text-fill-color: initial !important;
+    color: initial !important;
+    text-shadow: none !important;
+    filter: none !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    background-clip: initial !important;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Futuristic Header Container */
 header {
     text-align: center;
-    padding: 20px;
+    margin: 30px auto 10px;
+    padding: 25px 50px;
+    background: rgba(10, 20, 30, 0.85);
+    border: 2px solid #00ffcc;
+    border-radius: 16px;
+    box-shadow: 0 0 25px rgba(0, 255, 204, 0.35), inset 0 0 15px rgba(0, 255, 204, 0.15);
+    backdrop-filter: blur(10px);
+    max-width: 800px;
+    width: 85%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
-/* Hub Gallery Layout */
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+    margin: 0 0 10px 0;
+    background: linear-gradient(45deg, #00ffcc, #4da6ff);
+    background-clip: text; /* standard property for compatibility */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+}
+
+header p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1rem;
+    color: #8ab4f8;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+/* Hub Gallery Grid & Layout Containers */
 .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, auto);
-    gap: 50px;
+    gap: 40px;
     width: 100%;
-    max-width: 1200px;
-    padding: 40px;
+    max-width: 1300px;
+    padding: 30px;
     box-sizing: border-box;
+    justify-items: center;
+    align-items: stretch;
 }
 
-/* Precise grid positioning classes */
-.pos-top-left     { grid-column: 1; grid-row: 1; }
-.pos-top-right    { grid-column: 3; grid-row: 1; }
-.pos-center        { grid-column: 2; grid-row: 2; }
-.pos-bottom-left  { grid-column: 1; grid-row: 3; }
-.pos-bottom-right { grid-column: 3; grid-row: 3; }
+/* Grid wrappers acting as thematic character containers */
+.grid-wrapper {
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 320px;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.grid-wrapper:hover {
+    transform: translateY(-5px);
+}
+
+/* Individualized gradients for character wrappers (easy on the eyes) */
+.pos-center { 
+    grid-column: 2; 
+    grid-row: 2; 
+    background: linear-gradient(135deg, rgba(0, 50, 45, 0.75), rgba(10, 20, 30, 0.85));
+    border-color: rgba(0, 255, 204, 0.3);
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.15);
+}
+.pos-top-left { 
+    grid-column: 1; 
+    grid-row: 1; 
+    background: linear-gradient(135deg, rgba(60, 10, 35, 0.75), rgba(10, 20, 30, 0.85));
+    border-color: rgba(255, 0, 127, 0.3);
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.15);
+}
+.pos-top-right { 
+    grid-column: 3; 
+    grid-row: 1; 
+    background: linear-gradient(135deg, rgba(15, 35, 60, 0.75), rgba(10, 20, 30, 0.85));
+    border-color: rgba(77, 166, 255, 0.3);
+    box-shadow: 0 0 20px rgba(77, 166, 255, 0.15);
+}
+.pos-bottom-left { 
+    grid-column: 1; 
+    grid-row: 3; 
+    background: linear-gradient(135deg, rgba(30, 10, 45, 0.75), rgba(10, 20, 30, 0.85));
+    border-color: rgba(102, 0, 102, 0.3);
+    box-shadow: 0 0 20px rgba(102, 0, 102, 0.15);
+}
+.pos-bottom-right { 
+    grid-column: 3; 
+    grid-row: 3; 
+    background: linear-gradient(135deg, rgba(40, 15, 60, 0.75), rgba(10, 20, 30, 0.85));
+    border-color: rgba(153, 51, 255, 0.3);
+    box-shadow: 0 0 20px rgba(153, 51, 255, 0.15);
+}
 
 /* Base Character Box Design */
 .character-box {
-    width: 260px;
-    height: 160px; /* Rectangular proportions */
+    width: 270px;
+    height: 150px;
     border: 3px solid #fff;
     border-radius: 12px;
     display: flex;
@@ -48,86 +151,168 @@ header {
     position: relative;
     overflow: hidden;
     background-repeat: no-repeat;
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s;
     box-shadow: 0 0 15px var(--glow-color);
+    border-color: var(--glow-color);
 }
 
 .character-box:hover {
-    transform: scale(1.02);
+    transform: scale(1.03);
     box-shadow: 0 0 25px 8px var(--glow-color);
 }
 
-.card-title {
-    color: white;
-    font-weight: bold;
-    font-size: 2rem;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    z-index: 2;
+.character-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1;
+    transition: background 0.3s;
 }
 
-/* Character Card Custom Properties & Specific Images */
+.character-box:hover::before {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* Character Card Specific BG Images */
 .miku-original-card {
     --glow-color: #00ffcc;
     background-image: url('BG-character-cards/Hatsune-Miku/Hatsune-Miku-card/futuristic-hub-bg.jpg');
-    background-size: 100%;             
-    background-position: center center; 
+    background-size: cover;             
+    background-position: center; 
 }
 
 .miku-supreme-card {
     --glow-color: #4da6ff;
     background-image: url('BG-character-cards/Hatsune-Miku/Supreme-card/studiopratisaad0-diamond-642131_640edit.png');
-    background-size: 150%;
-    background-position: center center;
+    background-size: cover;
+    background-position: center;
 }
 
 .miku-honey-card {
     --glow-color: #ff007f;
     background-image: url('BG-character-cards/Hatsune-Miku/Honey-Whip-card/geralt-arrangement-2801824_640-edit.png');
-    background-size: 160%;
-    background-position: center center;
+    background-size: cover;
+    background-position: center;
 }
 
 .miku-25ji-card {
-    --glow-color: #660066;
+    --glow-color: #ff00ff;
     background-image: url('BG-character-cards/Hatsune-Miku/25-ji-card/geralt-time-4728962_640.jpg');
-    background-size: 160%;
-    background-position: -70px center;
+    background-size: cover;
+    background-position: center;
 }
 
 .vflower-card {
     --glow-color: #9933ff;
     background-image: url('BG-character-cards/VFlower-V3/darkmoon_art-balcony-8865325_1280.jpg');
-    background-size: 150%;
-    background-position: -10px -60px;
+    background-size: cover;
+    background-position: center;
 }
 
-/* Gallery Hover Pop Preview Window */
-.hover-preview-pop {
-    position: absolute;
-    width: 250px;
-    height: 150px;
-    background-size: contain; 
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: rgba(17, 26, 34, 0.95); 
-    border: 3px solid #ff69b4;
-    border-radius: 10px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.5);
-    pointer-events: none; 
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    z-index: 9999;
+/* Thematic 3D Character Name Titles with custom Fonts & 2-toned Gradients */
+.card-title {
+    font-size: 2.1rem;
+    z-index: 2;
+    text-align: center;
+    white-space: nowrap;
+    color: #ffffff; /* Solid high-contrast fallback color */
+}
+
+.pos-top-left     { grid-column: 1; grid-row: 1; }
+.pos-top-right    { grid-column: 3; grid-row: 1; }
+.pos-center        { grid-column: 2; grid-row: 2; }
+.pos-bottom-left  { grid-column: 1; grid-row: 3; }
+.pos-bottom-right { grid-column: 3; grid-row: 3; }
+
+
+/* Hatsune Miku: Futuristic Font & Aqua/Cyan Gradient */
+.miku-original-card .card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    background: linear-gradient(180deg, #ffffff 30%, #a3fff2 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 
+        1px 1px 0px #0fa4c9, 
+        3px 3px 0px #01473a, 
+        0px 0px 15px rgba(0, 255, 204, 0.95),
+        0px 0px 25px rgba(0, 255, 204, 0.5);
+}
+
+/* Honey Whip: Cutesy Readable Script & Hot Pink Gradient */
+.miku-honey-card .card-title {
+    font-family: 'Great Vibes', cursive;
+    font-size: 3rem;
+    font-weight: bold;
+    background: linear-gradient(180deg, #ffffff 30%, #ff9ce6 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 
+        1px 1px 0px #b4068f, 
+        3px 3px 0px #4d0026, 
+        0px 0px 15px rgba(255, 0, 127, 0.95),
+        0px 0px 25px rgba(255, 0, 127, 0.5);
+}
+
+/* Supreme: Royal Font & Regal Blue-Gold Hue Gradient */
+.miku-supreme-card .card-title {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    background: linear-gradient(180deg, #ffffff 30%, #b3d7ff 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 
+        1px 1px 0px #a30202, 
+        3px 3px 0px #002244, 
+        0px 0px 15px rgba(77, 166, 255, 0.95),
+        0px 0px 25px rgba(77, 166, 255, 0.5);
+}
+
+/* 25-ji: Brightened and optimized for perfect dark-background readability */
+.miku-25ji-card .card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 2.1rem;
+    color: #ffffff; /* Failsafe color */
+    background: linear-gradient(180deg, #ffffff 20%, #ffb3ff 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 
+        1px 1px 2px #d80c6b, 
+        3px 3px 4px #100010, 
+        0px 0px 18px rgba(255, 0, 255, 1),
+        0px 0px 30px rgba(255, 0, 255, 0.6);
+}
+
+/* VFlower V3: Gothic & Intense Magenta-Violet Gradient */
+.vflower-card .card-title {
+    font-family: 'Metal Mania', serif;
+    font-size: 2.3rem;
+    background: linear-gradient(180deg, #ffffff 30%, #dfbfff 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 
+        1px 1px 0px #690659, 
+        3px 3px 0px #300060, 
+        0px 0px 15px rgba(153, 51, 255, 0.95),
+        0px 0px 25px rgba(153, 51, 255, 0.5);
 }
 
 /* Horizontal Thumbnail Choice Track */
 .thumbnail-row {
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     width: 100%;
     margin-top: 15px; 
-    margin-left: -40px;
+    padding: 0;
 }
 
 /* Small Landscape Thumbnail Links */
@@ -135,17 +320,18 @@ header {
     position: relative;
     display: inline-block;
     width: 60px;   
-    height: 34px;  
-    border-radius: 4px;
-    border: 2px solid #fff;
-    overflow: visible; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    transition: transform 0.2s;
+    height: 36px;  
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    overflow: hidden; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.2s;
 }
 
 .thumb-link:hover {
-    transform: scale(1.1);
-    border-color: #ff69b4;
+    transform: scale(1.18);
+    border-color: #ffffff;
+    box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4);
 }
 
 .thumb-img {
@@ -155,31 +341,53 @@ header {
     display: block;
 }
 
-/* Game Interface Component Elements */
+/* Gallery Hover Pop Preview Window */
+.hover-preview-pop {
+    position: absolute;
+    width: 250px;
+    height: 150px;
+    background-size: cover; 
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: rgba(17, 26, 34, 0.95); 
+    border: 3px solid var(--modal-theme-color, #ff69b4);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    pointer-events: none; 
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    z-index: 9999;
+}
+
+/* Game Interface Page Controls */
 .controls {
-    margin-bottom: 20px;
+    margin: 10px auto 25px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 900px;
 }
 
 .size-btn, .back-btn {
-    background: white;
-    border: 2px solid #ffb6c1;
+    background: rgba(32, 43, 54, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.3);
     padding: 10px 20px;
     border-radius: 20px;
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
-    color: #333;
-    transition: background 0.2s, transform 0.1s;
+    color: #fff;
+    transition: all 0.2s, transform 0.1s;
+    backdrop-filter: blur(5px);
 }
 
 .size-btn:hover, .back-btn:hover {
-    background: #fff0f5;
-    border-color: #ff69b4;
+    background: #ffffff;
+    border-color: #ffffff;
+    color: #111a22;
+    transform: translateY(-1px);
 }
 
 /* Dynamic Live Timer stopwatch formatting banner */
@@ -206,59 +414,64 @@ header {
     border-radius: 12px;
     overflow: hidden;        
     margin: 15px auto;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
 }
 
-/* Square Sliding puzzle tiles with smooth slide transitions and 3D bevel offsets */
+/* Square Sliding puzzle tiles with smooth transitions */
 .puzzle-piece {
     position: absolute;
     cursor: pointer;
     touch-action: none;
     will-change: left, top;
     box-sizing: border-box;
-    border: 1.5px solid rgba(26, 37, 47, 0.7);
+    border: 1.5px solid rgba(26, 37, 47, 0.75);
     border-radius: 6px;
     
     /* Sliding Animations */
-    transition: left 0.15s ease-out, top 0.15s ease-out, opacity 0.2s;
+    transition: left 0.18s cubic-bezier(0.25, 1, 0.5, 1), top 0.18s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s;
     
     /* 3D Bevel Edge Effect */
     filter: 
-        drop-shadow(1px 1.5px 0.5px rgba(255, 255, 255, 0.35)) 
-        drop-shadow(-1px -1px 0.5px rgba(0, 0, 0, 0.55))
+        drop-shadow(1px 1.5px 0.5px rgba(255, 255, 255, 0.3)) 
+        drop-shadow(-1px -1px 0.5px rgba(0, 0, 0, 0.5))
         drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.3));
 }
 
 .puzzle-piece:active {
-    /* Click depth drop-shadow feedback */
     filter: 
         drop-shadow(1px 1px 0.5px rgba(255, 255, 255, 0.2)) 
         drop-shadow(-1px -1px 0.5px rgba(0, 0, 0, 0.6));
 }
 
-/* Clean numerical overlays displayed upon clicking "Hint" */
+/* Clean numerical overlays displayed upon clicking "Hint" (With Perfect Center Alignment) */
 .tile-hint-number {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(17, 26, 34, 0.8);
-    border: 1.5px solid var(--modal-theme-color, #00ffcc);
-    color: #fff;
-    font-size: 1.3rem;
-    font-weight: bold;
-    width: 36px;
-    height: 36px;
+    background: rgba(17, 26, 34, 0.95);
+    border: 2.5px solid var(--modal-theme-color, #00ffcc);
+    color: #ffffff;
+    font-size: 1.4rem;
+    font-weight: 900;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
+    
+    /* Perfect Center Grid Alignment */
+    display: inline-grid;
+    place-items: center;
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+    
+    /* Corrects text shift artifacts across different font engines */
+    line-height: 0; 
     padding: 0;
     margin: 0;
-    line-height: 1;
-    text-align: center;
     box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: 0 0 10px var(--modal-theme-color, rgba(0, 255, 204, 0.5));
+    
+    box-shadow: 0 0 12px var(--modal-theme-color, rgba(0, 255, 204, 0.65));
     pointer-events: none;
     z-index: 10;
 }
@@ -270,7 +483,7 @@ header {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -278,7 +491,7 @@ header {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease-in-out;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(6px);
 }
 
 .modal-overlay.show {
@@ -390,7 +603,7 @@ header {
     background: #ff6b5b;
 }
 
-/* Victory social media sharing link layout */
+/* Victory Social Sharing Strip */
 .social-share-strip {
     margin-top: 25px;
     padding-top: 20px;
@@ -432,7 +645,7 @@ header {
 .share-btn.tw { background-color: #1da1f2; }
 .share-btn.ig { background-color: #e1306c; }
 
-/* Custom temporary notification Toast system layout */
+/* In-App Toast Container */
 .toast-container {
     position: fixed;
     bottom: -80px;
@@ -457,7 +670,7 @@ header {
     bottom: 30px;
 }
 
-/* Dynamic Animation Particle systems */
+/* Particle Systems */
 .particle {
     position: absolute;
     pointer-events: none;
@@ -469,4 +682,61 @@ header {
 @keyframes floatOut {
     0% { transform: translate(0, 0) scale(1); opacity: 1; }
     100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
+
+/* ==========================================================================
+   Desktop Resizing and Positioning Media Queries (Viewport Center Focus)
+   ========================================================================== */
+
+@media screen and (max-width: 1200px) {
+    .gallery-grid {
+        gap: 25px;
+        padding: 20px;
+        max-width: 1000px;
+    }
+    .grid-wrapper {
+        width: 290px;
+        padding: 15px;
+    }
+    .character-box {
+        width: 250px;
+        height: 140px;
+    }
+    .card-title {
+        font-size: 1.8rem;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    /* For medium desktop sizes, transition beautifully into dual-column flow to remain centered */
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        justify-content: center;
+        max-width: 800px;
+    }
+    .pos-center {
+        grid-column: 1 / span 2;
+        grid-row: 3;
+    }
+    .pos-top-left, .pos-top-right, .pos-bottom-left, .pos-bottom-right {
+        grid-column: auto;
+        grid-row: auto;
+    }
+    header {
+        margin-top: 20px;
+        padding: 20px;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    /* Solid fallback for narrow widths to keep all elements lined up correctly */
+    .gallery-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+    }
+    .pos-center {
+        grid-column: auto;
+        grid-row: auto;
+    }
 }

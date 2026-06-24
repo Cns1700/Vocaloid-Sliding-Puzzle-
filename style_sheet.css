@@ -6,7 +6,9 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-image: url('BG-Freepik/kpargeter-bokeh-lights-and-stars.jpg');
+    background: linear-gradient(to bottom, #0099b8, #bfeff5), 
+              url('BG-Freepik/kpargeter-bokeh-lights-and-stars.webp') no-repeat center center fixed;
+    background-image: url('BG-Freepik/kpargeter-bokeh-lights-and-stars.webp');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -346,7 +348,7 @@ header p {
     position: absolute;
     width: 250px;
     height: 150px;
-    background-size: cover; 
+    background-size: contain; 
     background-repeat: no-repeat;
     background-position: center;
     background-color: rgba(17, 26, 34, 0.95); 
@@ -739,4 +741,29 @@ header p {
         grid-column: auto;
         grid-row: auto;
     }
+}
+
+/* 🏆 Dynamic Canvas Certificate Styling Extension 🏆 */
+.generated-cert-container {
+    background: #111a22;
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.cert-image-preview {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid var(--modal-theme-color);
+}
+
+.cert-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 5px;
 }

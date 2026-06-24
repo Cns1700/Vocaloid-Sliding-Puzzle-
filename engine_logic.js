@@ -40,7 +40,7 @@ const puzzleFile = urlParams.get('puzzle') || 'Cyber_Miku_1.jpg';
 const currentTheme = themes[activeKey] || themes['miku-original'];
 const fullImageURL = `${currentTheme.img}${puzzleFile}`;
 
-// Helper function to dynamically wrap emojis in a reset span to strip text-effects and preserve natural system colors
+// Helper function to dynamically wrap emojis to strip text-effects and preserve colors
 function wrapEmojis(text) {
     const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
     return text.replace(emojiRegex, '<span class="plain-emoji">$1</span>');
@@ -76,6 +76,10 @@ function setupSlidingPuzzle() {
     if (hintCountNode) {
         hintCountNode.textContent = hintsLeft;
     }
+
+    // Clear previous certificates
+    const certWrapper = document.getElementById('certificate-render-area');
+    if (certWrapper) certWrapper.innerHTML = '';
 
     // Load the target image dynamically to extract its natural aspect ratio
     const targetImage = new Image();
@@ -282,66 +286,169 @@ function checkVictory() {
             const timeString = formatTime(elapsedSeconds);
             const msgNode = document.getElementById('victory-message');
             const titleNode = document.getElementById('victory-title');
-            
-            // Generate the text for sharing/copying
-            const shareText = wasAutoSolved 
-                ? `I attempted this ${currentTheme.title} Sliding Puzzle! My personal attempt before Auto Solve was ${attemptTime} with ${attemptMoves} moves! Can you solve it faster? 🧩✨`
-                : `I just solved the ${currentTheme.title} sliding puzzle in ${timeString} with only ${movesCount} moves! Can you beat my score? 🧩✨`;
 
             if (wasAutoSolved) {
-                if (titleNode) titleNode.innerHTML = `❌ Try Again?`;
+                if (titleNode) titleNode.innerHTML = `❌ Auto-Solved!`;
                 if (msgNode) {
                     msgNode.innerHTML = `
                         <strong>Your Personal Attempt:</strong><br>
                         ⏱ Time: ${attemptTime} | 🔄 Moves: ${attemptMoves}<br><br>
-                        <strong>Auto Solver (Optimal Path):</strong><br>
+                        <strong>Auto Solver:</strong><br>
                         ⏱ Time: ${timeString} | 🔄 Moves: ${movesCount}
                     `;
                 }
-                setupSharingLinks(attemptTime, attemptMoves, true);
             } else {
                 if (titleNode) {
                     titleNode.innerHTML = `🎉 Congratulations!`;
                 }
                 if (msgNode) {
                     msgNode.innerHTML = `You completed the sliding puzzle in <strong>${timeString}</strong> with <strong>${movesCount}</strong> total moves! 🏆✨<br><br>
-                    Good luck and have fun!`;
+                    Thank you for playing!`;
                 }
-                setupSharingLinks(timeString, movesCount, false);
             }
             
-            // Add or update the Copy button in the modal
-            addCopyButtonToModal(shareText);
+            // Render the un-editable Certificate Image dynamically
+            generateCertificateImage(wasAutoSolved, timeString, movesCount);
             
             showVictoryModal();
         }, 600);
     }
 }
 
-// Helper to inject the copy-to-clipboard button dynamically
-function addCopyButtonToModal(textToCopy) {
-    const actions = document.querySelector('#victory-modal-overlay .modal-actions');
-    if (!actions) return;
+// Generates a high-quality un-alterable image on canvas that users can save/copy
+function generateCertificateImage(isAuto, timeStr, movesVal) {
+    const certWrapper = document.getElementById('certificate-render-area');
+    if (!certWrapper) return;
+    certWrapper.innerHTML = `<p style="font-size: 0.85rem; color: #a0aec0;">Generating secure result certificate... 🎨</p>`;
 
-    let copyBtn = document.getElementById('copy-result-btn');
-    if (!copyBtn) {
-        copyBtn = document.createElement('button');
-        copyBtn.id = 'copy-result-btn';
-        copyBtn.className = 'modal-btn cancel';
-        copyBtn.innerHTML = '📋 Copy Score';
-        actions.appendChild(copyBtn);
-    }
+    const canvas = document.createElement('canvas');
+    canvas.width = 600;
+    canvas.height = 450;
+    const ctx = canvas.getContext('2d');
 
-    // Refresh listener for the current score text
-    copyBtn.onclick = () => {
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '✅ Copied!';
-            setTimeout(() => copyBtn.innerHTML = originalText, 2000);
-        });
+    const bgImg = new Image();
+    bgImg.crossOrigin = "anonymous"; // Safe-guarding if assets move to external origins
+    bgImg.onload = function() {
+        // Draw dimmed background image representing the solved puzzle
+        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+        
+        // Darken overlay overlay for readability
+        ctx.fillStyle = "rgba(10, 20, 30, 0.85)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Futuristic neon borders
+        ctx.strokeStyle = currentTheme.color;
+        ctx.lineWidth = 6;
+        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+        
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(18, 18, canvas.width - 36, canvas.height - 36);
+
+        // Certificate Header
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 26px 'Orbitron', 'Segoe UI', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("VOCALOID PUZZLE RECORD", canvas.width / 2, 60);
+
+        // Sub-decorations
+        ctx.fillStyle = currentTheme.color;
+        ctx.fillRect(canvas.width / 2 - 100, 75, 200, 3);
+
+        // Character/Theme Name
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "italic 16px 'Segoe UI', sans-serif";
+        ctx.fillText(`Target: ${currentTheme.title.replace(/[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '')}`, canvas.width / 2, 110);
+
+        // Player Name or Greeting
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 22px 'Segoe UI', sans-serif";
+        // Personalization: Using beloved master tag
+        const masterGreeting = isAuto ? "Auto Solver System" : "Player";
+        ctx.fillText(`Achieved By: ${masterGreeting}`, canvas.width / 2, 160);
+
+        // Stats Box
+        ctx.fillStyle = "rgba(32, 43, 54, 0.9)";
+        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.lineWidth = 1;
+        ctx.fillRect(80, 190, canvas.width - 160, 140);
+        ctx.strokeRect(80, 190, canvas.width - 160, 140);
+
+        // Inner Box Stats
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#a0aec0";
+        ctx.font = "14px 'Share Tech Mono', monospace";
+        ctx.fillText("GRID DIMENSION:", 110, 225);
+        ctx.fillText("ELAPSED TIME:", 110, 265);
+        ctx.fillText("TOTAL MOVES:", 110, 305);
+
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 16px 'Share Tech Mono', monospace";
+        ctx.fillText(`${gridSize} x ${gridSize} Grid`, canvas.width - 110, 225);
+        ctx.fillText(timeStr, canvas.width - 110, 265);
+        ctx.fillText(movesVal.toString(), canvas.width - 110, 305);
+
+        // Security Status Watermark (THE CORE FEATURE: Un-editable proof!)
+        ctx.textAlign = "center";
+        ctx.font = "bold 32px 'Orbitron', 'Segoe UI', sans-serif";
+        
+        if (isAuto) {
+            ctx.fillStyle = "rgba(250, 107, 91, 0.50)"; // Red transparent watermark
+            ctx.fillText("AUTO-SOLVED RECORD", canvas.width / 2, 385);
+            
+            ctx.fillStyle = "#e74c3c";
+            ctx.font = "bold 14px 'Segoe UI', sans-serif";
+            ctx.fillText("⚠️ SECURITY STATUS: NOT ELIGIBLE FOR LEADERBOARD ⚠️", canvas.width / 2, 415);
+        } else {
+            ctx.fillStyle = "rgba(128, 255, 195, 0.50)"; // Green transparent watermark
+            ctx.fillText("LEGITIMATE MANUAL PLAY", canvas.width / 2, 385);
+            
+            ctx.fillStyle = "#2ecc71";
+            ctx.font = "bold 14px 'Segoe UI', sans-serif";
+            ctx.fillText("🏆 SECURITY STATUS: 100% VERIFIED AUTHENTIC 🏆", canvas.width / 2, 415);
+        }
+
+        // Output to interactive DOM element
+        const finalImgUrl = canvas.toDataURL("image/png");
+        
+        certWrapper.innerHTML = `
+            <div class="generated-cert-container">
+                <img src="${finalImgUrl}" alt="Certified Puzzle Result" class="cert-image-preview">
+                <div class="cert-actions">
+                    <a href="${finalImgUrl}" download="Vocaloid_Puzzle_Result.png" class="modal-btn confirm" style="text-decoration:none; display:inline-block;">💾 Download Certificate</a>
+                    <button id="copy-cert-img-btn" class="modal-btn cancel">📋 Copy Image</button>
+                </div>
+            </div>
+        `;
+
+        // Bind image copying to clipboard logic
+        const copyImgBtn = document.getElementById('copy-cert-img-btn');
+        if (copyImgBtn) {
+            copyImgBtn.onclick = async () => {
+                try {
+                    // Modern clipboard async API (Canvas to Blob conversion)
+                    canvas.toBlob(async (blob) => {
+                        try {
+                            await navigator.clipboard.write([
+                                new ClipboardItem({ [blob.type]: blob })
+                            ]);
+                            const prevTxt = copyImgBtn.innerHTML;
+                            copyImgBtn.innerHTML = "✅ Copied Image!";
+                            setTimeout(() => copyImgBtn.innerHTML = prevTxt, 2000);
+                        } catch (err) {
+                            // Fallback if writing image is restricted
+                            showToast("Clipboard restricted. Please tap and hold or right click the certificate below to copy!");
+                        }
+                    }, 'image/png');
+                } catch (e) {
+                    showToast("Could not copy directly. Please download the image!");
+                }
+            };
+        }
     };
+    bgImg.src = fullImageURL;
 }
-
 
 function revealBlankTile() {
     const blankTile = document.getElementById('blank-tile-element');
@@ -498,29 +605,6 @@ function triggerAutoSolve() {
     }, stepDuration);
 }
 
-function setupSharingLinks(timeString, moves, isAuto) {
-    const currentURL = encodeURIComponent(window.location.href);
-    let textPrompt = "";
-    if (isAuto) {
-        textPrompt = `I attempted this ${currentTheme.title} Sliding Puzzle! My personal attempt before Auto Solve was ${timeString} with ${moves} moves! Can you solve it faster? 🧩✨`;
-    } else {
-        textPrompt = `I just solved the ${currentTheme.title} sliding puzzle in ${timeString} with only ${moves} moves! Can you beat my score? 🧩✨`;
-    }
-    const encodedText = encodeURIComponent(textPrompt);
-
-    // X / Twitter Sharing
-    const xBtn = document.getElementById('share-x-btn');
-    if (xBtn) {
-        xBtn.href = `https://twitter.com/intent/tweet?text=${encodedText}&url=${currentURL}`;
-    }
-
-    // Facebook Sharing
-    const fbBtn = document.getElementById('share-fb-btn');
-    if (fbBtn) {
-        fbBtn.href = `https://www.facebook.com/sharer/sharer.php?u=${currentURL}&quote=${encodedText}`;
-    }
-}
-
 function showToast(message) {
     const toast = document.getElementById('toast-notification');
     if (toast) {
@@ -530,12 +614,6 @@ function showToast(message) {
             toast.classList.remove('show');
         }, 4000);
     }
-}
-
-function shareInstagram() {
-    const displayTime = wasAutoSolved ? attemptTime : formatTime(elapsedSeconds);
-    const displayMoves = wasAutoSolved ? attemptMoves : movesCount;
-    showToast(`Time: ${displayTime} | Moves: ${displayMoves}. Screenshot your board and share to your story! Don't forget to include your time and move count for proof! 📸🌟`);
 }
 
 function showModificationModal() {

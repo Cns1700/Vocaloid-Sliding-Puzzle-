@@ -179,35 +179,35 @@ header p {
 /* Character Card Specific BG Images */
 .miku-original-card {
     --glow-color: #00ffcc;
-    background-image: url('BG-character-cards/Hatsune-Miku/Hatsune-Miku-card/futuristic-hub-bg.jpg');
+    background-image: url('BG-character-cards/Hatsune-Miku/Hatsune-Miku-card/futuristic-hub-bg.webp');
     background-size: cover;             
     background-position: center; 
 }
 
 .miku-supreme-card {
     --glow-color: #4da6ff;
-    background-image: url('BG-character-cards/Hatsune-Miku/Supreme-card/studiopratisaad0-diamond-642131_640edit.png');
+    background-image: url('BG-character-cards/Hatsune-Miku/Supreme-card/studiopratisaad0-diamond-642131_640edit.webp');
     background-size: cover;
     background-position: center;
 }
 
 .miku-honey-card {
     --glow-color: #ff007f;
-    background-image: url('BG-character-cards/Hatsune-Miku/Honey-Whip-card/geralt-arrangement-2801824_640-edit.png');
+    background-image: url('BG-character-cards/Hatsune-Miku/Honey-Whip-card/geralt-arrangement-2801824_640-edit.webp');
     background-size: cover;
     background-position: center;
 }
 
 .miku-25ji-card {
     --glow-color: #ff00ff;
-    background-image: url('BG-character-cards/Hatsune-Miku/25-ji-card/geralt-time-4728962_640.jpg');
+    background-image: url('BG-character-cards/Hatsune-Miku/25-ji-card/geralt-time-4728962_640.webp');
     background-size: cover;
     background-position: center;
 }
 
 .vflower-card {
     --glow-color: #9933ff;
-    background-image: url('BG-character-cards/VFlower-V3/darkmoon_art-balcony-8865325_1280.jpg');
+    background-image: url('BG-character-cards/VFlower-V3/darkmoon_art-balcony-8865325_1280.webp');
     background-size: cover;
     background-position: center;
 }

@@ -18,6 +18,7 @@ let stopwatchStarted = false;
 let isPaused = false;
 let gameWon = false;
 let wasAutoSolved = false;
+let isAutoSolving = false;
 
 // Saved user attempt stats prior to Auto Solve
 let attemptTime = "00:00:00";
@@ -140,7 +141,7 @@ function buildGrid(boardWidth, boardHeight) {
 
         // Click handler to trigger sliding transitions
         tile.addEventListener('click', () => {
-            if (isPaused || gameWon) return;
+            if (isPaused || gameWon || isAutoSolving) return;
             tryMoveTile(tileData);
         });
 
@@ -291,7 +292,8 @@ function checkVictory() {
                         <strong>Your Personal Attempt:</strong><br>
                         ⏱ Time: ${attemptTime} | 🔄 Moves: ${attemptMoves}<br><br>
                         <strong>Auto Solver (Optimal Path):</strong><br>
-                        ⏱ Time: ${timeString} | 🔄 Moves: ${movesCount}
+                        ⏱ Time: ${timeString} | 🔄 Moves: ${movesCount}<br><br>
+                        <em>I'll be updating this website on occasions so there may be times it's unavailable. If you have any questions, reach out via my X/Twitter account: https://x.com/MizuchiSylph</em>
                     `;
                 }
                 setupSharingLinks(attemptTime, attemptMoves, true);
@@ -300,7 +302,9 @@ function checkVictory() {
                     titleNode.innerHTML = `🎉 Congratulations!`;
                 }
                 if (msgNode) {
-                    msgNode.innerHTML = `You completed the sliding puzzle in <strong>${timeString}</strong> with <strong>${movesCount}</strong> total moves! 🏆✨`;
+                    msgNode.innerHTML = `You completed the sliding puzzle in <strong>${timeString}</strong> with <strong>${movesCount}</strong> total moves! 🏆✨<br><br>
+                    Good luck and have fun! <br><br>
+                    <em>I'll be updating this website on occasions so there may be times it's unavailable. If you have any questions, reach out via my X/Twitter account: https://x.com/MizuchiSylph</em>`;
                 }
                 setupSharingLinks(timeString, movesCount, false);
             }
@@ -414,8 +418,8 @@ function triggerHint() {
 }
 
 function triggerAutoSolve() {
-    if (isPaused || gameWon) return;
-
+    if (isPaused || gameWon || isAutoSolving) return;
+    
     // Save actual user game attempt statistics prior to Auto Solving
     attemptTime = formatTime(elapsedSeconds);
     attemptMoves = movesCount;
@@ -424,6 +428,7 @@ function triggerAutoSolve() {
     
     // Set game parameters
     wasAutoSolved = true;
+    isAutoSolving = true;
 
     // Reset visual board stopwatch and move tally to show optimal metrics dynamically in real-time
     elapsedSeconds = 0;
@@ -443,6 +448,7 @@ function triggerAutoSolve() {
 
     const solveInterval = setInterval(() => {
         if (moveHistory.length === 0) {
+            isAutoSolving = false;
             clearInterval(solveInterval);
             clearInterval(solverStopwatch);
             checkVictory();

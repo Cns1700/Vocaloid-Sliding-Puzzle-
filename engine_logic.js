@@ -283,17 +283,19 @@ function checkVictory() {
             const msgNode = document.getElementById('victory-message');
             const titleNode = document.getElementById('victory-title');
             
+            // Generate the text for sharing/copying
+            const shareText = wasAutoSolved 
+                ? `I attempted this ${currentTheme.title} Sliding Puzzle! My personal attempt before Auto Solve was ${attemptTime} with ${attemptMoves} moves! Can you solve it faster? 🧩✨`
+                : `I just solved the ${currentTheme.title} sliding puzzle in ${timeString} with only ${movesCount} moves! Can you beat my score? 🧩✨`;
+
             if (wasAutoSolved) {
-                if (titleNode) {
-                    titleNode.innerHTML = `❌ Try Again?`;
-                }
+                if (titleNode) titleNode.innerHTML = `❌ Try Again?`;
                 if (msgNode) {
                     msgNode.innerHTML = `
                         <strong>Your Personal Attempt:</strong><br>
                         ⏱ Time: ${attemptTime} | 🔄 Moves: ${attemptMoves}<br><br>
                         <strong>Auto Solver (Optimal Path):</strong><br>
-                        ⏱ Time: ${timeString} | 🔄 Moves: ${movesCount}<br><br>
-                        <em>I'll be updating this website on occasions so there may be times it's unavailable. If you have any questions, reach out via my X/Twitter account: https://x.com/MizuchiSylph</em>
+                        ⏱ Time: ${timeString} | 🔄 Moves: ${movesCount}
                     `;
                 }
                 setupSharingLinks(attemptTime, attemptMoves, true);
@@ -303,15 +305,43 @@ function checkVictory() {
                 }
                 if (msgNode) {
                     msgNode.innerHTML = `You completed the sliding puzzle in <strong>${timeString}</strong> with <strong>${movesCount}</strong> total moves! 🏆✨<br><br>
-                    Good luck and have fun! <br><br>
-                    <em>I'll be updating this website on occasions so there may be times it's unavailable. If you have any questions, reach out via my X/Twitter account: https://x.com/MizuchiSylph</em>`;
+                    Good luck and have fun!`;
                 }
                 setupSharingLinks(timeString, movesCount, false);
             }
+            
+            // Add or update the Copy button in the modal
+            addCopyButtonToModal(shareText);
+            
             showVictoryModal();
         }, 600);
     }
 }
+
+// Helper to inject the copy-to-clipboard button dynamically
+function addCopyButtonToModal(textToCopy) {
+    const actions = document.querySelector('#victory-modal-overlay .modal-actions');
+    if (!actions) return;
+
+    let copyBtn = document.getElementById('copy-result-btn');
+    if (!copyBtn) {
+        copyBtn = document.createElement('button');
+        copyBtn.id = 'copy-result-btn';
+        copyBtn.className = 'modal-btn cancel';
+        copyBtn.innerHTML = '📋 Copy Score';
+        actions.appendChild(copyBtn);
+    }
+
+    // Refresh listener for the current score text
+    copyBtn.onclick = () => {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '✅ Copied!';
+            setTimeout(() => copyBtn.innerHTML = originalText, 2000);
+        });
+    };
+}
+
 
 function revealBlankTile() {
     const blankTile = document.getElementById('blank-tile-element');
@@ -505,7 +535,7 @@ function showToast(message) {
 function shareInstagram() {
     const displayTime = wasAutoSolved ? attemptTime : formatTime(elapsedSeconds);
     const displayMoves = wasAutoSolved ? attemptMoves : movesCount;
-    showToast(`Time: ${displayTime} | Moves: ${displayMoves}. Take a screenshot of your solved board and share it to your story! 📸🌟`);
+    showToast(`Time: ${displayTime} | Moves: ${displayMoves}. Screenshot your board and share to your story! Don't forget to include your time and move count for proof! 📸🌟`);
 }
 
 function showModificationModal() {

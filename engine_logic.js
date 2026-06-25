@@ -1,7 +1,8 @@
 const container = document.getElementById('puzzle-container');
 
 // Core grid & state parameters
-let gridSize = 3; // Default to 3x3 sliding grid
+let gridRows = 3; // Default rows
+let gridCols = 3; // Default columns
 let tiles = []; // 1D representation of the board cells
 let blankRow = 2; // Position tracking for empty slot
 let blankCol = 2;
@@ -10,6 +11,8 @@ let hintsLeft = 3;
 
 // History tracking to support legal step-by-step backtracking solver
 let moveHistory = [];
+// State history tracking to eliminate redundant loops in pathing
+let stateHistory = [];
 
 // Stopwatch parameters
 let elapsedSeconds = 0;
@@ -63,6 +66,20 @@ document.addEventListener('DOMContentLoaded', () => {
     setupSlidingPuzzle();
 });
 
+// Generates a lightweight unique string key of the current board layout to detect repeats
+function getBoardStateString() {
+    const stateGrid = new Array(gridRows * gridCols).fill(-1);
+    tiles.forEach(tile => {
+        if (tile) {
+            const idx = tile.currentRow * gridCols + tile.currentCol;
+            stateGrid[idx] = tile.id;
+        }
+    });
+    const blankIdx = blankRow * gridCols + blankCol;
+    stateGrid[blankIdx] = -1;
+    return stateGrid.join(',');
+}
+
 function setupSlidingPuzzle() {
     resetStopwatch();
     movesCount = 0;
@@ -70,6 +87,7 @@ function setupSlidingPuzzle() {
     gameWon = false;
     wasAutoSolved = false;
     moveHistory = [];
+    stateHistory = [];
     
     // Reset visual hints count display
     const hintCountNode = document.getElementById('hints-count');
@@ -104,12 +122,12 @@ function buildGrid(boardWidth, boardHeight) {
     container.innerHTML = '';
     tiles = [];
     
-    const tileWidth = boardWidth / gridSize;
-    const tileHeight = boardHeight / gridSize;
+    const tileWidth = boardWidth / gridCols;
+    const tileHeight = boardHeight / gridRows;
 
-    const totalTilesCount = gridSize * gridSize;
-    blankRow = gridSize - 1;
-    blankCol = gridSize - 1;
+    const totalTilesCount = gridRows * gridCols;
+    blankRow = gridRows - 1;
+    blankCol = gridCols - 1;
 
     // Generate tiles for all cells except the last slot (which remains empty)
     for (let i = 0; i < totalTilesCount - 1; i++) {
@@ -118,8 +136,8 @@ function buildGrid(boardWidth, boardHeight) {
         tile.style.width = `${tileWidth}px`;
         tile.style.height = `${tileHeight}px`;
 
-        const correctRow = Math.floor(i / gridSize);
-        const correctCol = i % gridSize;
+        const correctRow = Math.floor(i / gridCols);
+        const correctCol = i % gridCols;
 
         // Clip background slice parameters corresponding to correct coordinates
         tile.style.backgroundImage = `url('${fullImageURL}')`;
@@ -164,9 +182,9 @@ function buildGrid(boardWidth, boardHeight) {
     blankTile.style.height = `${tileHeight}px`;
     blankTile.style.backgroundImage = `url('${fullImageURL}')`;
     blankTile.style.backgroundSize = `${boardWidth}px ${boardHeight}px`;
-    blankTile.style.backgroundPosition = `-${(gridSize - 1) * tileWidth}px -${(gridSize - 1) * tileHeight}px`;
-    blankTile.style.left = `${(gridSize - 1) * tileWidth}px`;
-    blankTile.style.top = `${(gridSize - 1) * tileHeight}px`;
+    blankTile.style.backgroundPosition = `-${(gridCols - 1) * tileWidth}px -${(gridRows - 1) * tileHeight}px`;
+    blankTile.style.left = `${(gridCols - 1) * tileWidth}px`;
+    blankTile.style.top = `${(gridRows - 1) * tileHeight}px`;
     blankTile.style.opacity = '0';
     blankTile.style.display = 'none';
     container.appendChild(blankTile);
@@ -186,11 +204,6 @@ function tryMoveTile(tile, isInteractive = true) {
             startStopwatch();
         }
 
-        // Track and log the moves into history with quick backtrack cancellation optimization
-        if (isInteractive) {
-            pushMoveToHistory(tile.id);
-        }
-
         // Swap coordinates
         const tempRow = tile.currentRow;
         const tempCol = tile.currentCol;
@@ -202,12 +215,14 @@ function tryMoveTile(tile, isInteractive = true) {
         blankCol = tempCol;
 
         // Trigger visual sliding movement translation
-        const tileWidth = container.clientWidth / gridSize;
-        const tileHeight = container.clientHeight / gridSize;
+        const tileWidth = container.clientWidth / gridCols;
+        const tileHeight = container.clientHeight / gridRows;
         tile.element.style.left = `${tile.currentCol * tileWidth}px`;
         tile.element.style.top = `${tile.currentRow * tileHeight}px`;
 
+        // Track and log the moves with live loop elimination
         if (isInteractive) {
+            pushMoveToHistory(tile.id);
             movesCount++;
             updateMovesDisplay();
             checkVictory();
@@ -215,11 +230,17 @@ function tryMoveTile(tile, isInteractive = true) {
     }
 }
 
+// Optimized move stack recorder that instantly prunes circular movements on-the-fly
 function pushMoveToHistory(tileId) {
-    // If the player slides a piece, then immediately slides it back, remove it to optimize solver pathing!
-    if (moveHistory.length > 0 && moveHistory[moveHistory.length - 1] === tileId) {
-        moveHistory.pop();
+    const currentState = getBoardStateString();
+    const existingIndex = stateHistory.indexOf(currentState);
+
+    if (existingIndex !== -1) {
+        // Player returned to a state they've already been in! Trim out the wasted loop steps.
+        stateHistory.splice(existingIndex + 1);
+        moveHistory.splice(existingIndex);
     } else {
+        stateHistory.push(currentState);
         moveHistory.push(tileId);
     }
 }
@@ -234,7 +255,10 @@ function repositionAllTiles(tileWidth, tileHeight) {
 }
 
 function shuffleBoard() {
-    const shuffleSteps = gridSize * gridSize * 40;
+    const shuffleSteps = gridRows * gridCols * 40;
+    
+    moveHistory = [];
+    stateHistory = [getBoardStateString()];
 
     for (let step = 0; step < shuffleSteps; step++) {
         // Collect all currently slidable tiles next to the empty cell
@@ -248,9 +272,6 @@ function shuffleBoard() {
         if (options.length > 0) {
             // Perform random coordinate swaps
             const choice = options[Math.floor(Math.random() * options.length)];
-            
-            // Record shuffled coordinate swaps directly into solving path history
-            pushMoveToHistory(choice.id);
 
             const tempRow = choice.currentRow;
             const tempCol = choice.currentCol;
@@ -260,6 +281,18 @@ function shuffleBoard() {
 
             blankRow = tempRow;
             blankCol = tempCol;
+
+            // Instantly eliminate circular state paths during shuffle generation
+            const currentState = getBoardStateString();
+            const existingIndex = stateHistory.indexOf(currentState);
+
+            if (existingIndex !== -1) {
+                stateHistory.splice(existingIndex + 1);
+                moveHistory.splice(existingIndex);
+            } else {
+                stateHistory.push(currentState);
+                moveHistory.push(choice.id);
+            }
         }
     }
 }
@@ -363,7 +396,6 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         // Player Name or Greeting
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 22px 'Segoe UI', sans-serif";
-        // Personalization: Using beloved master tag
         const masterGreeting = isAuto ? "Auto Solver System" : "Player";
         ctx.fillText(`Achieved By: ${masterGreeting}`, canvas.width / 2, 160);
 
@@ -385,7 +417,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         ctx.textAlign = "right";
         ctx.fillStyle = "#ffffff";
         ctx.font = "bold 16px 'Share Tech Mono', monospace";
-        ctx.fillText(`${gridSize} x ${gridSize} Grid`, canvas.width - 110, 225);
+        ctx.fillText(`${gridRows} x ${gridCols} Grid`, canvas.width - 110, 225);
         ctx.fillText(timeStr, canvas.width - 110, 265);
         ctx.fillText(movesVal.toString(), canvas.width - 110, 305);
 
@@ -580,9 +612,8 @@ function triggerAutoSolve() {
         updateTimerDisplay();
     }, 1000);
 
-    // Periodical stepping speed configuration (300ms per slide is visually clear, moderate and clean!)
-    const stepDuration = 300;
-
+    // Calculate dynamic step speed based on remaining moves. 
+    // Fewer moves = nice and readable (200ms). Many moves = blistering lightning execution (80ms).
     const solveInterval = setInterval(() => {
         if (moveHistory.length === 0) {
             isAutoSolving = false;
@@ -602,7 +633,7 @@ function triggerAutoSolve() {
             movesCount++;
             updateMovesDisplay();
         }
-    }, stepDuration);
+    }, Math.max(80, Math.min(200, Math.floor(1800 / (moveHistory.length || 1)))));
 }
 
 function showToast(message) {
@@ -618,8 +649,10 @@ function showToast(message) {
 
 function showModificationModal() {
     const overlay = document.getElementById('mod-modal-overlay');
-    const input = document.getElementById('grid-size-input');
-    if (input) input.value = gridSize;
+    const rowsInput = document.getElementById('grid-rows-input');
+    const colsInput = document.getElementById('grid-cols-input');
+    if (rowsInput) rowsInput.value = gridRows;
+    if (colsInput) colsInput.value = gridCols;
     if (overlay) overlay.classList.add('show');
 }
 
@@ -629,16 +662,27 @@ function hideModificationModal() {
 }
 
 function submitGridModification() {
-    const input = document.getElementById('grid-size-input');
-    const size = parseInt(input.value);
+    const rowsInput = document.getElementById('grid-rows-input');
+    const colsInput = document.getElementById('grid-cols-input');
+    const rows = parseInt(rowsInput.value);
+    const cols = parseInt(colsInput.value);
     
-    if (isNaN(size) || size < 3 || size > 8) {
-        input.style.borderColor = "#ff007f";
-        setTimeout(() => { input.style.borderColor = ""; }, 1000);
-        return;
+    let hasError = false;
+    if (isNaN(rows) || rows < 3 || rows > 8) {
+        rowsInput.style.borderColor = "#ff007f";
+        setTimeout(() => { rowsInput.style.borderColor = ""; }, 1000);
+        hasError = true;
+    }
+    if (isNaN(cols) || cols < 3 || cols > 8) {
+        colsInput.style.borderColor = "#ff007f";
+        setTimeout(() => { colsInput.style.borderColor = ""; }, 1000);
+        hasError = true;
     }
     
-    gridSize = size;
+    if (hasError) return;
+    
+    gridRows = rows;
+    gridCols = cols;
     hideModificationModal();
     setupSlidingPuzzle();
 }

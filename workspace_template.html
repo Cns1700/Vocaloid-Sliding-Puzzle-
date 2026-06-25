@@ -34,8 +34,20 @@
     <div id="mod-modal-overlay" class="modal-overlay">
         <div class="modal-card" id="mod-modal-card">
             <h2>🔧 Grid Customization</h2>
-            <p>Select the desired dimension for your sliding grid:<br><small>(Choose a size from 3x3 up to 8x8)</small></p>
-            <input type="number" id="grid-size-input" min="3" max="8" value="3">
+            <p>Select the desired dimensions for your sliding grid:<br><small>(Rows and Columns can be set from 3 to 8 independently)</small></p>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; align-items: center;">
+                <div>
+                    <label for="grid-rows-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Rows</label>
+                    <input type="number" id="grid-rows-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;">
+                </div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--modal-theme-color); margin-top: 15px;">✕</div>
+                <div>
+                    <label for="grid-cols-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Columns</label>
+                    <input type="number" id="grid-cols-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;">
+                </div>
+            </div>
+
             <div class="modal-actions">
                 <button class="modal-btn cancel" onclick="hideModificationModal()">Cancel</button>
                 <button class="modal-btn confirm" onclick="submitGridModification()">Apply Grid</button>

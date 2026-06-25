@@ -11,40 +11,40 @@
         <h1 id="game-title">Loading Puzzle...</h1>
     </header>
 
-    <div class="controls">
+    <main class="controls" aria-label="Game controls and stats">
         <a href="index.html" class="back-btn">⬅ Back to Gallery</a>
-        <button class="size-btn" onclick="showModificationModal()">🔧 Grid Settings</button>
+        <button class="size-btn" onclick="showModificationModal()" aria-haspopup="dialog" aria-controls="mod-modal-overlay">🔧 Grid Settings</button>
         
-        <!-- Live Stopwatch Timer Display -->
-        <div id="timer-display" class="timer-banner">⏱ 00:00:00</div>
+        <!-- Live Stopwatch Timer Display with Polite Live Region -->
+        <div id="timer-display" class="timer-banner" role="status" aria-live="polite" aria-label="Elapsed Time">⏱ 00:00:00</div>
         
-        <!-- Real-Time Move Counter Display -->
-        <div id="move-display" class="timer-banner">Moves: 0</div>
+        <!-- Real-Time Move Counter Display with Polite Live Region -->
+        <div id="move-display" class="timer-banner" role="status" aria-live="polite" aria-label="Moves Count">Moves: 0</div>
         
         <!-- Interactive Game Control Buttons -->
         <button id="pause-btn" class="size-btn" onclick="togglePauseGame()">⏸ Pause</button>
         <button id="hint-btn" class="size-btn" onclick="triggerHint()">💡 Hint (<span id="hints-count">3</span> left)</button>
         <button id="solve-btn" class="size-btn" onclick="triggerAutoSolve()">🤖 Auto Solve</button>
-    </div>
+    </main>
 
     <!-- Main expansive sliding tile board container -->
-    <div id="puzzle-container"></div>
+    <div id="puzzle-container" role="grid" aria-label="Sliding Puzzle Grid Board"></div>
 
     <!-- Custom Grid Modification Modal Overlay (3x3 to 8x8) -->
-    <div id="mod-modal-overlay" class="modal-overlay">
+    <div id="mod-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mod-modal-title" aria-describedby="mod-modal-desc" aria-hidden="true">
         <div class="modal-card" id="mod-modal-card">
-            <h2>🔧 Grid Customization</h2>
-            <p>Select the desired dimensions for your sliding grid:<br><small>(Rows and Columns can be set from 3 to 8 independently)</small></p>
+            <h2 id="mod-modal-title">🔧 Grid Customization</h2>
+            <p id="mod-modal-desc">Select the desired dimensions for your sliding grid:<br><small>(Rows and Columns can be set from 3 to 8 independently)</small></p>
             
             <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; align-items: center;">
                 <div>
-                    <label for="grid-rows-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Rows</label>
-                    <input type="number" id="grid-rows-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;">
+                    <label id="rows-label" for="grid-rows-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Rows</label>
+                    <input type="number" id="grid-rows-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;" aria-labelledby="rows-label">
                 </div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--modal-theme-color); margin-top: 15px;">✕</div>
+                <div style="font-size: 1.5rem; font-weight: bold; color: var(--modal-theme-color); margin-top: 15px;" aria-hidden="true">✕</div>
                 <div>
-                    <label for="grid-cols-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Columns</label>
-                    <input type="number" id="grid-cols-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;">
+                    <label id="cols-label" for="grid-cols-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Columns</label>
+                    <input type="number" id="grid-cols-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;" aria-labelledby="cols-label">
                 </div>
             </div>
 
@@ -56,10 +56,10 @@
     </div>
 
     <!-- Custom Pause Screen Modal Overlay -->
-    <div id="pause-modal-overlay" class="modal-overlay">
+    <div id="pause-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-modal-title" aria-describedby="pause-modal-desc" aria-hidden="true">
         <div class="modal-card">
-            <h2>⏸ Game Paused</h2>
-            <p>The sliding puzzle is paused!<br><small>Click below to resume your puzzle adventure!</small></p>
+            <h2 id="pause-modal-title">⏸ Game Paused</h2>
+            <p id="pause-modal-desc">The sliding puzzle is paused!<br><small>Click below to resume your puzzle adventure!</small></p>
             <div class="modal-actions">
                 <button class="modal-btn confirm" onclick="togglePauseGame()">▶ Resume Game</button>
             </div>
@@ -67,7 +67,7 @@
     </div>
 
     <!-- Custom Victory Celebration Modal Overlay with Upgraded Certificate Area -->
-    <div id="victory-modal-overlay" class="modal-overlay">
+    <div id="victory-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="victory-title" aria-describedby="victory-message" aria-hidden="true">
         <div class="modal-card" id="victory-modal-card" style="width: 550px; max-width: 95%;">
             <h2 id="victory-title">🎉 Congratulations!</h2>
             <p id="victory-message">You have successfully completed the sliding puzzle!</p>
@@ -88,7 +88,7 @@
     </div>
 
     <!-- Custom Toast Overlay for in-app alert notifications -->
-    <div id="toast-notification" class="toast-container"></div>
+    <div id="toast-notification" class="toast-container" role="alert" aria-live="assertive"></div>
 
     <script src="engine_logic.js"></script>
 </body>

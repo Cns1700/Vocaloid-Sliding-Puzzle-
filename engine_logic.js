@@ -27,6 +27,9 @@ let isAutoSolving = false;
 let attemptTime = "00:00:00";
 let attemptMoves = 0;
 
+// Track previously focused element for accessible modal focus restoration
+let lastFocusedElement = null;
+
 const themes = {
     'miku-original': { title: 'Hatsune Miku (Original) 🎼', color: '#00ffcc', img: 'Puzzles/Hatsune-Miku/Hatsune-Miku-images/' },
     'miku-supreme': { title: 'Hatsune Miku (Supreme) 👑', color: '#4da6ff', img: 'Puzzles/Hatsune-Miku/Supreme-images/' },
@@ -131,8 +134,10 @@ function buildGrid(boardWidth, boardHeight) {
 
     // Generate tiles for all cells except the last slot (which remains empty)
     for (let i = 0; i < totalTilesCount - 1; i++) {
-        const tile = document.createElement('div');
+        // Semantic Change: Generated as a button for native accessibility & keyboard tab index paths
+        const tile = document.createElement('button');
         tile.classList.add('puzzle-piece');
+        tile.setAttribute('type', 'button');
         tile.style.width = `${tileWidth}px`;
         tile.style.height = `${tileHeight}px`;
 
@@ -151,6 +156,9 @@ function buildGrid(boardWidth, boardHeight) {
         hintOverlay.style.display = 'none';
         tile.appendChild(hintOverlay);
 
+        // Bind accessibility descriptive strings dynamically
+        tile.setAttribute('aria-label', `Tile ${i + 1}. Position: Row ${correctRow + 1}, Column ${correctCol + 1}`);
+
         // Bind metadata coordinates
         const tileData = {
             id: i,
@@ -165,6 +173,15 @@ function buildGrid(boardWidth, boardHeight) {
         tile.addEventListener('click', () => {
             if (isPaused || gameWon || isAutoSolving) return;
             tryMoveTile(tileData);
+        });
+
+        // Add Keydown Handler to allow keyboard users to solve the puzzle natively
+        tile.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault(); // Stop standard spacebar scrolling page jumps
+                if (isPaused || gameWon || isAutoSolving) return;
+                tryMoveTile(tileData);
+            }
         });
 
         tiles.push(tileData);
@@ -187,6 +204,7 @@ function buildGrid(boardWidth, boardHeight) {
     blankTile.style.top = `${(gridRows - 1) * tileHeight}px`;
     blankTile.style.opacity = '0';
     blankTile.style.display = 'none';
+    blankTile.setAttribute('aria-hidden', 'true'); // Hide structural artifact from screen readers
     container.appendChild(blankTile);
 
     // Shuffle the puzzle board through guaranteed solvable sliding moves
@@ -219,6 +237,9 @@ function tryMoveTile(tile, isInteractive = true) {
         const tileHeight = container.clientHeight / gridRows;
         tile.element.style.left = `${tile.currentCol * tileWidth}px`;
         tile.element.style.top = `${tile.currentRow * tileHeight}px`;
+
+        // Update accessibility label dynamically with the new layout coordinates
+        tile.element.setAttribute('aria-label', `Tile ${tile.id + 1}. Position: Row ${tile.currentRow + 1}, Column ${tile.currentCol + 1}`);
 
         // Track and log the moves with live loop elimination
         if (isInteractive) {
@@ -648,17 +669,30 @@ function showToast(message) {
 }
 
 function showModificationModal() {
+    lastFocusedElement = document.activeElement;
     const overlay = document.getElementById('mod-modal-overlay');
     const rowsInput = document.getElementById('grid-rows-input');
     const colsInput = document.getElementById('grid-cols-input');
     if (rowsInput) rowsInput.value = gridRows;
     if (colsInput) colsInput.value = gridCols;
-    if (overlay) overlay.classList.add('show');
+    if (overlay) {
+        overlay.classList.add('show');
+        overlay.setAttribute('aria-hidden', 'false');
+        // Set focus inside modal dynamically for immediate keyboard interaction
+        setTimeout(() => { if (rowsInput) rowsInput.focus(); }, 100);
+    }
 }
 
 function hideModificationModal() {
     const overlay = document.getElementById('mod-modal-overlay');
-    if (overlay) overlay.classList.remove('show');
+    if (overlay) {
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+    }
+    // Restore focus to original trigger element cleanly
+    if (lastFocusedElement) {
+        lastFocusedElement.focus();
+    }
 }
 
 function submitGridModification() {
@@ -683,18 +717,33 @@ function submitGridModification() {
     
     gridRows = rows;
     gridCols = cols;
+    
+    // Hide overlay semantics
+    const overlay = document.getElementById('mod-modal-overlay');
+    if (overlay) overlay.setAttribute('aria-hidden', 'true');
+    
     hideModificationModal();
     setupSlidingPuzzle();
 }
 
 function showVictoryModal() {
+    lastFocusedElement = document.activeElement;
     const overlay = document.getElementById('victory-modal-overlay');
-    if (overlay) overlay.classList.add('show');
+    if (overlay) {
+        overlay.classList.add('show');
+        overlay.setAttribute('aria-hidden', 'false');
+        // Shift screen-reader focus cleanly to victory window
+        const titleNode = document.getElementById('victory-title');
+        if (titleNode) setTimeout(() => { titleNode.setAttribute('tabindex', '-1'); titleNode.focus(); }, 100);
+    }
 }
 
 function restartCurrentPuzzle() {
     const overlay = document.getElementById('victory-modal-overlay');
-    if (overlay) overlay.classList.remove('show');
+    if (overlay) {
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+    }
     setupSlidingPuzzle();
 }
 
@@ -709,7 +758,10 @@ function setupVictoryModalMinimizeButton() {
         minBtn.innerHTML = 'View Board 🖼️';
         minBtn.addEventListener('click', () => {
             const overlay = document.getElementById('victory-modal-overlay');
-            if (overlay) overlay.classList.remove('show');
+            if (overlay) {
+                overlay.classList.remove('show');
+                overlay.setAttribute('aria-hidden', 'true');
+            }
             showRestoreButton();
         });
         actions.appendChild(minBtn);
@@ -731,7 +783,10 @@ function showRestoreButton() {
         restoreBtn.innerHTML = '🏆 Show Victory Menu';
         restoreBtn.addEventListener('click', () => {
             const overlay = document.getElementById('victory-modal-overlay');
-            if (overlay) overlay.classList.add('show');
+            if (overlay) {
+                overlay.classList.add('show');
+                overlay.setAttribute('aria-hidden', 'false');
+            }
             restoreBtn.style.display = 'none';
         });
         document.body.appendChild(restoreBtn);

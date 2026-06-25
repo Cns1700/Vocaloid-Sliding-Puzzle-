@@ -445,37 +445,55 @@ header p {
         drop-shadow(-1px -1px 0.5px rgba(0, 0, 0, 0.6));
 }
 
-/* Clean numerical overlays displayed upon clicking "Hint" (With Perfect Center Alignment) */
-.tile-hint-number {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(17, 26, 34, 0.95);
-    border: 2.5px solid var(--modal-theme-color, #00ffcc);
-    color: #ffffff;
-    font-size: 1.4rem;
-    font-weight: 900;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    
-    /* Perfect Center Grid Alignment */
-    display: inline-grid;
-    place-items: center;
-    align-content: center;
-    justify-content: center;
-    text-align: center;
-    
-    /* Corrects text shift artifacts across different font engines */
-    line-height: 0; 
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    
-    box-shadow: 0 0 12px var(--modal-theme-color, rgba(0, 255, 204, 0.65));
-    pointer-events: none;
-    z-index: 10;
+/*Clean numerical overlays displayed upon clicking "Hint" (With Perfect Center Alignment) */ 
+.tile-hint-number { 
+position: absolute; 
+top: 50%; 
+left: 50%; 
+transform: translate(-50%, -50%); 
+background: rgba(17, 26, 34, 0.95); 
+border: 2.5px solid var(--modal-theme-color, #00ffcc); 
+color: #ffffff; 
+font-size: 1.4rem; 
+font-weight: 900; 
+width: 40px; 
+height: 40px; 
+border-radius: 50%;
+
+/* Perfect Center Grid Alignment */
+display: inline-grid;
+place-items: center;
+align-content: center;
+justify-content: center;
+text-align: center;
+
+/* Corrects text shift artifacts across different font engines */
+line-height: 0; 
+padding: 0;
+margin: 0;
+box-sizing: border-box;
+box-shadow: 0 0 12px var(--modal-theme-color, rgba(0, 255, 204, 0.65));
+pointer-events: none;
+z-index: 10;
+}
+/* == Accessible Keyboard Focus Rings and Button Resets for Dynamic Grid Elements == */
+button:focus-visible, a:focus-visible, input:focus-visible { 
+outline: 3px solid var(--modal-theme-color, #00ffcc); 
+outline-offset: 3px; 
+box-shadow: 0 0 12px var(--modal-theme-color, rgba(0, 255, 204, 0.85)); 
+}
+
+/* Specific reset when the .puzzle-piece is generated as a <button> element */ 
+button.puzzle-piece { background-color: transparent; 
+padding: 0; 
+margin: 0; 
+font-family: inherit; 
+color: inherit; 
+text-align: inherit; }
+button.puzzle-piece:focus-visible { 
+outline-offset: -3px; 
+/* Keeps the focus glow contained precisely inside the tile boundaries */ 
+box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc); 
 }
 
 /* Custom Interactive Modals (Popup Overlays) */

@@ -363,19 +363,20 @@ header p {
 /* Gallery Hover Pop Preview Window */
 .hover-preview-pop {
     position: absolute;
-    width: 250px;
-    height: 150px;
-    background-size: contain; 
+    width: 280px;
+    height: 200px;
+    background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    background-color: rgba(17, 26, 34, 0.95); 
+    background-color: rgba(17, 26, 34, 0.95);
     border: 3px solid var(--modal-theme-color, #ff69b4);
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    pointer-events: none; 
+    pointer-events: none;
+    image-rendering: auto;
     opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-    z-index: 9999;
+    transition: opacity 0.15s ease;
+    z-index: 1000;
 }
 
 /* Game Interface Page Controls */

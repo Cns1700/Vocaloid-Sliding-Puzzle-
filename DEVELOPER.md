@@ -20,7 +20,8 @@ Live builds:
 | `style_sheet.css` | All styling: gallery, board, modals, certificate preview, responsive / itch-friendly media queries. |
 | `gallery-preview.js` | Hover preview on gallery thumbnails (deferred). |
 | `Puzzles/` | Full-resolution illustrations (loaded only when a puzzle is opened). |
-| `thumbs/` | Small WebP gallery thumbnails (~2–6 KB each). **Required** on the gallery page. |
+| `thumbs/` | Small WebP gallery strip thumbnails. **Required** on the gallery page. |
+| `previews/` | Medium WebP hover previews (~15–90 KB). Used by `data-preview` on thumb links. |
 | `BG-character-cards/` | Card background art for the gallery. |
 | `BG-Freepik/` | Page background art. |
 | `screenshots/` | PNGs for the player READMEs (GitHub). |

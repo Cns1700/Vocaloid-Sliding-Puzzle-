@@ -1,20 +1,39 @@
+/* ============================================================
+   Vocaloid Sliding Puzzle — engine_logic.js
+   Cleaned + real A* Auto Solve (Item 1–3 combined review)
+
+   Sections (search for "===="):
+     1. GLOBAL STATE & THEMES
+     2. BOARD STATE KEYS & HISTORY
+     3. SETUP / GRID BUILD / SHUFFLE
+     4. MOVE HANDLING
+     5. A* SOLVER (Auto Solve)
+     6. VICTORY & CERTIFICATE
+     7. STOPWATCH / PAUSE / HINT
+     8. MODALS & UI HELPERS
+   ============================================================ */
+
+// ============================================================
+// 1. GLOBAL STATE & THEMES
+// ============================================================
+
 const container = document.getElementById('puzzle-container');
 
 // Core grid & state parameters
-let gridRows = 3; // Default rows
-let gridCols = 3; // Default columns
-let tiles = []; // 1D representation of the board cells
-let blankRow = 2; // Position tracking for empty slot
+let gridRows = 3;
+let gridCols = 3;
+let tiles = [];          // array of tile objects (or null for blank slot in the logical array)
+let blankRow = 2;
 let blankCol = 2;
 let movesCount = 0;
 let hintsLeft = 3;
 
-// History tracking to support legal step-by-step backtracking solver
+// History tracking (used for cycle pruning during play + shuffle, and as A* fallback)
 let moveHistory = [];
-// State history tracking to eliminate redundant loops in pathing
 let stateHistory = [];
+let visitedStates = new Set();
 
-// Stopwatch parameters
+// Stopwatch / game flags
 let elapsedSeconds = 0;
 let stopwatchInterval = null;
 let stopwatchStarted = false;
@@ -27,26 +46,24 @@ let isAutoSolving = false;
 let attemptTime = "00:00:00";
 let attemptMoves = 0;
 
-// Track previously focused element for accessible modal focus restoration
+// Accessibility focus restoration
 let lastFocusedElement = null;
 
 const themes = {
     'miku-original': { title: 'Hatsune Miku (Original) 🎼', color: '#00ffcc', img: 'Puzzles/Hatsune-Miku/Hatsune-Miku-images/' },
-    'miku-supreme': { title: 'Hatsune Miku (Supreme) 👑', color: '#4da6ff', img: 'Puzzles/Hatsune-Miku/Supreme-images/' },
-    'miku-honey': { title: 'Hatsune Miku (Honey Whip) 🦋', color: '#ff007f', img: 'Puzzles/Hatsune-Miku/Honey-Whip-images/' },
-    'miku-25ji': { title: 'Hatsune Miku (25-ji) ⚫⚪', color: '#ff00ff', img: 'Puzzles/Hatsune-Miku/25-ji-images/' },
-    'vflower': { title: 'VFlower (V3) 🌺', color: '#9933ff', img: 'Puzzles/VFlower-V3/' }
+    'miku-supreme':  { title: 'Hatsune Miku (Supreme) 👑',  color: '#4da6ff', img: 'Puzzles/Hatsune-Miku/Supreme-images/' },
+    'miku-honey':    { title: 'Hatsune Miku (Honey Whip) 🦋', color: '#ff007f', img: 'Puzzles/Hatsune-Miku/Honey-Whip-images/' },
+    'miku-25ji':     { title: 'Hatsune Miku (25-ji) ⚫⚪',   color: '#ff00ff', img: 'Puzzles/Hatsune-Miku/25-ji-images/' },
+    'vflower':       { title: 'VFlower (V3) 🌺',            color: '#9933ff', img: 'Puzzles/VFlower-V3/' }
 };
 
-// Parse URL parameters to fetch the chosen character and image file
 const urlParams = new URLSearchParams(window.location.search);
 const activeKey = urlParams.get('char') || 'miku-original';
 const puzzleFile = urlParams.get('puzzle') || 'Cyber_Miku_1.jpg';
-
 const currentTheme = themes[activeKey] || themes['miku-original'];
 const fullImageURL = `${currentTheme.img}${puzzleFile}`;
 
-// Helper function to dynamically wrap emojis to strip text-effects and preserve colors
+// Helper: wrap emojis so text-shadow / effects do not recolor them
 function wrapEmojis(text) {
     const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
     return text.replace(emojiRegex, '<span class="plain-emoji">$1</span>');
@@ -58,30 +75,57 @@ document.addEventListener('DOMContentLoaded', () => {
         gameTitleNode.innerHTML = wrapEmojis(currentTheme.title);
         gameTitleNode.style.textShadow = `0 0 15px ${currentTheme.color}`;
     }
-    
-    // Apply theme-specific accent color variables
     document.documentElement.style.setProperty('--modal-theme-color', currentTheme.color);
-
-    // Initialize the view board minimize trigger listener
     setupVictoryModalMinimizeButton();
-
-    // Initialize the puzzle grid setup
     setupSlidingPuzzle();
 });
 
-// Generates a lightweight unique string key of the current board layout to detect repeats
-function getBoardStateString() {
-    const stateGrid = new Array(gridRows * gridCols).fill(-1);
-    tiles.forEach(tile => {
+
+// ============================================================
+// 2. BOARD STATE KEYS & HISTORY
+// ============================================================
+
+/** Compact unique key of the current board for cycle detection. */
+function getBoardStateKey() {
+    const total = gridRows * gridCols;
+    const stateGrid = new Array(total);
+    for (let i = 0; i < total; i++) stateGrid[i] = -1;
+
+    for (let i = 0; i < tiles.length; i++) {
+        const tile = tiles[i];
         if (tile) {
-            const idx = tile.currentRow * gridCols + tile.currentCol;
-            stateGrid[idx] = tile.id;
+            stateGrid[tile.currentRow * gridCols + tile.currentCol] = tile.id;
         }
-    });
-    const blankIdx = blankRow * gridCols + blankCol;
-    stateGrid[blankIdx] = -1;
+    }
+    stateGrid[blankRow * gridCols + blankCol] = -1;
     return stateGrid.join(',');
 }
+
+/**
+ * Records a move and prunes cycles (player returned to a previous board state).
+ * Keeps an ordered path so moveHistory can be truncated correctly.
+ */
+function pushMoveToHistory(tileId) {
+    const currentState = getBoardStateKey();
+
+    if (visitedStates.has(currentState)) {
+        const existingIndex = stateHistory.indexOf(currentState);
+        if (existingIndex !== -1) {
+            stateHistory.length = existingIndex + 1;
+            moveHistory.length = existingIndex;
+            visitedStates = new Set(stateHistory);
+        }
+    } else {
+        stateHistory.push(currentState);
+        moveHistory.push(tileId);
+        visitedStates.add(currentState);
+    }
+}
+
+
+// ============================================================
+// 3. SETUP / GRID BUILD / SHUFFLE
+// ============================================================
 
 function setupSlidingPuzzle() {
     resetStopwatch();
@@ -91,25 +135,20 @@ function setupSlidingPuzzle() {
     wasAutoSolved = false;
     moveHistory = [];
     stateHistory = [];
-    
-    // Reset visual hints count display
-    const hintCountNode = document.getElementById('hints-count');
-    if (hintCountNode) {
-        hintCountNode.textContent = hintsLeft;
-    }
+    visitedStates = new Set();
 
-    // Clear previous certificates
+    const hintCountNode = document.getElementById('hints-count');
+    if (hintCountNode) hintCountNode.textContent = hintsLeft;
+
     const certWrapper = document.getElementById('certificate-render-area');
     if (certWrapper) certWrapper.innerHTML = '';
 
-    // Load the target image dynamically to extract its natural aspect ratio
     const targetImage = new Image();
-    targetImage.onload = function() {
+    targetImage.onload = function () {
         const imageWidth = targetImage.naturalWidth || 800;
         const imageHeight = targetImage.naturalHeight || 600;
         const imageAspectRatio = imageWidth / imageHeight;
 
-        // Resize the workspace board to perfectly match the original image
         const viewWidth = Math.min(window.innerWidth * 0.9, 650);
         const viewHeight = viewWidth / imageAspectRatio;
 
@@ -124,17 +163,15 @@ function setupSlidingPuzzle() {
 function buildGrid(boardWidth, boardHeight) {
     container.innerHTML = '';
     tiles = [];
-    
+
     const tileWidth = boardWidth / gridCols;
     const tileHeight = boardHeight / gridRows;
-
     const totalTilesCount = gridRows * gridCols;
+
     blankRow = gridRows - 1;
     blankCol = gridCols - 1;
 
-    // Generate tiles for all cells except the last slot (which remains empty)
     for (let i = 0; i < totalTilesCount - 1; i++) {
-        // Semantic Change: Generated as a button for native accessibility & keyboard tab index paths
         const tile = document.createElement('button');
         tile.classList.add('puzzle-piece');
         tile.setAttribute('type', 'button');
@@ -144,41 +181,35 @@ function buildGrid(boardWidth, boardHeight) {
         const correctRow = Math.floor(i / gridCols);
         const correctCol = i % gridCols;
 
-        // Clip background slice parameters corresponding to correct coordinates
         tile.style.backgroundImage = `url('${fullImageURL}')`;
         tile.style.backgroundSize = `${boardWidth}px ${boardHeight}px`;
         tile.style.backgroundPosition = `-${correctCol * tileWidth}px -${correctRow * tileHeight}px`;
 
-        // Create hint helper overlay numbers
         const hintOverlay = document.createElement('span');
         hintOverlay.classList.add('tile-hint-number');
         hintOverlay.textContent = i + 1;
         hintOverlay.style.display = 'none';
         tile.appendChild(hintOverlay);
 
-        // Bind accessibility descriptive strings dynamically
         tile.setAttribute('aria-label', `Tile ${i + 1}. Position: Row ${correctRow + 1}, Column ${correctCol + 1}`);
 
-        // Bind metadata coordinates
         const tileData = {
             id: i,
-            correctRow: correctRow,
-            correctCol: correctCol,
+            correctRow,
+            correctCol,
             currentRow: correctRow,
             currentCol: correctCol,
             element: tile
         };
 
-        // Click handler to trigger sliding transitions
         tile.addEventListener('click', () => {
             if (isPaused || gameWon || isAutoSolving) return;
             tryMoveTile(tileData);
         });
 
-        // Add Keydown Handler to allow keyboard users to solve the puzzle natively
         tile.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault(); // Stop standard spacebar scrolling page jumps
+                e.preventDefault();
                 if (isPaused || gameWon || isAutoSolving) return;
                 tryMoveTile(tileData);
             }
@@ -188,10 +219,9 @@ function buildGrid(boardWidth, boardHeight) {
         container.appendChild(tile);
     }
 
-    // Add empty cell placeholder
-    tiles.push(null);
+    tiles.push(null); // logical blank slot
 
-    // Build the final hidden blank tile which fades in on solve completion
+    // Hidden blank tile that fades in on solve
     const blankTile = document.createElement('div');
     blankTile.classList.add('puzzle-piece');
     blankTile.id = 'blank-tile-element';
@@ -204,65 +234,82 @@ function buildGrid(boardWidth, boardHeight) {
     blankTile.style.top = `${(gridRows - 1) * tileHeight}px`;
     blankTile.style.opacity = '0';
     blankTile.style.display = 'none';
-    blankTile.setAttribute('aria-hidden', 'true'); // Hide structural artifact from screen readers
+    blankTile.setAttribute('aria-hidden', 'true');
     container.appendChild(blankTile);
 
-    // Shuffle the puzzle board through guaranteed solvable sliding moves
     shuffleBoard();
     repositionAllTiles(tileWidth, tileHeight);
 }
 
-function tryMoveTile(tile, isInteractive = true) {
-    const rowDiff = Math.abs(tile.currentRow - blankRow);
-    const colDiff = Math.abs(tile.currentCol - blankCol);
+/**
+ * Shuffle by performing only legal slides from the solved position.
+ * Guarantees solvability. Uses a lighter step count + avoids immediate reverses
+ * for better mixing with less work.
+ */
+function shuffleBoard() {
+    const shuffleSteps = Math.min(gridRows * gridCols * 18, 700);
 
-    // Determine if clicked tile is adjacent to the blank cell space
-    if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
-        if (isInteractive && !stopwatchStarted) {
-            startStopwatch();
+    moveHistory = [];
+    stateHistory = [];
+    visitedStates = new Set();
+
+    const startKey = getBoardStateKey();
+    stateHistory.push(startKey);
+    visitedStates.add(startKey);
+
+    let lastMovedId = -1;
+
+    for (let step = 0; step < shuffleSteps; step++) {
+        const options = [];
+        for (let i = 0; i < tiles.length; i++) {
+            const tile = tiles[i];
+            if (!tile) continue;
+            const rowDiff = Math.abs(tile.currentRow - blankRow);
+            const colDiff = Math.abs(tile.currentCol - blankCol);
+            if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+                if (tile.id !== lastMovedId || options.length === 0) {
+                    options.push(tile);
+                }
+            }
         }
 
-        // Swap coordinates
-        const tempRow = tile.currentRow;
-        const tempCol = tile.currentCol;
+        if (options.length === 0) {
+            for (let i = 0; i < tiles.length; i++) {
+                const tile = tiles[i];
+                if (!tile) continue;
+                const rowDiff = Math.abs(tile.currentRow - blankRow);
+                const colDiff = Math.abs(tile.currentCol - blankCol);
+                if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+                    options.push(tile);
+                }
+            }
+        }
 
-        tile.currentRow = blankRow;
-        tile.currentCol = blankCol;
+        if (options.length === 0) break;
 
+        const choice = options[Math.floor(Math.random() * options.length)];
+        lastMovedId = choice.id;
+
+        const tempRow = choice.currentRow;
+        const tempCol = choice.currentCol;
+        choice.currentRow = blankRow;
+        choice.currentCol = blankCol;
         blankRow = tempRow;
         blankCol = tempCol;
 
-        // Trigger visual sliding movement translation
-        const tileWidth = container.clientWidth / gridCols;
-        const tileHeight = container.clientHeight / gridRows;
-        tile.element.style.left = `${tile.currentCol * tileWidth}px`;
-        tile.element.style.top = `${tile.currentRow * tileHeight}px`;
-
-        // Update accessibility label dynamically with the new layout coordinates
-        tile.element.setAttribute('aria-label', `Tile ${tile.id + 1}. Position: Row ${tile.currentRow + 1}, Column ${tile.currentCol + 1}`);
-
-        // Track and log the moves with live loop elimination
-        if (isInteractive) {
-            pushMoveToHistory(tile.id);
-            movesCount++;
-            updateMovesDisplay();
-            checkVictory();
+        const currentState = getBoardStateKey();
+        if (visitedStates.has(currentState)) {
+            const existingIndex = stateHistory.indexOf(currentState);
+            if (existingIndex !== -1) {
+                stateHistory.length = existingIndex + 1;
+                moveHistory.length = existingIndex;
+                visitedStates = new Set(stateHistory);
+            }
+        } else {
+            stateHistory.push(currentState);
+            moveHistory.push(choice.id);
+            visitedStates.add(currentState);
         }
-    }
-}
-
-// Optimized move stack recorder that instantly prunes circular movements on-the-fly
-function pushMoveToHistory(tileId) {
-    const currentState = getBoardStateString();
-    const existingIndex = stateHistory.indexOf(currentState);
-
-    if (existingIndex !== -1) {
-        // Player returned to a state they've already been in! Trim out the wasted loop steps.
-        stateHistory.splice(existingIndex + 1);
-        moveHistory.splice(existingIndex);
-    } else {
-        stateHistory.push(currentState);
-        moveHistory.push(tileId);
     }
 }
 
@@ -275,52 +322,265 @@ function repositionAllTiles(tileWidth, tileHeight) {
     });
 }
 
-function shuffleBoard() {
-    const shuffleSteps = gridRows * gridCols * 40;
-    
-    moveHistory = [];
-    stateHistory = [getBoardStateString()];
 
-    for (let step = 0; step < shuffleSteps; step++) {
-        // Collect all currently slidable tiles next to the empty cell
-        const options = tiles.filter(tile => {
-            if (!tile) return false;
-            const rowDiff = Math.abs(tile.currentRow - blankRow);
-            const colDiff = Math.abs(tile.currentCol - blankCol);
-            return (rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1);
-        });
+// ============================================================
+// 4. MOVE HANDLING
+// ============================================================
 
-        if (options.length > 0) {
-            // Perform random coordinate swaps
-            const choice = options[Math.floor(Math.random() * options.length)];
+function tryMoveTile(tile, isInteractive = true) {
+    const rowDiff = Math.abs(tile.currentRow - blankRow);
+    const colDiff = Math.abs(tile.currentCol - blankCol);
 
-            const tempRow = choice.currentRow;
-            const tempCol = choice.currentCol;
+    if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+        if (isInteractive && !stopwatchStarted) {
+            startStopwatch();
+        }
 
-            choice.currentRow = blankRow;
-            choice.currentCol = blankCol;
+        const tempRow = tile.currentRow;
+        const tempCol = tile.currentCol;
+        tile.currentRow = blankRow;
+        tile.currentCol = blankCol;
+        blankRow = tempRow;
+        blankCol = tempCol;
 
-            blankRow = tempRow;
-            blankCol = tempCol;
+        const tileWidth = container.clientWidth / gridCols;
+        const tileHeight = container.clientHeight / gridRows;
+        tile.element.style.left = `${tile.currentCol * tileWidth}px`;
+        tile.element.style.top = `${tile.currentRow * tileHeight}px`;
 
-            // Instantly eliminate circular state paths during shuffle generation
-            const currentState = getBoardStateString();
-            const existingIndex = stateHistory.indexOf(currentState);
+        tile.element.setAttribute(
+            'aria-label',
+            `Tile ${tile.id + 1}. Position: Row ${tile.currentRow + 1}, Column ${tile.currentCol + 1}`
+        );
 
-            if (existingIndex !== -1) {
-                stateHistory.splice(existingIndex + 1);
-                moveHistory.splice(existingIndex);
-            } else {
-                stateHistory.push(currentState);
-                moveHistory.push(choice.id);
-            }
+        if (isInteractive) {
+            pushMoveToHistory(tile.id);
+            movesCount++;
+            updateMovesDisplay();
+            checkVictory();
         }
     }
 }
 
+
+// ============================================================
+// 5. A* SOLVER (Auto Solve)
+// ============================================================
+
+/**
+ * Build a flat state array [id or -1, ...] from the live board.
+ */
+function snapshotState() {
+    const total = gridRows * gridCols;
+    const state = new Array(total).fill(-1);
+    for (let i = 0; i < tiles.length; i++) {
+        const t = tiles[i];
+        if (t) state[t.currentRow * gridCols + t.currentCol] = t.id;
+    }
+    state[blankRow * gridCols + blankCol] = -1;
+    return state;
+}
+
+/** Manhattan distance heuristic for a flat state. */
+function manhattanHeuristic(state, rows, cols) {
+    let dist = 0;
+    for (let i = 0; i < state.length; i++) {
+        const id = state[i];
+        if (id === -1) continue;
+        const goalRow = Math.floor(id / cols);
+        const goalCol = id % cols;
+        const curRow = Math.floor(i / cols);
+        const curCol = i % cols;
+        dist += Math.abs(goalRow - curRow) + Math.abs(goalCol - curCol);
+    }
+    return dist;
+}
+
+/**
+ * A* search. Returns an ordered list of tile IDs to move (blank swaps with that tile),
+ * or null if the node budget is exhausted.
+ *
+ * For grids larger than ~5×5 the state space grows quickly; a soft node limit
+ * prevents the browser from freezing. On timeout we fall back to the recorded
+ * shuffle path (always solvable).
+ */
+function solveWithAStar(maxNodes = 80000) {
+    const rows = gridRows;
+    const cols = gridCols;
+    const total = rows * cols;
+    const start = snapshotState();
+
+    // Already solved?
+    let solved = true;
+    for (let i = 0; i < total - 1; i++) {
+        if (start[i] !== i) { solved = false; break; }
+    }
+    if (solved && start[total - 1] === -1) return [];
+
+    const startKey = start.join(',');
+    const open = []; // simple array priority queue (fine for this node budget)
+    const cameFrom = new Map(); // key -> { prevKey, movedTileId }
+    const gScore = new Map();
+
+    open.push({ key: startKey, state: start, g: 0, f: manhattanHeuristic(start, rows, cols) });
+    gScore.set(startKey, 0);
+
+    let nodes = 0;
+
+    while (open.length > 0 && nodes < maxNodes) {
+        // Pop lowest f (linear scan is acceptable at this scale)
+        let bestIdx = 0;
+        for (let i = 1; i < open.length; i++) {
+            if (open[i].f < open[bestIdx].f) bestIdx = i;
+        }
+        const current = open.splice(bestIdx, 1)[0];
+        nodes++;
+
+        // Goal test
+        let isGoal = true;
+        for (let i = 0; i < total - 1; i++) {
+            if (current.state[i] !== i) { isGoal = false; break; }
+        }
+        if (isGoal && current.state[total - 1] === -1) {
+            // Reconstruct path of tile IDs
+            const path = [];
+            let key = current.key;
+            while (cameFrom.has(key)) {
+                const info = cameFrom.get(key);
+                path.push(info.movedTileId);
+                key = info.prevKey;
+            }
+            path.reverse();
+            return path;
+        }
+
+        // Locate blank
+        let blankIdx = current.state.indexOf(-1);
+        const br = Math.floor(blankIdx / cols);
+        const bc = blankIdx % cols;
+
+        const deltas = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        for (const [dr, dc] of deltas) {
+            const nr = br + dr;
+            const nc = bc + dc;
+            if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+
+            const neighborIdx = nr * cols + nc;
+            const movedTileId = current.state[neighborIdx];
+
+            // Swap blank with the neighbor tile
+            const nextState = current.state.slice();
+            nextState[blankIdx] = movedTileId;
+            nextState[neighborIdx] = -1;
+            const nextKey = nextState.join(',');
+
+            const tentativeG = current.g + 1;
+            if (tentativeG >= (gScore.get(nextKey) ?? Infinity)) continue;
+
+            gScore.set(nextKey, tentativeG);
+            cameFrom.set(nextKey, { prevKey: current.key, movedTileId });
+            const f = tentativeG + manhattanHeuristic(nextState, rows, cols);
+            open.push({ key: nextKey, state: nextState, g: tentativeG, f });
+        }
+    }
+
+    return null; // budget exhausted
+}
+
+/**
+ * Animate a sequence of tile IDs (the solution path).
+ */
+function animateSolutionPath(path, onDone) {
+    if (!path || path.length === 0) {
+        onDone();
+        return;
+    }
+
+    // Fast lookup: id → tile object
+    const tileById = new Map();
+    tiles.forEach(t => { if (t) tileById.set(t.id, t); });
+
+    let idx = 0;
+    const stepMs = Math.max(60, Math.min(180, Math.floor(1600 / path.length)));
+
+    const timer = setInterval(() => {
+        if (idx >= path.length) {
+            clearInterval(timer);
+            onDone();
+            return;
+        }
+        const tile = tileById.get(path[idx]);
+        if (tile) {
+            tryMoveTile(tile, false);
+            movesCount++;
+            updateMovesDisplay();
+        }
+        idx++;
+    }, stepMs);
+}
+
+function triggerAutoSolve() {
+    if (isPaused || gameWon || isAutoSolving) return;
+
+    attemptTime = formatTime(elapsedSeconds);
+    attemptMoves = movesCount;
+
+    pauseStopwatch();
+    wasAutoSolved = true;
+    isAutoSolving = true;
+
+    elapsedSeconds = 0;
+    movesCount = 0;
+    updateTimerDisplay();
+    updateMovesDisplay();
+
+    const solverStartTime = Date.now();
+    const solverStopwatch = setInterval(() => {
+        elapsedSeconds = Math.floor((Date.now() - solverStartTime) / 1000);
+        updateTimerDisplay();
+    }, 1000);
+
+    // Immediate feedback so the UI does not feel frozen while A* runs
+    const cells = gridRows * gridCols;
+    showToast(cells > 16 ? 'Solver searching…' : 'Solving…');
+
+    // Adaptive node budget — larger grids fail over to the recorded path
+    // sooner so the tab stays responsive.
+    let nodeBudget = 25000;
+    if (cells <= 9) nodeBudget = 50000;
+    else if (cells <= 16) nodeBudget = 60000;
+    else if (cells <= 25) nodeBudget = 40000;
+
+    // Yield two frames so the toast and button state can paint first
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            const path = solveWithAStar(nodeBudget);
+
+            const finish = () => {
+                isAutoSolving = false;
+                clearInterval(solverStopwatch);
+                checkVictory();
+            };
+
+            if (path !== null) {
+                animateSolutionPath(path, finish);
+            } else {
+                showToast('Search budget reached — using recorded path');
+                const fallback = moveHistory.slice().reverse();
+                moveHistory = [];
+                animateSolutionPath(fallback, finish);
+            }
+        }, 30);
+    });
+}
+
+
+// ============================================================
+// 6. VICTORY & CERTIFICATE
+// ============================================================
+
 function checkVictory() {
     let matchesSolved = true;
-
     tiles.forEach(tile => {
         if (tile) {
             if (tile.currentRow !== tile.correctRow || tile.currentCol !== tile.correctCol) {
@@ -332,8 +592,6 @@ function checkVictory() {
     if (matchesSolved) {
         gameWon = true;
         pauseStopwatch();
-
-        // Reveal the missing block segment of the puzzle to complete the image!
         revealBlankTile();
 
         setTimeout(() => {
@@ -352,119 +610,321 @@ function checkVictory() {
                     `;
                 }
             } else {
-                if (titleNode) {
-                    titleNode.innerHTML = `🎉 Congratulations!`;
-                }
+                if (titleNode) titleNode.innerHTML = `🎉 Congratulations!`;
                 if (msgNode) {
                     msgNode.innerHTML = `You completed the sliding puzzle in <strong>${timeString}</strong> with <strong>${movesCount}</strong> total moves! 🏆✨<br><br>
                     Thank you for playing!`;
                 }
             }
-            
-            // Render the un-editable Certificate Image dynamically
+
             generateCertificateImage(wasAutoSolved, timeString, movesCount);
-            
             showVictoryModal();
         }, 600);
     }
 }
 
-// Generates a high-quality un-alterable image on canvas that users can save/copy
+/**
+ * Certificate generator
+ * - Canvas keeps the puzzle image’s aspect ratio (no stretch)
+ * - Longest side capped at 1280 (readable download + fits the modal)
+ * - Image is drawn with “contain” inside the frame (letterbox/pillarbox if needed)
+ * - Text scale is clamped so titles never spill outside the border
+ */
 function generateCertificateImage(isAuto, timeStr, movesVal) {
     const certWrapper = document.getElementById('certificate-render-area');
     if (!certWrapper) return;
     certWrapper.innerHTML = `<p style="font-size: 0.85rem; color: #a0aec0;">Generating secure result certificate... 🎨</p>`;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = 600;
-    canvas.height = 450;
-    const ctx = canvas.getContext('2d');
-
     const bgImg = new Image();
-    bgImg.crossOrigin = "anonymous"; // Safe-guarding if assets move to external origins
-    bgImg.onload = function() {
-        // Draw dimmed background image representing the solved puzzle
-        ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
-        
-        // Darken overlay overlay for readability
-        ctx.fillStyle = "rgba(10, 20, 30, 0.85)";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    bgImg.crossOrigin = "anonymous";
+    bgImg.onload = function () {
+        const natW = bgImg.naturalWidth || 1920;
+        const natH = bgImg.naturalHeight || 1080;
 
-        // Futuristic neon borders
-        ctx.strokeStyle = currentTheme.color;
-        ctx.lineWidth = 6;
-        ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-        
-        ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(18, 18, canvas.width - 36, canvas.height - 36);
+        // Aspect-correct canvas, moderate max size for modal + download
+        const MAX_SIDE = 1280;
+        let canvasW, canvasH;
+        if (natW >= natH) {
+            canvasW = Math.min(natW, MAX_SIDE);
+            canvasH = Math.max(1, Math.round(canvasW * (natH / natW)));
+        } else {
+            canvasH = Math.min(natH, MAX_SIDE);
+            canvasW = Math.max(1, Math.round(canvasH * (natW / natH)));
+        }
 
-        // Certificate Header
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 26px 'Orbitron', 'Segoe UI', sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("VOCALOID PUZZLE RECORD", canvas.width / 2, 60);
+        const canvas = document.createElement('canvas');
+        canvas.width = canvasW;
+        canvas.height = canvasH;
+        const ctx = canvas.getContext('2d');
 
-        // Sub-decorations
-        ctx.fillStyle = currentTheme.color;
-        ctx.fillRect(canvas.width / 2 - 100, 75, 200, 3);
+        // Clamped scale — prevents huge fonts on tall portrait certs
+        const shortSide = Math.min(canvasW, canvasH);
+        const s = Math.min(1.25, Math.max(0.85, shortSide / 520));
 
-        // Character/Theme Name
-        ctx.fillStyle = "#e2e8f0";
-        ctx.font = "italic 16px 'Segoe UI', sans-serif";
-        ctx.fillText(`Target: ${currentTheme.title.replace(/[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '')}`, canvas.width / 2, 110);
+        const theme = currentTheme.color;
+        const margin = Math.max(16, Math.round(22 * s));       // outer frame inset
+        const frameThick = Math.max(5, Math.round(7 * s));
+        const contentPad = margin + frameThick + Math.round(10 * s); // safe area inside frame
 
-        // Player Name or Greeting
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 22px 'Segoe UI', sans-serif";
+        // ---- Background: fill the area INSIDE the outer frame only ----
+        // Canvas aspect already matches the image, so this fills the inner
+        // rectangle with no stretch and no letterboxing dead space.
+        // The image never crosses the first (outer) border.
+        ctx.fillStyle = "#0a1018";
+        ctx.fillRect(0, 0, canvasW, canvasH);
+
+        const imgInset = margin; // stop at the outer frame edge
+        const imgW = canvasW - imgInset * 2;
+        const imgH = canvasH - imgInset * 2;
+        ctx.drawImage(bgImg, imgInset, imgInset, imgW, imgH);
+
+        // Dark overlay for text readability
+        ctx.fillStyle = "rgba(8, 14, 22, 0.78)";
+        ctx.fillRect(0, 0, canvasW, canvasH);
+
+        // ---- Multi-layer certificate frame (drawn after image so it sits on top) ----
+        ctx.strokeStyle = theme;
+        ctx.lineWidth = frameThick;
+        ctx.strokeRect(margin, margin, canvasW - margin * 2, canvasH - margin * 2);
+
+        const mid = margin + Math.round(6 * s);
+        ctx.strokeStyle = theme;
+        ctx.globalAlpha = 0.4;
+        ctx.lineWidth = Math.max(1, Math.round(2 * s));
+        ctx.strokeRect(mid, mid, canvasW - mid * 2, canvasH - mid * 2);
+        ctx.globalAlpha = 1;
+
+        const inner = margin + Math.round(12 * s);
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.lineWidth = Math.max(1, Math.round(1.5 * s));
+        ctx.strokeRect(inner, inner, canvasW - inner * 2, canvasH - inner * 2);
+
+        // Corner brackets
+        const cornerLen = Math.max(16, Math.round(28 * s));
+        const cPad = margin + Math.round(2 * s);
+        ctx.strokeStyle = theme;
+        ctx.lineWidth = Math.max(2, Math.round(3 * s));
+        ctx.beginPath();
+        ctx.moveTo(cPad, cPad + cornerLen); ctx.lineTo(cPad, cPad); ctx.lineTo(cPad + cornerLen, cPad);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(canvasW - cPad - cornerLen, cPad); ctx.lineTo(canvasW - cPad, cPad); ctx.lineTo(canvasW - cPad, cPad + cornerLen);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cPad, canvasH - cPad - cornerLen); ctx.lineTo(cPad, canvasH - cPad); ctx.lineTo(cPad + cornerLen, canvasH - cPad);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(canvasW - cPad - cornerLen, canvasH - cPad); ctx.lineTo(canvasW - cPad, canvasH - cPad); ctx.lineTo(canvasW - cPad, canvasH - cPad - cornerLen);
+        ctx.stroke();
+
+        // ---- Typography (orientation-aware, width-safe) ----
+        const cx = canvasW / 2;
+        const isPortrait = canvasH > canvasW * 1.05;
+        // Extra side padding so measured text never kisses the frame
+        const maxTextW = canvasW - contentPad * 2 - Math.round(16 * s);
+
+        function fitFont(basePx, text, fontFamily, weight, limitW) {
+            const limit = limitW != null ? limitW : maxTextW;
+            let size = basePx;
+            ctx.font = `${weight} ${size}px ${fontFamily}`;
+            // 0.96 safety factor accounts for font fallback / anti-alias width variance
+            while (size > 9 && ctx.measureText(text).width > limit * 0.96) {
+                size -= 1;
+                ctx.font = `${weight} ${size}px ${fontFamily}`;
+            }
+            return size;
+        }
+
+        const titleFull = "VOCALOID PUZZLE RECORD";
+        const titleLine1 = "VOCALOID";
+        const titleLine2 = "PUZZLE RECORD";
+        const stampText = isAuto ? "AUTO-SOLVED RECORD" : "LEGITIMATE MANUAL PLAY";
+        const statusLine = isAuto
+            ? "⚠ SECURITY STATUS: NOT ELIGIBLE FOR LEADERBOARD ⚠"
+            : "🏆 SECURITY STATUS: 100% VERIFIED AUTHENTIC 🏆";
+
+        // Portrait: prefer two-line title + tighter width-based sizes
+        // Landscape: single-line title with more generous sizing
+        let useTwoLineTitle = false;
+        let titleSize;
+        if (isPortrait) {
+            const singleBase = Math.min(Math.round(canvasW * 0.048), Math.round(26 * s));
+            const singleFit = fitFont(singleBase, titleFull, "'Orbitron', 'Segoe UI', sans-serif", "bold");
+            // If a single line would shrink below a comfortable size, wrap to two lines
+            if (singleFit < Math.round(canvasW * 0.038)) {
+                useTwoLineTitle = true;
+                titleSize = fitFont(
+                    Math.min(Math.round(canvasW * 0.07), Math.round(30 * s)),
+                    titleLine2, // longer of the two lines
+                    "'Orbitron', 'Segoe UI', sans-serif",
+                    "bold"
+                );
+            } else {
+                titleSize = singleFit;
+            }
+        } else {
+            titleSize = fitFont(
+                Math.min(Math.round(canvasW * 0.055), Math.round(34 * s)),
+                titleFull,
+                "'Orbitron', 'Segoe UI', sans-serif",
+                "bold"
+            );
+        }
+
+        const subSize = isPortrait
+            ? Math.max(11, Math.min(Math.round(canvasW * 0.032), Math.round(15 * s)))
+            : Math.max(13, Math.round(17 * s));
+        const bodySize = isPortrait
+            ? Math.max(13, Math.min(Math.round(canvasW * 0.038), Math.round(18 * s)))
+            : Math.max(15, Math.round(21 * s));
+        const labelSize = isPortrait
+            ? Math.max(11, Math.min(Math.round(canvasW * 0.03), Math.round(13 * s)))
+            : Math.max(12, Math.round(15 * s));
+        const valueSize = isPortrait
+            ? Math.max(12, Math.min(Math.round(canvasW * 0.034), Math.round(15 * s)))
+            : Math.max(14, Math.round(17 * s));
+        const stampSize = fitFont(
+            isPortrait
+                ? Math.min(Math.round(canvasW * 0.048), Math.round(24 * s))
+                : Math.min(Math.round(canvasW * 0.05), Math.round(30 * s)),
+            stampText,
+            "'Orbitron', 'Segoe UI', sans-serif",
+            "bold"
+        );
+        const statusSize = fitFont(
+            isPortrait
+                ? Math.min(Math.round(canvasW * 0.028), Math.round(12 * s))
+                : Math.min(Math.round(canvasW * 0.03), Math.round(14 * s)),
+            statusLine,
+            "'Segoe UI', sans-serif",
+            "bold"
+        );
+
+        const cleanTitle = currentTheme.title.replace(
+            /[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g,
+            ''
+        ).trim();
         const masterGreeting = isAuto ? "Auto Solver System" : "Player";
-        ctx.fillText(`Achieved By: ${masterGreeting}`, canvas.width / 2, 160);
 
-        // Stats Box
-        ctx.fillStyle = "rgba(32, 43, 54, 0.9)";
-        ctx.strokeStyle = "rgba(255,255,255,0.1)";
-        ctx.lineWidth = 1;
-        ctx.fillRect(80, 190, canvas.width - 160, 140);
-        ctx.strokeRect(80, 190, canvas.width - 160, 140);
+        // Vertical metrics for the centered stack
+        const titleBlockH = useTwoLineTitle
+            ? titleSize * 2 + Math.round(6 * s)
+            : titleSize;
+        const gapTitleToLine = Math.round(10 * s);
+        const gapLineToTarget = Math.round(26 * s);
+        const gapTargetToAchieved = Math.round(26 * s);
+        const gapAchievedToBox = Math.round(20 * s);
+        const boxH = Math.round((isPortrait ? 124 : 138) * s);
+        const gapBoxToStamp = Math.round(26 * s);
+        const gapStampToStatus = Math.round(22 * s);
 
-        // Inner Box Stats
+        const stackH =
+            titleBlockH +
+            gapTitleToLine + Math.max(2, Math.round(3 * s)) +
+            gapLineToTarget + subSize +
+            gapTargetToAchieved + bodySize +
+            gapAchievedToBox + boxH +
+            gapBoxToStamp + stampSize +
+            gapStampToStatus + statusSize;
+
+        const safeTop = contentPad;
+        const safeBottom = canvasH - contentPad;
+        const safeH = safeBottom - safeTop;
+        let stackTop = safeTop + Math.max(0, (safeH - stackH) / 2);
+        if (stackTop + stackH > safeBottom) {
+            stackTop = Math.max(safeTop, safeBottom - stackH);
+        }
+
+        // ---- Draw title ----
+        let y = stackTop + (useTwoLineTitle ? titleSize : titleSize);
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${titleSize}px 'Orbitron', 'Segoe UI', sans-serif`;
+        ctx.textAlign = "center";
+        if (useTwoLineTitle) {
+            ctx.fillText(titleLine1, cx, y);
+            y += titleSize + Math.round(6 * s);
+            ctx.fillText(titleLine2, cx, y);
+        } else {
+            ctx.fillText(titleFull, cx, y);
+        }
+
+        // Accent line
+        y += gapTitleToLine;
+        const lineW = Math.min(maxTextW * 0.45, Math.round(isPortrait ? 160 * s : 210 * s));
+        ctx.fillStyle = theme;
+        ctx.fillRect(cx - lineW / 2, y, lineW, Math.max(2, Math.round(3 * s)));
+
+        // Target
+        y += gapLineToTarget + subSize;
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = `italic ${subSize}px 'Segoe UI', sans-serif`;
+        // Fit target line too (long character names)
+        const targetLabel = `Target: ${cleanTitle}`;
+        let targetDrawSize = subSize;
+        ctx.font = `italic ${targetDrawSize}px 'Segoe UI', sans-serif`;
+        while (targetDrawSize > 9 && ctx.measureText(targetLabel).width > maxTextW * 0.96) {
+            targetDrawSize -= 1;
+            ctx.font = `italic ${targetDrawSize}px 'Segoe UI', sans-serif`;
+        }
+        ctx.fillText(targetLabel, cx, y);
+
+        // Achieved by
+        y += gapTargetToAchieved + bodySize;
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${bodySize}px 'Segoe UI', sans-serif`;
+        ctx.fillText(`Achieved By: ${masterGreeting}`, cx, y);
+
+        // Stats box
+        y += gapAchievedToBox;
+        const boxW = Math.min(maxTextW, Math.round((isPortrait ? 400 : 460) * s));
+        const boxX = (canvasW - boxW) / 2;
+        const boxY = y;
+
+        ctx.fillStyle = "rgba(20, 28, 38, 0.94)";
+        ctx.strokeStyle = "rgba(255,255,255,0.12)";
+        ctx.lineWidth = Math.max(1, Math.round(1.5 * s));
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+        const row1 = boxY + Math.round(34 * s);
+        const row2 = boxY + Math.round(64 * s);
+        const row3 = boxY + Math.round(94 * s);
+        const leftX = boxX + Math.round(22 * s);
+        const rightX = boxX + boxW - Math.round(22 * s);
+
         ctx.textAlign = "left";
         ctx.fillStyle = "#a0aec0";
-        ctx.font = "14px 'Share Tech Mono', monospace";
-        ctx.fillText("GRID DIMENSION:", 110, 225);
-        ctx.fillText("ELAPSED TIME:", 110, 265);
-        ctx.fillText("TOTAL MOVES:", 110, 305);
+        ctx.font = `${labelSize}px 'Share Tech Mono', monospace`;
+        ctx.fillText("GRID DIMENSION:", leftX, row1);
+        ctx.fillText("ELAPSED TIME:", leftX, row2);
+        ctx.fillText("TOTAL MOVES:", leftX, row3);
 
         ctx.textAlign = "right";
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 16px 'Share Tech Mono', monospace";
-        ctx.fillText(`${gridRows} x ${gridCols} Grid`, canvas.width - 110, 225);
-        ctx.fillText(timeStr, canvas.width - 110, 265);
-        ctx.fillText(movesVal.toString(), canvas.width - 110, 305);
+        ctx.font = `bold ${valueSize}px 'Share Tech Mono', monospace`;
+        ctx.fillText(`${gridRows} x ${gridCols} Grid`, rightX, row1);
+        ctx.fillText(timeStr, rightX, row2);
+        ctx.fillText(String(movesVal), rightX, row3);
 
-        // Security Status Watermark (THE CORE FEATURE: Un-editable proof!)
+        // Stamp + status
+        y = boxY + boxH + gapBoxToStamp + stampSize;
         ctx.textAlign = "center";
-        ctx.font = "bold 32px 'Orbitron', 'Segoe UI', sans-serif";
-        
+        ctx.font = `bold ${stampSize}px 'Orbitron', 'Segoe UI', sans-serif`;
         if (isAuto) {
-            ctx.fillStyle = "rgba(250, 107, 91, 0.50)"; // Red transparent watermark
-            ctx.fillText("AUTO-SOLVED RECORD", canvas.width / 2, 385);
-            
+            ctx.fillStyle = "rgba(250, 107, 91, 0.75)";
+            ctx.fillText(stampText, cx, y);
             ctx.fillStyle = "#e74c3c";
-            ctx.font = "bold 14px 'Segoe UI', sans-serif";
-            ctx.fillText("⚠️ SECURITY STATUS: NOT ELIGIBLE FOR LEADERBOARD ⚠️", canvas.width / 2, 415);
         } else {
-            ctx.fillStyle = "rgba(128, 255, 195, 0.50)"; // Green transparent watermark
-            ctx.fillText("LEGITIMATE MANUAL PLAY", canvas.width / 2, 385);
-            
+            ctx.fillStyle = "rgba(128, 255, 195, 0.75)";
+            ctx.fillText(stampText, cx, y);
             ctx.fillStyle = "#2ecc71";
-            ctx.font = "bold 14px 'Segoe UI', sans-serif";
-            ctx.fillText("🏆 SECURITY STATUS: 100% VERIFIED AUTHENTIC 🏆", canvas.width / 2, 415);
         }
+        y += gapStampToStatus + statusSize;
+        ctx.font = `bold ${statusSize}px 'Segoe UI', sans-serif`;
+        ctx.fillText(statusLine, cx, y);
 
-        // Output to interactive DOM element
+        // ---- Output ----
         const finalImgUrl = canvas.toDataURL("image/png");
-        
         certWrapper.innerHTML = `
             <div class="generated-cert-container">
                 <img src="${finalImgUrl}" alt="Certified Puzzle Result" class="cert-image-preview">
@@ -475,12 +935,10 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
             </div>
         `;
 
-        // Bind image copying to clipboard logic
         const copyImgBtn = document.getElementById('copy-cert-img-btn');
         if (copyImgBtn) {
             copyImgBtn.onclick = async () => {
                 try {
-                    // Modern clipboard async API (Canvas to Blob conversion)
                     canvas.toBlob(async (blob) => {
                         try {
                             await navigator.clipboard.write([
@@ -490,7 +948,6 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
                             copyImgBtn.innerHTML = "✅ Copied Image!";
                             setTimeout(() => copyImgBtn.innerHTML = prevTxt, 2000);
                         } catch (err) {
-                            // Fallback if writing image is restricted
                             showToast("Clipboard restricted. Please tap and hold or right click the certificate below to copy!");
                         }
                     }, 'image/png');
@@ -514,10 +971,14 @@ function revealBlankTile() {
     }
 }
 
+
+// ============================================================
+// 7. STOPWATCH / PAUSE / HINT
+// ============================================================
+
 function startStopwatch() {
     stopwatchStarted = true;
     const startTimeStamp = Date.now() - (elapsedSeconds * 1000);
-    
     stopwatchInterval = setInterval(() => {
         elapsedSeconds = Math.floor((Date.now() - startTimeStamp) / 1000);
         updateTimerDisplay();
@@ -535,7 +996,7 @@ function resetStopwatch() {
     stopwatchStarted = false;
     isPaused = false;
     updateTimerDisplay();
-    
+
     const pauseBtn = document.getElementById('pause-btn');
     if (pauseBtn) pauseBtn.innerHTML = '⏸ Pause';
 
@@ -561,7 +1022,6 @@ function formatTime(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-
     const pad = (num) => String(num).padStart(2, '0');
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
@@ -593,78 +1053,27 @@ function triggerHint() {
 
     hintsLeft--;
     const hintCountNode = document.getElementById('hints-count');
-    if (hintCountNode) {
-        hintCountNode.textContent = hintsLeft;
-    }
+    if (hintCountNode) hintCountNode.textContent = hintsLeft;
 
-    // Toggle on visible text overlays
     const hintNumbers = container.querySelectorAll('.tile-hint-number');
     hintNumbers.forEach(num => num.style.display = 'block');
 
-    // Automatically clean up numbers overlay after 4 seconds
     setTimeout(() => {
         hintNumbers.forEach(num => num.style.display = 'none');
     }, 4000);
 }
 
-function triggerAutoSolve() {
-    if (isPaused || gameWon || isAutoSolving) return;
-    
-    // Save actual user game attempt statistics prior to Auto Solving
-    attemptTime = formatTime(elapsedSeconds);
-    attemptMoves = movesCount;
 
-    pauseStopwatch();
-    
-    // Set game parameters
-    wasAutoSolved = true;
-    isAutoSolving = true;
-
-    // Reset visual board stopwatch and move tally to show optimal metrics dynamically in real-time
-    elapsedSeconds = 0;
-    movesCount = 0;
-    updateTimerDisplay();
-    updateMovesDisplay();
-
-    // Start clock running specifically for the solver's execution run
-    let solverStartTime = Date.now();
-    let solverStopwatch = setInterval(() => {
-        elapsedSeconds = Math.floor((Date.now() - solverStartTime) / 1000);
-        updateTimerDisplay();
-    }, 1000);
-
-    // Calculate dynamic step speed based on remaining moves. 
-    // Fewer moves = nice and readable (200ms). Many moves = blistering lightning execution (80ms).
-    const solveInterval = setInterval(() => {
-        if (moveHistory.length === 0) {
-            isAutoSolving = false;
-            clearInterval(solveInterval);
-            clearInterval(solverStopwatch);
-            checkVictory();
-            return;
-        }
-
-        // Pop last move, finding tile to slide reverse-directionally into blankRow/blankCol
-        const lastTileId = moveHistory.pop();
-        const tileToSlide = tiles.find(t => t && t.id === lastTileId);
-        
-        if (tileToSlide) {
-            // Legally shift the selected tile directly into empty adjacent slot
-            tryMoveTile(tileToSlide, false);
-            movesCount++;
-            updateMovesDisplay();
-        }
-    }, Math.max(80, Math.min(200, Math.floor(1800 / (moveHistory.length || 1)))));
-}
+// ============================================================
+// 8. MODALS & UI HELPERS
+// ============================================================
 
 function showToast(message) {
     const toast = document.getElementById('toast-notification');
     if (toast) {
         toast.textContent = message;
         toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 4000);
+        setTimeout(() => toast.classList.remove('show'), 4000);
     }
 }
 
@@ -678,7 +1087,6 @@ function showModificationModal() {
     if (overlay) {
         overlay.classList.add('show');
         overlay.setAttribute('aria-hidden', 'false');
-        // Set focus inside modal dynamically for immediate keyboard interaction
         setTimeout(() => { if (rowsInput) rowsInput.focus(); }, 100);
     }
 }
@@ -689,10 +1097,7 @@ function hideModificationModal() {
         overlay.classList.remove('show');
         overlay.setAttribute('aria-hidden', 'true');
     }
-    // Restore focus to original trigger element cleanly
-    if (lastFocusedElement) {
-        lastFocusedElement.focus();
-    }
+    if (lastFocusedElement) lastFocusedElement.focus();
 }
 
 function submitGridModification() {
@@ -700,7 +1105,7 @@ function submitGridModification() {
     const colsInput = document.getElementById('grid-cols-input');
     const rows = parseInt(rowsInput.value);
     const cols = parseInt(colsInput.value);
-    
+
     let hasError = false;
     if (isNaN(rows) || rows < 3 || rows > 8) {
         rowsInput.style.borderColor = "#ff007f";
@@ -712,16 +1117,14 @@ function submitGridModification() {
         setTimeout(() => { colsInput.style.borderColor = ""; }, 1000);
         hasError = true;
     }
-    
     if (hasError) return;
-    
+
     gridRows = rows;
     gridCols = cols;
-    
-    // Hide overlay semantics
+
     const overlay = document.getElementById('mod-modal-overlay');
     if (overlay) overlay.setAttribute('aria-hidden', 'true');
-    
+
     hideModificationModal();
     setupSlidingPuzzle();
 }
@@ -732,7 +1135,6 @@ function showVictoryModal() {
     if (overlay) {
         overlay.classList.add('show');
         overlay.setAttribute('aria-hidden', 'false');
-        // Shift screen-reader focus cleanly to victory window
         const titleNode = document.getElementById('victory-title');
         if (titleNode) setTimeout(() => { titleNode.setAttribute('tabindex', '-1'); titleNode.focus(); }, 100);
     }

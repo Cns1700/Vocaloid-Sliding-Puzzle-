@@ -765,18 +765,23 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
 .generated-cert-container {
     background: #111a22;
     border-radius: 12px;
-    padding: 12px;
+    padding: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+    max-width: 100%;
 }
 
+/* Keep preview inside the modal — never stretched, never taller than ~55vh */
 .cert-image-preview {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
     display: block;
-    margin-bottom: 12px;
+    width: auto;
+    max-width: 100%;
+    max-height: 55vh;
+    height: auto;
+    margin: 0 auto 12px auto;
+    border-radius: 8px;
     border: 1px solid var(--modal-theme-color);
+    object-fit: contain;
 }
 
 .cert-actions {
@@ -784,4 +789,12 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     gap: 10px;
     justify-content: center;
     margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+/* Victory modal: scroll if needed, constrained width */
+#victory-modal-card {
+    max-height: 90vh;
+    overflow-y: auto;
+    width: min(560px, 95vw) !important;
 }

@@ -147,10 +147,16 @@ function setupSlidingPuzzle() {
     targetImage.onload = function () {
         const imageWidth = targetImage.naturalWidth || 800;
         const imageHeight = targetImage.naturalHeight || 600;
-        const imageAspectRatio = imageWidth / imageHeight;
 
-        const viewWidth = Math.min(window.innerWidth * 0.9, 650);
-        const viewHeight = viewWidth / imageAspectRatio;
+        // Fit board inside a shared "play area" so landscape and portrait
+        // both land at similar on-screen sizes (no giant portrait boards).
+        // Leave room for header + control bar + itch embed chrome.
+        const maxW = Math.min(window.innerWidth * 0.92, 640);
+        const maxH = Math.min(window.innerHeight * 0.62, 560);
+
+        const scale = Math.min(maxW / imageWidth, maxH / imageHeight);
+        const viewWidth = Math.max(180, Math.round(imageWidth * scale));
+        const viewHeight = Math.max(180, Math.round(imageHeight * scale));
 
         container.style.width = `${viewWidth}px`;
         container.style.height = `${viewHeight}px`;

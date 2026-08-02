@@ -3,22 +3,40 @@
 Internal reference for the **finalized** version of this project.  
 Player-facing docs live in `README.md` / `README.ja.md`.
 
+Live builds:
+
+- itch.io: https://mizuchisylph.itch.io/vocaloid-sliding-puzzle  
+- GitHub: https://github.com/Cns1700/Vocaloid-Sliding-Puzzle-
+
 ---
 
 ## File map
 
 | File / folder | Role |
 |---|---|
-| `index.html` | Gallery page. Hard-coded character cards + thumbnail links that pass `?char=…&puzzle=…` to the workspace. |
-| `workspace_template.html` | Game page. Puzzle board, control bar, modals (grid size, pause, victory + certificate). Loads `engine_logic.js`. |
-| `engine_logic.js` | All game logic (single file, sectioned with `====` banners). |
-| `style_sheet.css` | All styling, including certificate preview constraints and victory-modal scroll rules. |
-| `gallery-preview.js` | Hover preview pop-up on gallery thumbnails. |
-| `Puzzles/` | Source illustrations grouped by character / module. |
-| `BG-character-cards/` | Card background art used on the gallery. |
-| `screenshots/` | PNGs referenced by the player READMEs. |
+| `index.html` | Gallery page. Character cards + thumbnail links (`?char=…&puzzle=…`). Uses **`thumbs/`** for preview images. |
+| `workspace_template.html` | Game page. Puzzle board, control bar, modals. Loads `engine_logic.js`. |
+| `engine_logic.js` | All game logic (one file, sectioned with `====` banners). |
+| `style_sheet.css` | All styling: gallery, board, modals, certificate preview, responsive / itch-friendly media queries. |
+| `gallery-preview.js` | Hover preview on gallery thumbnails (deferred). |
+| `Puzzles/` | Full-resolution illustrations (loaded only when a puzzle is opened). |
+| `thumbs/` | Small WebP gallery thumbnails (~2–6 KB each). **Required** on the gallery page. |
+| `BG-character-cards/` | Card background art for the gallery. |
+| `BG-Freepik/` | Page background art. |
+| `screenshots/` | PNGs for the player READMEs (GitHub). |
 | `README.md` / `README.ja.md` | Player-facing English / Japanese. |
 | `DEVELOPER.md` | This file. |
+
+### Do not ship to itch.io
+
+| Exclude | Why |
+|---|---|
+| `*.xcf` | GIMP sources (large, unused at runtime) |
+| `engine_logic_review.js` | Old review draft |
+| `Vocaloid-Sliding-Puzzle.zip` | Nested archive |
+| `.git/` | VCS metadata |
+| `screenshots/` | Optional; not needed to play |
+| `DEVELOPER.md` | Optional on itch |
 
 ---
 
@@ -26,14 +44,29 @@ Player-facing docs live in `README.md` / `README.ja.md`.
 
 Search for the `====` banners:
 
-1. **GLOBAL STATE & THEMES** — grid size, tiles array, history, stopwatch flags, theme map, URL params  
+1. **GLOBAL STATE & THEMES** — grid size, tiles, history, stopwatch flags, theme map, URL params  
 2. **BOARD STATE KEYS & HISTORY** — `getBoardStateKey()`, `pushMoveToHistory()` (cycle pruning with a `Set`)  
 3. **SETUP / GRID BUILD / SHUFFLE** — `setupSlidingPuzzle()`, `buildGrid()`, `shuffleBoard()`, `repositionAllTiles()`  
 4. **MOVE HANDLING** — `tryMoveTile()`  
-5. **A\* SOLVER (Auto Solve)** — snapshot, Manhattan heuristic, A\* search, path animation, `triggerAutoSolve()`  
-6. **VICTORY & CERTIFICATE** — `checkVictory()`, canvas certificate generation, blank-tile reveal  
+5. **A\* SOLVER (Auto Solve)** — Manhattan heuristic, adaptive node budget, path animation, `triggerAutoSolve()`  
+6. **VICTORY & CERTIFICATE** — `checkVictory()`, canvas certificate, blank-tile reveal  
 7. **STOPWATCH / PAUSE / HINT**  
 8. **MODALS & UI HELPERS**
+
+---
+
+## Board display size (portrait + landscape)
+
+`setupSlidingPuzzle()` sizes the board to fit a **shared play area**, not “fixed width then unlimited height”:
+
+- `maxW = min(92% of window width, 640)`  
+- `maxH = min(62% of window height, 560)`  
+- `scale = min(maxW / imageWidth, maxH / imageHeight)`  
+- Board pixel size = image size × scale  
+
+So landscape and portrait both stay on-screen at similar overall footprint. Tiles stay proportional to the image (rectangular tiles when the art is not square). Full-resolution art is still used for the tile backgrounds; only the **on-screen board box** is scaled.
+
+itch.io: fullscreen + scroll enabled on the embed works well with this. Gallery may still scroll on short embeds; workspace boards (including Supreme portraits) should fit without forced browser zoom.
 
 ---
 
@@ -41,37 +74,35 @@ Search for the `====` banners:
 
 `shuffleBoard()` runs on **every fresh board setup**:
 
-- First load of `workspace_template.html`
-- Player changes grid size (“Apply Grid”)
-- Player clicks “Play Again” after a win
+- First load of `workspace_template.html`  
+- Player changes grid size (“Apply Grid”)  
+- Player clicks “Play Again” after a win  
 
 Rules:
 
 - Only legal slides from the solved position → every puzzle is solvable  
-- Step count: `min(rows × cols × 18, 700)` (lighter than the original ×40 design)  
-- Avoids immediately reversing the previous move when other options exist (better mixing with fewer steps)  
-- Uses the same cycle-pruning history system as player moves
+- Step count: `min(rows × cols × 18, 700)`  
+- Avoids immediately reversing the previous move when other options exist  
+- Uses the same cycle-pruning history system as player moves  
 
 ---
 
 ## History / cycle pruning
 
-During player moves **and** the shuffle, the engine keeps:
-
 | Structure | Purpose |
 |---|---|
-| `moveHistory` | Ordered list of tile IDs moved (used for Auto Solve fallback) |
-| `stateHistory` | Ordered list of board-state keys (path truncation) |
-| `visitedStates` | `Set` for O(1) “have we seen this layout?” checks |
+| `moveHistory` | Ordered tile IDs (Auto Solve fallback path) |
+| `stateHistory` | Ordered board-state keys (path truncation) |
+| `visitedStates` | `Set` for O(1) “seen this layout?” checks |
 
-When a previously seen state reappears, both histories are truncated so loops are removed. This keeps the fallback Auto Solve path reasonably short.
+When a previous state reappears, histories are truncated so loops are removed.
 
 ---
 
 ## Auto Solve (A*)
 
-- Real **A\*** search with **Manhattan distance** heuristic  
-- Adaptive node budget (keeps the tab responsive):
+- Real **A\*** with **Manhattan distance**  
+- Adaptive node budget:
 
   | Grid size (cells) | Node budget |
   |---|---|
@@ -80,85 +111,105 @@ When a previously seen state reappears, both histories are truncated so loops ar
   | ≤ 25 (e.g. 5×5) | 40 000 |
   | larger | 25 000 |
 
-- If the budget is exhausted → falls back to reversing the recorded shuffle path (always works) and shows a toast  
-- Immediate “Solving…” / “Solver searching…” toast so the UI never feels frozen  
-- Solution is animated via `tryMoveTile(..., false)` in sequence  
-- Auto-solved clears are marked on the certificate as **not** leaderboard-eligible
+- Budget exhausted → reverse recorded shuffle path + toast  
+- Immediate “Solving…” / “Solver searching…” toast  
+- Path animated with `tryMoveTile(..., false)`  
+- Auto-solved clears marked **not** leaderboard-eligible on the certificate  
 
 ---
 
-## Certificate generation (final design)
+## Certificate generation
 
-`generateCertificateImage()` builds a client-side canvas PNG.
+`generateCertificateImage()` — client-side canvas PNG.
 
-### Canvas size & aspect
+### Canvas & frame
 
-- Canvas aspect ratio **matches the puzzle image** (no stretch)  
-- Longest side capped at **1280** (readable download + fits the victory modal)
-
-### Background image vs frame
-
-- Image is drawn **only inside the outer frame border** (`margin` inset)  
-- Because canvas aspect = image aspect, that inner rectangle is filled completely — **no letterboxing dead space**, **no distortion**, and the art never crosses the first border  
-- Multi-layer frame: outer theme stroke, mid accent, inner light line, corner brackets  
-- Dark overlay for text readability
+- Canvas aspect **matches the puzzle image** (no stretch)  
+- Longest side capped at **1280**  
+- Image drawn **only inside the outer frame** (fills that rect; no letterbox dead space; does not cross the first border)  
+- Multi-layer frame + corner brackets + dark overlay  
 
 ### Typography (orientation-aware)
 
-Portrait and landscape use different recipes so long titles do not clip the side borders:
-
 | | Portrait | Landscape |
 |---|---|---|
-| Title | Width-based; if a single line would shrink too far → **two lines** (`VOCALOID` / `PUZZLE RECORD`) | Single line, more generous size |
-| Body / stats | Sized from canvas **width** | Slightly larger |
+| Title | Width-based; may wrap to two lines (`VOCALOID` / `PUZZLE RECORD`) | Single line |
+| Body / stats | Sized from canvas width | Slightly larger |
 | Stamp / status | `fitFont` + safety margin | Same |
 
-- Entire results block (title → stats box → stamp) is **vertically centered** in the safe content area  
-- `fitFont()` shrinks any line until it fits inside the safe width (with a small safety factor for font-metric variance)
+Results block (title → stats → stamp) is **vertically centered** in the safe area.
 
-### Modal preview (CSS)
+### Modal CSS
 
-In `style_sheet.css`:
+- `.cert-image-preview` — `max-height: 55vh`, `object-fit: contain`  
+- `#victory-modal-card` — `max-height: 90vh`, scroll if needed  
 
-- `.cert-image-preview` — `max-height: 55vh`, `width: auto`, `object-fit: contain` (no forced stretch in the browser)  
-- `#victory-modal-card` — `max-height: 90vh`, scroll if needed, width capped
+---
+
+## Gallery performance & responsive layout
+
+### Thumbs (critical for itch / GitHub speed)
+
+Gallery used to load full `Puzzles/` files as tiny `<img>` tags (~**45 MB**). That blocked interaction on remote hosts.
+
+**Current:** `thumbs/` WebP previews (~**89 KB** total). `index.html` uses those with `loading="lazy"` and `decoding="async"`. Full images load only in the workspace.
+
+When adding a puzzle: create ≈168×100 WebP under `thumbs/` and point the gallery `src` at it. Keep the full file under `Puzzles/` for the workspace `?puzzle=` param.
+
+### CSS / media queries
+
+- Fluid character cards (`max-width`, not fixed-only widths)  
+- Thumbnail rows **wrap** so many picks are not clipped  
+- Breakpoints ~1280 / 1100 / 992 / 700 for gallery columns  
+- `max-height: 800px` tightens vertical spacing for short embeds  
+- `html` / `body` allow vertical scroll in the itch iframe  
 
 ---
 
 ## Adding a new character / puzzle
 
-1. Put the illustration files under `Puzzles/<Character-or-Module>/`.  
-2. Add a theme entry in the `themes` object inside `engine_logic.js`:
+1. Add full art under `Puzzles/<Character-or-Module>/`.  
+2. Generate a small WebP thumb under `thumbs/` (≈168×100).  
+3. Theme entry in `engine_logic.js` `themes`:
    ```js
    'my-key': { title: 'Display Name 🎵', color: '#hex', img: 'Puzzles/My-Folder/' }
    ```
-3. Add a card + thumbnail links in `index.html` that point to  
-   `workspace_template.html?char=my-key&puzzle=filename.jpg`  
-4. (Optional) Add matching card background art under `BG-character-cards/`.
+4. Gallery card + links in `index.html`:
+   - `href` → `workspace_template.html?char=my-key&puzzle=filename.jpg`  
+   - `img src` → `thumbs/....webp`  
+5. Optional: card background under `BG-character-cards/`.  
 
-No build step — refresh the gallery after editing.
+No build step — refresh and re-upload.
 
 ---
 
 ## Screenshots for the README
 
-Place four PNGs in `screenshots/` with these exact names:
+Place four PNGs in `screenshots/`:
 
-| File | Suggested content |
+| File | Content |
 |---|---|
-| `gallery.png` | Main gallery / character select |
-| `workspace.png` | Mid-game puzzle board with controls visible |
-| `hint.png` | Board with numbered hint overlays showing |
-| `victory.png` | Victory modal + generated certificate |
+| `gallery.png` | Character select |
+| `workspace.png` | Mid-game board + controls |
+| `hint.png` | Hint numbers visible |
+| `victory.png` | Victory modal + certificate |
 
-The tables in `README.md` / `README.ja.md` pick them up automatically on GitHub (same pattern as the Miku Fever project).
+---
+
+## itch.io embed notes
+
+- Kind: **HTML**, index: `index.html`  
+- Fullscreen: **on**  
+- Scroll: **on** (mainly helps the gallery)  
+- Viewport example that works: **1280 × 800** (or 720)  
+- Ship `thumbs/` in the zip; exclude `.xcf` and review files  
 
 ---
 
 ## Notes & limitations
 
-- A\* is optimal or near-optimal on small/medium grids. On large grids the node budget may be hit and the recorded-path fallback is used.  
-- Certificate “security status” text is visual only (client-side canvas).  
-- Themes and image paths are still hard-coded in a few places; a future cleanup could centralize them in one config object.  
-- No module system — one JS file so the project stays a simple static drop-in.  
-- Do not push changes to GitHub from external contributors without the owner’s explicit action; the owner commits and pushes themselves.
+- A\* is strong on small/medium grids; large grids may use the recorded-path fallback.  
+- Certificate “security status” is visual only.  
+- Themes / paths are still partly hard-coded; a single config object would be a future cleanup.  
+- One JS file on purpose — static drop-in, no bundler.  
+- Owner commits and pushes to GitHub; external tools should not push as a contributor without explicit owner action.  

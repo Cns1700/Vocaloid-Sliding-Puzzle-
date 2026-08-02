@@ -1,0 +1,7 @@
+*.zip
+*.xcf
+engine_logic_review.js
+.DS_Store
+Thumbs.db
+.vscode/
+**/gimp-sliding/

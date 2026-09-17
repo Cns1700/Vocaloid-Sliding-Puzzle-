@@ -53,7 +53,7 @@ No build step. Open `index.html`, or serve the folder with any static server.
 
 ## Credits
 
-Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work. Character-card backgrounds are from Magnific (formerly Freepik). Full-page scene photos are non-AI photographs.
+Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work. Character-card and full-page backgrounds are Magnific (formerly Freepik) illustrations — not photographs and not AI.
 
 ## License
 

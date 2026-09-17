@@ -2,6 +2,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const previewDiv = document.createElement('div');
     previewDiv.classList.add('hover-preview-pop');
+    const previewImg = document.createElement('img');
+    previewImg.alt = '';
+    previewDiv.appendChild(previewImg);
     document.body.appendChild(previewDiv);
 
     const records = typeof vspLoadRecords === 'function' ? vspLoadRecords() : { puzzles: {} };
@@ -59,31 +62,54 @@ document.addEventListener('DOMContentLoaded', () => {
         const canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
         if (canHover) {
             thumb.addEventListener('mouseenter', () => {
-                previewDiv.style.backgroundImage = `url('${previewSrc}')`;
-                const rect = thumb.getBoundingClientRect();
-                const previewWidth = 280;
-                const previewHeight = 200;
-                const clearance = 14;
-                let centerX = rect.left + window.scrollX + rect.width / 2 - previewWidth / 2;
-                let topY = rect.top + window.scrollY - previewHeight - clearance;
-                const minX = window.scrollX + 8;
-                const maxX = window.scrollX + window.innerWidth - previewWidth - 8;
-                centerX = Math.max(minX, Math.min(maxX, centerX));
-                if (topY < window.scrollY + 8) {
-                    topY = rect.bottom + window.scrollY + clearance;
-                }
-                previewDiv.style.width = `${previewWidth}px`;
-                previewDiv.style.height = `${previewHeight}px`;
-                previewDiv.style.left = `${centerX}px`;
-                previewDiv.style.top = `${topY}px`;
-                previewDiv.style.opacity = '1';
+                previewDiv.dataset.active = '1';
+                const panel = thumb.closest('.character-panel');
+                const theme = panel ? getComputedStyle(panel).getPropertyValue('--theme-color').trim() : '';
+                if (theme) previewDiv.style.borderColor = theme;
+                previewImg.src = previewSrc;
+
+                const place = () => {
+                    if (previewDiv.dataset.active !== '1') return;
+                    const MAX_W = 268;
+                    const MAX_H = 200;
+                    const natW = previewImg.naturalWidth || MAX_W;
+                    const natH = previewImg.naturalHeight || MAX_H;
+                    const scale = Math.min(MAX_W / natW, MAX_H / natH);
+                    const previewWidth = Math.max(72, Math.round(natW * scale));
+                    const previewHeight = Math.max(72, Math.round(natH * scale));
+                    previewImg.style.width = `${previewWidth}px`;
+                    previewImg.style.height = `${previewHeight}px`;
+
+                    const rect = thumb.getBoundingClientRect();
+                    const clearance = 12;
+                    let centerX = rect.left + window.scrollX + rect.width / 2 - previewWidth / 2;
+                    let topY = rect.top + window.scrollY - previewHeight - clearance;
+                    const minX = window.scrollX + 8;
+                    const maxX = window.scrollX + window.innerWidth - previewWidth - 8;
+                    centerX = Math.max(minX, Math.min(maxX, centerX));
+                    if (topY < window.scrollY + 8) {
+                        topY = rect.bottom + window.scrollY + clearance;
+                    }
+                    previewDiv.style.left = `${centerX}px`;
+                    previewDiv.style.top = `${topY}px`;
+                    previewDiv.style.opacity = '1';
+                };
+
+                if (previewImg.complete && previewImg.naturalWidth) place();
+                else previewImg.onload = place;
             });
 
             thumb.addEventListener('mouseleave', () => {
+                previewDiv.dataset.active = '0';
                 previewDiv.style.opacity = '0';
             });
         }
     });
+
+    window.addEventListener('scroll', () => {
+        previewDiv.dataset.active = '0';
+        previewDiv.style.opacity = '0';
+    }, { passive: true });
 
     const progress = document.getElementById('gallery-progress');
     if (progress) progress.textContent = `Cleared ${cleared} / ${thumbs.length}`;

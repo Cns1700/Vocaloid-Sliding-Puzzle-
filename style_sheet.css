@@ -56,79 +56,7 @@ body {
     transition: background 2.4s ease;
 }
 
-.particle-field {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.ambient-particle {
-    position: absolute;
-    bottom: -8%;
-    border-radius: 50%;
-    background: var(--ambient-color);
-    opacity: 0;
-    box-shadow: 0 0 10px var(--ambient-color);
-    animation-name: particleDrift;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-}
-
-.fx-layer {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    overflow: hidden;
-}
-
-.fx-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(2px);
-    background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--ambient-color) 70%, #fff), transparent 70%);
-    opacity: 0.28;
-    animation: orbFloat 18s ease-in-out infinite;
-}
-
-.fx-orb-1 { width: 220px; height: 220px; left: -40px; top: 12%; animation-duration: 22s; }
-.fx-orb-2 { width: 140px; height: 140px; right: 8%; top: 58%; animation-duration: 16s; animation-delay: -6s; }
-.fx-orb-3 { width: 90px; height: 90px; left: 18%; bottom: 8%; animation-duration: 20s; animation-delay: -10s; }
-
-.fx-ring {
-    position: absolute;
-    width: 420px;
-    height: 420px;
-    right: -120px;
-    top: -80px;
-    border-radius: 50%;
-    border: 2px solid color-mix(in srgb, var(--ambient-color) 45%, transparent);
-    box-shadow: 0 0 24px color-mix(in srgb, var(--ambient-color) 25%, transparent);
-    animation: ringSpin 48s linear infinite;
-    opacity: 0.45;
-}
-
-@keyframes particleDrift {
-    0% { transform: translate3d(0, 0, 0); opacity: 0; }
-    12% { opacity: 0.55; }
-    88% { opacity: 0.4; }
-    100% { transform: translate3d(28px, -115vh, 0); opacity: 0; }
-}
-
-@keyframes orbFloat {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(24px, -18px, 0); }
-}
-
-@keyframes ringSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .ambient-particle, .fx-orb, .fx-ring { animation: none !important; opacity: 0.2; }
     .bg-image-layer { transition: none; }
 }
 
@@ -410,23 +338,30 @@ header p {
     display: block;
 }
 
-/* Gallery Hover Pop Preview Window */
+/* Gallery Hover Pop Preview Window — window matches image aspect, no letterbox */
 .hover-preview-pop {
     position: absolute;
-    width: 280px;
-    height: 200px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: rgba(17, 26, 34, 0.95);
-    border: 3px solid var(--modal-theme-color, #ff69b4);
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    width: auto;
+    height: auto;
+    padding: 0;
+    overflow: hidden;
+    background: #0b141c;
+    border: 2px solid var(--theme-color, #ff69b4);
+    border-radius: 10px;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.72);
     pointer-events: none;
-    image-rendering: auto;
     opacity: 0;
     transition: opacity 0.15s ease;
     z-index: 1000;
+}
+
+.hover-preview-pop img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 268px;
+    max-height: 200px;
+    object-fit: contain;
 }
 
 /* Game Interface Page Controls */

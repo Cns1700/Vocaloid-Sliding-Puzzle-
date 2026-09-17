@@ -1,4 +1,4 @@
-/* Gallery / workspace ambient background (crossfade + drifting motes). */
+/* Gallery / workspace ambient background (crossfade + color wash). */
 const VSP_AMBIENT_THEMES = {
     'miku-original': { color: '#00ffcc', bg: 'BG-themes/miku-original.webp' },
     'miku-supreme':  { color: '#4da6ff', bg: 'BG-themes/miku-supreme.webp' },
@@ -11,7 +11,6 @@ const VSP_AMBIENT_ORDER = ['miku-original', 'miku-supreme', 'miku-honey', 'miku-
 let vspActiveBgLayer = 'A';
 let vspAmbientTimer = null;
 let vspAmbientIndex = 0;
-let vspParticlesReady = false;
 
 function vspHexToRgba(hex, alpha) {
     const h = hex.replace('#', '');
@@ -37,25 +36,6 @@ function vspSetAmbientTheme(key) {
     vspActiveBgLayer = vspActiveBgLayer === 'A' ? 'B' : 'A';
 }
 
-function vspInitParticles() {
-    const field = document.getElementById('particleField');
-    if (!field || vspParticlesReady) return;
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    vspParticlesReady = true;
-    for (let i = 0; i < 14; i++) {
-        const el = document.createElement('span');
-        el.className = 'ambient-particle';
-        const duration = 16 + Math.random() * 14;
-        const size = 5 + Math.random() * 9;
-        el.style.left = `${Math.random() * 100}%`;
-        el.style.width = `${size}px`;
-        el.style.height = `${size}px`;
-        el.style.animationDuration = `${duration}s`;
-        el.style.animationDelay = `${-Math.random() * duration}s`;
-        field.appendChild(el);
-    }
-}
-
 function vspStartAmbientCycle() {
     vspStopAmbientCycle();
     vspAmbientIndex = 0;
@@ -74,7 +54,6 @@ function vspStopAmbientCycle() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    vspInitParticles();
     const params = new URLSearchParams(window.location.search);
     const lock = params.get('char');
     const onWorkspace = /workspace_template\.html/i.test(window.location.pathname);

@@ -20,8 +20,8 @@ Live builds:
 | `style_sheet.css` | All styling: gallery, board, modals, certificate preview, responsive / itch-friendly media queries. |
 | `gallery-preview.js` | Hover preview, daily banner, gallery PB badges. |
 | `records.js` | Shared catalog, `localStorage` records, daily hash, star math. |
-| `ambient.js` | Home-page background crossfade + drifting motes. Same layer on the puzzle page, locked to the selected character. |
-| `BG-themes/` | Compressed WebP scene photos for the ambient layers. |
+| `ambient.js` | Home-page background crossfade + color wash. Same layer on the puzzle page, locked to the selected character. |
+| `BG-themes/` | Compressed WebP **illustrations** (Magnific / Freepik, non-AI) for the ambient layers. |
 | `Puzzles/` | Full-resolution illustrations (loaded only when a puzzle is opened). |
 | `thumbs/` | Small WebP gallery strip thumbnails. **Required** on the gallery page. |
 | `previews/` | Medium WebP hover previews (~15–90 KB). Used by `data-preview` on thumb links. |
@@ -103,11 +103,11 @@ A daily clear is stored under `records.daily` for that date so the banner can ma
 
 The gallery is a **stacked roster** (one row per character: name banner + thumbs). The old 5-dot dice grid is gone.
 
-`ambient.js` copies the Miku Fever pattern: two `#bgImageLayerA/B` divs crossfade with opacity, a wash tinted by `--ambient-color`, and a handful of CSS motes. Gallery cycles every 9 seconds. Puzzle pages read `?char=` and lock that theme. Motion is `transform`/`opacity` only. `prefers-reduced-motion` turns the loop off.
+`ambient.js` copies the Miku Fever pattern: two `#bgImageLayerA/B` divs crossfade with opacity, and a wash tinted by `--ambient-color`. Gallery cycles every 9 seconds. Puzzle pages read `?char=` and lock that theme. Motion is `opacity` only. `prefers-reduced-motion` turns the loop off. There is no particle field.
 
 Character name banners no longer change a dark overlay on hover. Panels use the character color instead of a grey box.
 
-Full-page photos live in `BG-themes/` (non-AI). Character-card art is still the Magnific / Freepik set under `BG-character-cards/`.
+Full-page backgrounds in `BG-themes/` are Magnific (formerly Freepik) **illustrations** — the same art family as the character cards (cyan hub, diamond, floral arrangement, clocks, gothic balcony). No photographs, no AI images. Hover previews on the gallery size the window to the picture’s aspect so portraits do not sit in a letterbox.
 
 When you add a puzzle, append it to `VSP_CATALOG` in `records.js` **and** the gallery HTML.
 

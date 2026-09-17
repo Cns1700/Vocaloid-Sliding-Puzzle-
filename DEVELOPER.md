@@ -1,12 +1,12 @@
 # Vocaloid Sliding Puzzle — Developer Notes
 
-Internal reference for the **finalized** version of this project.  
-Player-facing docs live in `README.md` / `README.ja.md`.
+How the current build is put together. Player-facing docs live in `README.md` and `README.ja.md`.
 
 Live builds:
 
 - itch.io: https://mizuchisylph.itch.io/vocaloid-sliding-puzzle  
 - GitHub: https://github.com/Cns1700/Vocaloid-Sliding-Puzzle-
+
 
 ---
 
@@ -18,7 +18,8 @@ Live builds:
 | `workspace_template.html` | Game page. Puzzle board, control bar, modals. Loads `engine_logic.js`. |
 | `engine_logic.js` | All game logic (one file, sectioned with `====` banners). |
 | `style_sheet.css` | All styling: gallery, board, modals, certificate preview, responsive / itch-friendly media queries. |
-| `gallery-preview.js` | Hover preview on gallery thumbnails (deferred). |
+| `gallery-preview.js` | Hover preview, daily banner, gallery PB badges. |
+| `records.js` | Shared catalog, `localStorage` records, daily hash, star math. |
 | `Puzzles/` | Full-resolution illustrations (loaded only when a puzzle is opened). |
 | `thumbs/` | Small WebP gallery strip thumbnails. **Required** on the gallery page. |
 | `previews/` | Medium WebP hover previews (~15–90 KB). Used by `data-preview` on thumb links. |
@@ -52,7 +53,55 @@ Search for the `====` banners:
 5. **A\* SOLVER (Auto Solve)** — Manhattan heuristic, adaptive node budget, path animation, `triggerAutoSolve()`  
 6. **VICTORY & CERTIFICATE** — `checkVictory()`, canvas certificate, blank-tile reveal  
 7. **STOPWATCH / PAUSE / HINT**  
-8. **MODALS & UI HELPERS**
+8. **MODALS & UI HELPERS**  
+9. **PEEK** — `triggerPeek()` (full-image flash)
+
+---
+
+## Records, stars, peek, daily stage
+
+All of this is local. Key: `vsp-records-v1`.
+
+### Personal bests
+
+`vspRecordManualClear()` writes after a **manual** win only. Auto Solve does not overwrite PBs.
+
+Per puzzle id (`char|filename`):
+
+- `cleared`
+- `bestStars` (max 1–3 across grids)
+- `bests["RxC"]` → `{ time, moves, stars }`
+
+The gallery paints a star badge on cleared thumbs and a short PB line (`4x4 · 32m`). Progress text is `Cleared n / 24`.
+
+### Stars
+
+`vspComputeStars(isAuto, moves, seconds, rows, cols)`:
+
+| Result | When |
+|---|---|
+| 0 / UNRANKED | Auto Solve |
+| 3 | `moves ≤ cells×3` and `time ≤ cells×6` seconds |
+| 2 | `moves ≤ cells×8` and `time ≤ cells×14` |
+| 1 | any other manual clear |
+
+Shown on the victory copy and as a **RANK** row on the certificate.
+
+### Peek
+
+Three uses per board setup (same reset as hints: new shuffle / Play Again / Apply Grid). Shows `#peek-overlay` for 1.2s. Does not pause the timer.
+
+### Daily stage
+
+`vspTodayFeatured()` hashes the local calendar date (`YYYY-MM-DD`) against `VSP_CATALOG` and a small grid list (`3×3`, `3×4`, `4×4`, `4×5`). Same day → same stage for everyone in that timezone.
+
+Play link: `workspace_template.html?char=…&puzzle=…&daily=1&rows=…&cols=…`
+
+A daily clear is stored under `records.daily` for that date so the banner can mark it done.
+
+When you add a puzzle, append it to `VSP_CATALOG` in `records.js` **and** the gallery HTML.
+
+Changing the grid on a daily run drops the daily flag, so a custom size is not counted as today’s stage.
 
 ---
 

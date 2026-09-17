@@ -11,6 +11,7 @@
      6. VICTORY & CERTIFICATE
      7. STOPWATCH / PAUSE / HINT
      8. MODALS & UI HELPERS
+     9. RECORDS / PEEK / DAILY
    ============================================================ */
 
 // ============================================================
@@ -27,6 +28,8 @@ let blankRow = 2;
 let blankCol = 2;
 let movesCount = 0;
 let hintsLeft = 3;
+let peeksLeft = 3;
+let isDailyRun = false;
 
 // History tracking (used for cycle pruning during play + shuffle, and as A* fallback)
 let moveHistory = [];
@@ -62,6 +65,11 @@ const activeKey = urlParams.get('char') || 'miku-original';
 const puzzleFile = urlParams.get('puzzle') || 'Cyber_Miku_1.jpg';
 const currentTheme = themes[activeKey] || themes['miku-original'];
 const fullImageURL = `${currentTheme.img}${puzzleFile}`;
+isDailyRun = urlParams.get('daily') === '1';
+const urlRows = parseInt(urlParams.get('rows'), 10);
+const urlCols = parseInt(urlParams.get('cols'), 10);
+if (!isNaN(urlRows) && urlRows >= 3 && urlRows <= 8) gridRows = urlRows;
+if (!isNaN(urlCols) && urlCols >= 3 && urlCols <= 8) gridCols = urlCols;
 
 // Helper: wrap emojis so text-shadow / effects do not recolor them
 function wrapEmojis(text) {
@@ -77,6 +85,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.documentElement.style.setProperty('--modal-theme-color', currentTheme.color);
     setupVictoryModalMinimizeButton();
+    if (isDailyRun) {
+        const titleNode = document.getElementById('game-title');
+        if (titleNode) {
+            titleNode.innerHTML = wrapEmojis('Daily Stage · ' + currentTheme.title);
+        }
+    }
     setupSlidingPuzzle();
 });
 
@@ -133,12 +147,20 @@ function setupSlidingPuzzle() {
     updateMovesDisplay();
     gameWon = false;
     wasAutoSolved = false;
+    hintsLeft = 3;
+    peeksLeft = 3;
     moveHistory = [];
     stateHistory = [];
     visitedStates = new Set();
 
     const hintCountNode = document.getElementById('hints-count');
     if (hintCountNode) hintCountNode.textContent = hintsLeft;
+    const peekCountNode = document.getElementById('peeks-count');
+    if (peekCountNode) peekCountNode.textContent = peeksLeft;
+    const hintBtn = document.getElementById('hint-btn');
+    const peekBtn = document.getElementById('peek-btn');
+    if (hintBtn) hintBtn.disabled = hintsLeft <= 0;
+    if (peekBtn) peekBtn.disabled = peeksLeft <= 0;
 
     const certWrapper = document.getElementById('certificate-render-area');
     if (certWrapper) certWrapper.innerHTML = '';
@@ -616,11 +638,25 @@ function checkVictory() {
                     `;
                 }
             } else {
-                if (titleNode) titleNode.innerHTML = `🎉 Congratulations!`;
+                if (titleNode) titleNode.innerHTML = `Congratulations!`;
                 if (msgNode) {
-                    msgNode.innerHTML = `You completed the sliding puzzle in <strong>${timeString}</strong> with <strong>${movesCount}</strong> total moves! 🏆✨<br><br>
-                    Thank you for playing!`;
+                    const starN = vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols);
+                    msgNode.innerHTML = `You finished in <strong>${timeString}</strong> with <strong>${movesCount}</strong> moves.<br>
+                    Rank: <strong class="star-rank">${vspStarGlyphs(starN)}</strong>${isDailyRun ? '<br>Daily stage recorded.' : ''}`;
                 }
+            }
+
+            if (!wasAutoSolved) {
+                vspRecordManualClear({
+                    charKey: activeKey,
+                    puzzleName: puzzleFile,
+                    rows: gridRows,
+                    cols: gridCols,
+                    seconds: elapsedSeconds,
+                    moves: movesCount,
+                    stars: vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols),
+                    isDaily: isDailyRun
+                });
             }
 
             generateCertificateImage(wasAutoSolved, timeString, movesCount);
@@ -820,7 +856,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         const gapLineToTarget = Math.round(26 * s);
         const gapTargetToAchieved = Math.round(26 * s);
         const gapAchievedToBox = Math.round(20 * s);
-        const boxH = Math.round((isPortrait ? 124 : 138) * s);
+        const boxH = Math.round((isPortrait ? 148 : 162) * s);
         const gapBoxToStamp = Math.round(26 * s);
         const gapStampToStatus = Math.round(22 * s);
 
@@ -892,11 +928,15 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         ctx.fillRect(boxX, boxY, boxW, boxH);
         ctx.strokeRect(boxX, boxY, boxW, boxH);
 
-        const row1 = boxY + Math.round(34 * s);
-        const row2 = boxY + Math.round(64 * s);
-        const row3 = boxY + Math.round(94 * s);
+        const row1 = boxY + Math.round(30 * s);
+        const row2 = boxY + Math.round(54 * s);
+        const row3 = boxY + Math.round(78 * s);
+        const row4 = boxY + Math.round(102 * s);
         const leftX = boxX + Math.round(22 * s);
         const rightX = boxX + boxW - Math.round(22 * s);
+
+        const starN = vspComputeStars(isAuto, movesVal, elapsedSeconds, gridRows, gridCols);
+        const rankText = isAuto ? 'UNRANKED' : vspStarGlyphs(starN);
 
         ctx.textAlign = "left";
         ctx.fillStyle = "#a0aec0";
@@ -904,6 +944,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         ctx.fillText("GRID DIMENSION:", leftX, row1);
         ctx.fillText("ELAPSED TIME:", leftX, row2);
         ctx.fillText("TOTAL MOVES:", leftX, row3);
+        ctx.fillText("RANK:", leftX, row4);
 
         ctx.textAlign = "right";
         ctx.fillStyle = "#ffffff";
@@ -911,6 +952,8 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         ctx.fillText(`${gridRows} x ${gridCols} Grid`, rightX, row1);
         ctx.fillText(timeStr, rightX, row2);
         ctx.fillText(String(movesVal), rightX, row3);
+        ctx.fillStyle = isAuto ? "#e74c3c" : "#ffd76a";
+        ctx.fillText(rankText, rightX, row4);
 
         // Stamp + status
         y = boxY + boxH + gapBoxToStamp + stampSize;
@@ -1060,6 +1103,8 @@ function triggerHint() {
     hintsLeft--;
     const hintCountNode = document.getElementById('hints-count');
     if (hintCountNode) hintCountNode.textContent = hintsLeft;
+    const hintBtn = document.getElementById('hint-btn');
+    if (hintBtn) hintBtn.disabled = hintsLeft <= 0;
 
     const hintNumbers = container.querySelectorAll('.tile-hint-number');
     hintNumbers.forEach(num => num.style.display = 'block');
@@ -1067,6 +1112,29 @@ function triggerHint() {
     setTimeout(() => {
         hintNumbers.forEach(num => num.style.display = 'none');
     }, 4000);
+}
+
+function triggerPeek() {
+    if (isPaused || gameWon || isAutoSolving || peeksLeft <= 0) return;
+    peeksLeft--;
+    const peekCountNode = document.getElementById('peeks-count');
+    if (peekCountNode) peekCountNode.textContent = peeksLeft;
+    const peekBtn = document.getElementById('peek-btn');
+    if (peekBtn) peekBtn.disabled = peeksLeft <= 0;
+
+    const overlay = document.getElementById('peek-overlay');
+    const img = document.getElementById('peek-image');
+    if (!overlay || !img) {
+        showToast('Reference overlay missing.');
+        return;
+    }
+    img.src = fullImageURL;
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+    setTimeout(() => {
+        overlay.classList.remove('show');
+        overlay.setAttribute('aria-hidden', 'true');
+    }, 1200);
 }
 
 
@@ -1127,6 +1195,15 @@ function submitGridModification() {
 
     gridRows = rows;
     gridCols = cols;
+
+    if (isDailyRun && typeof vspTodayFeatured === 'function') {
+        const featured = vspTodayFeatured();
+        if (!featured || featured.rows !== rows || featured.cols !== cols) {
+            isDailyRun = false;
+            const titleNode = document.getElementById('game-title');
+            if (titleNode) titleNode.innerHTML = wrapEmojis(currentTheme.title);
+        }
+    }
 
     const overlay = document.getElementById('mod-modal-overlay');
     if (overlay) overlay.setAttribute('aria-hidden', 'true');

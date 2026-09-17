@@ -1,7 +1,11 @@
 /* Import Theme Fonts from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Great+Vibes&family=Cinzel:wght@700;900&family=Rubik+Glitch&family=Metal+Mania&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Great+Vibes&family=Cinzel:wght@700;900&family=Metal+Mania&family=Share+Tech+Mono&display=swap');
 
-/* Core Presentation Resets */
+:root {
+    --ambient-color: #00ffcc;
+    --ambient-color-soft: rgba(0, 255, 204, 0.22);
+}
+
 html {
     height: auto;
     overflow-y: auto;
@@ -11,12 +15,7 @@ body {
     margin: 0;
     padding: 0 0 40px 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to bottom, #0099b8, #bfeff5), 
-              url('BG-Freepik/kpargeter-bokeh-lights-and-stars.webp') no-repeat center center fixed;
-    background-image: url('BG-Freepik/kpargeter-bokeh-lights-and-stars.webp');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background: #071018;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,6 +24,117 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     box-sizing: border-box;
+    position: relative;
+}
+
+.bg-image-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-color: #071018;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity 2.4s ease;
+    pointer-events: none;
+    will-change: opacity;
+}
+
+.bg-image-layer.active {
+    opacity: 1;
+}
+
+.bg-wash {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 50% 0%, var(--ambient-color-soft) 0%, transparent 58%),
+        linear-gradient(180deg, rgba(5, 10, 16, 0.45) 0%, rgba(5, 10, 16, 0.72) 100%);
+    transition: background 2.4s ease;
+}
+
+.particle-field {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ambient-particle {
+    position: absolute;
+    bottom: -8%;
+    border-radius: 50%;
+    background: var(--ambient-color);
+    opacity: 0;
+    box-shadow: 0 0 10px var(--ambient-color);
+    animation-name: particleDrift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.fx-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.fx-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    background: radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--ambient-color) 70%, #fff), transparent 70%);
+    opacity: 0.28;
+    animation: orbFloat 18s ease-in-out infinite;
+}
+
+.fx-orb-1 { width: 220px; height: 220px; left: -40px; top: 12%; animation-duration: 22s; }
+.fx-orb-2 { width: 140px; height: 140px; right: 8%; top: 58%; animation-duration: 16s; animation-delay: -6s; }
+.fx-orb-3 { width: 90px; height: 90px; left: 18%; bottom: 8%; animation-duration: 20s; animation-delay: -10s; }
+
+.fx-ring {
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    right: -120px;
+    top: -80px;
+    border-radius: 50%;
+    border: 2px solid color-mix(in srgb, var(--ambient-color) 45%, transparent);
+    box-shadow: 0 0 24px color-mix(in srgb, var(--ambient-color) 25%, transparent);
+    animation: ringSpin 48s linear infinite;
+    opacity: 0.45;
+}
+
+@keyframes particleDrift {
+    0% { transform: translate3d(0, 0, 0); opacity: 0; }
+    12% { opacity: 0.55; }
+    88% { opacity: 0.4; }
+    100% { transform: translate3d(28px, -115vh, 0); opacity: 0; }
+}
+
+@keyframes orbFloat {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(24px, -18px, 0); }
+}
+
+@keyframes ringSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ambient-particle, .fx-orb, .fx-ring { animation: none !important; opacity: 0.2; }
+    .bg-image-layer { transition: none; }
+}
+
+header, main, .daily-stage, .character-roster, .controls, #puzzle-container {
+    position: relative;
+    z-index: 2;
 }
 
 /* Emoji Reset - Strips all parent gradients, shadows, and text effects */
@@ -49,12 +159,10 @@ header {
     background: rgba(10, 20, 30, 0.85);
     border: 2px solid #00ffcc;
     border-radius: 16px;
-    box-shadow: 0 0 25px rgba(0, 255, 204, 0.35), inset 0 0 15px rgba(0, 255, 204, 0.15);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 0 25px rgba(0, 255, 204, 0.35);
     max-width: 800px;
     width: 85%;
     box-sizing: border-box;
-    transition: all 0.3s ease;
 }
 
 header h1 {
@@ -77,114 +185,63 @@ header p {
     letter-spacing: 1px;
 }
 
-/* Hub Gallery Grid & Layout Containers */
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(3, auto);
-    gap: 28px;
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px 16px 40px;
-    box-sizing: border-box;
-    justify-items: center;
-    align-items: stretch;
-}
-
-/* Grid wrappers acting as thematic character containers */
-.grid-wrapper {
-    background: rgba(17, 24, 39, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 16px;
-    box-sizing: border-box;
+/* Character roster — stacked panels instead of the old dice formation */
+.character-roster {
     display: flex;
     flex-direction: column;
+    gap: 18px;
+    width: min(980px, 94vw);
+    padding: 12px 0 36px;
+    box-sizing: border-box;
+}
+
+.character-panel {
+    --theme-color: #00ffcc;
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 18px;
     align-items: center;
-    width: 100%;
-    max-width: 320px;
-    min-width: 0; /* allow grid children to shrink */
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    padding: 14px 16px;
+    border-radius: 22px;
+    border: 2px solid color-mix(in srgb, var(--theme-color) 75%, #ffffff 10%);
+    background:
+        linear-gradient(135deg, color-mix(in srgb, var(--theme-color) 24%, transparent), rgba(6, 12, 20, 0.78));
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35), 0 0 22px color-mix(in srgb, var(--theme-color) 22%, transparent);
+    content-visibility: auto;
+    contain-intrinsic-size: 180px;
 }
 
-.grid-wrapper:hover {
-    transform: translateY(-5px);
-}
+.theme-miku-original { --theme-color: #00ffcc; }
+.theme-miku-supreme { --theme-color: #4da6ff; }
+.theme-miku-honey { --theme-color: #ff007f; }
+.theme-miku-25ji { --theme-color: #ff00ff; }
+.theme-vflower { --theme-color: #b266ff; }
 
-/* Individualized gradients for character wrappers (easy on the eyes) */
-.pos-center { 
-    grid-column: 2; 
-    grid-row: 2; 
-    background: linear-gradient(135deg, rgba(0, 50, 45, 0.75), rgba(10, 20, 30, 0.85));
-    border-color: rgba(0, 255, 204, 0.3);
-    box-shadow: 0 0 20px rgba(0, 255, 204, 0.15);
-}
-.pos-top-left { 
-    grid-column: 1; 
-    grid-row: 1; 
-    background: linear-gradient(135deg, rgba(60, 10, 35, 0.75), rgba(10, 20, 30, 0.85));
-    border-color: rgba(255, 0, 127, 0.3);
-    box-shadow: 0 0 20px rgba(255, 0, 127, 0.15);
-}
-.pos-top-right { 
-    grid-column: 3; 
-    grid-row: 1; 
-    background: linear-gradient(135deg, rgba(15, 35, 60, 0.75), rgba(10, 20, 30, 0.85));
-    border-color: rgba(77, 166, 255, 0.3);
-    box-shadow: 0 0 20px rgba(77, 166, 255, 0.15);
-}
-.pos-bottom-left { 
-    grid-column: 1; 
-    grid-row: 3; 
-    background: linear-gradient(135deg, rgba(30, 10, 45, 0.75), rgba(10, 20, 30, 0.85));
-    border-color: rgba(102, 0, 102, 0.3);
-    box-shadow: 0 0 20px rgba(102, 0, 102, 0.15);
-}
-.pos-bottom-right { 
-    grid-column: 3; 
-    grid-row: 3; 
-    background: linear-gradient(135deg, rgba(40, 15, 60, 0.75), rgba(10, 20, 30, 0.85));
-    border-color: rgba(153, 51, 255, 0.3);
-    box-shadow: 0 0 20px rgba(153, 51, 255, 0.15);
-}
-
-/* Base Character Box Design */
+/* Name banner — no hover dimming */
 .character-box {
     width: 100%;
-    max-width: 270px;
     height: 150px;
-    border: 3px solid #fff;
-    border-radius: 12px;
+    border: 3px solid var(--glow-color, var(--theme-color));
+    border-radius: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     overflow: hidden;
     background-repeat: no-repeat;
-    transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s;
-    box-shadow: 0 0 15px var(--glow-color);
-    border-color: var(--glow-color);
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 16px var(--glow-color, var(--theme-color));
     box-sizing: border-box;
 }
 
-.character-box:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 25px 8px var(--glow-color);
-}
-
-.character-box::before {
+.character-box::after {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.35);
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0.38) 100%);
     z-index: 1;
-    transition: background 0.3s;
-}
-
-.character-box:hover::before {
-    background: rgba(0, 0, 0, 0.15);
+    pointer-events: none;
 }
 
 /* Character Card Specific BG Images */
@@ -229,14 +286,8 @@ header p {
     z-index: 2;
     text-align: center;
     white-space: nowrap;
-    color: #ffffff; /* Solid high-contrast fallback color */
+    color: #ffffff;
 }
-
-.pos-top-left     { grid-column: 1; grid-row: 1; }
-.pos-top-right    { grid-column: 3; grid-row: 1; }
-.pos-center        { grid-column: 2; grid-row: 2; }
-.pos-bottom-left  { grid-column: 1; grid-row: 3; }
-.pos-bottom-right { grid-column: 3; grid-row: 3; }
 
 
 /* Hatsune Miku: Futuristic Font & Aqua/Cyan Gradient */
@@ -257,7 +308,7 @@ header p {
 /* Honey Whip: Cutesy Readable Script & Hot Pink Gradient */
 .miku-honey-card .card-title {
     font-family: 'Great Vibes', cursive;
-    font-size: 3rem;
+    font-size: 2.4rem;
     font-weight: bold;
     background: linear-gradient(180deg, #ffffff 30%, #ff9ce6 100%);
     background-clip: text;
@@ -322,24 +373,23 @@ header p {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
+    gap: 10px;
+    justify-content: flex-start;
     align-content: center;
     width: 100%;
     max-width: 100%;
-    margin-top: 12px;
+    margin-top: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Small Landscape Thumbnail Links */
 .thumb-link {
     position: relative;
     display: inline-block;
     flex: 0 0 auto;
-    width: 56px;
-    height: 34px;
-    border-radius: 6px;
+    width: 88px;
+    height: 52px;
+    border-radius: 8px;
     border: 2px solid rgba(255, 255, 255, 0.7);
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
@@ -399,8 +449,7 @@ header p {
     font-weight: bold;
     text-decoration: none;
     color: #fff;
-    transition: all 0.2s, transform 0.1s;
-    backdrop-filter: blur(5px);
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
 }
 
 .size-btn:hover, .back-btn:hover {
@@ -538,7 +587,7 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease-in-out;
-    backdrop-filter: blur(6px);
+    backdrop-filter: none;
 }
 
 .modal-overlay.show {
@@ -735,74 +784,18 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
    Responsive gallery — tuned for itch.io embeds (e.g. 1280×720) and smaller
    ========================================================================== */
 
-/* itch / laptop widths: keep 3 columns but shrink cards so thumbs stay visible */
-@media screen and (max-width: 1280px) {
-    .gallery-grid {
-        gap: 20px;
-        padding: 16px 12px 32px;
-        max-width: 1100px;
-    }
-    .grid-wrapper {
-        max-width: 300px;
-        padding: 14px;
+@media screen and (max-width: 900px) {
+    .character-panel {
+        grid-template-columns: 1fr;
+        max-width: 520px;
+        margin: 0 auto;
+        width: 100%;
     }
     .character-box {
-        max-width: 260px;
-        height: 140px;
-    }
-    .card-title {
-        font-size: 1.85rem;
-    }
-    .miku-honey-card .card-title {
-        font-size: 2.4rem;
-    }
-    .thumb-link {
-        width: 52px;
-        height: 32px;
-    }
-}
-
-@media screen and (max-width: 1100px) {
-    .gallery-grid {
-        gap: 16px;
-        max-width: 960px;
-    }
-    .grid-wrapper {
-        max-width: 280px;
-        padding: 12px;
-    }
-    .character-box {
-        max-width: 240px;
         height: 130px;
     }
-    .card-title {
-        font-size: 1.65rem;
-    }
-    .thumb-link {
-        width: 48px;
-        height: 30px;
-    }
-}
-
-@media screen and (max-width: 992px) {
-    /* Dual-column flow so nothing is clipped in medium embeds */
-    .gallery-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-template-rows: auto;
+    .thumbnail-row {
         justify-content: center;
-        max-width: 720px;
-        gap: 18px;
-    }
-    .pos-center {
-        grid-column: 1 / span 2;
-        grid-row: auto;
-    }
-    .pos-top-left, .pos-top-right, .pos-bottom-left, .pos-bottom-right {
-        grid-column: auto;
-        grid-row: auto;
-    }
-    .grid-wrapper {
-        max-width: 320px;
     }
     header {
         margin-top: 16px;
@@ -816,22 +809,12 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
 }
 
 @media screen and (max-width: 700px) {
-    .gallery-grid {
-        grid-template-columns: 1fr;
-        max-width: 360px;
-        gap: 16px;
-        padding: 12px 10px 28px;
-    }
-    .pos-center {
-        grid-column: auto;
-        grid-row: auto;
-    }
-    .grid-wrapper {
-        max-width: 100%;
+    .character-roster {
+        width: 94vw;
+        gap: 14px;
     }
     .character-box {
-        max-width: 100%;
-        height: 130px;
+        height: 120px;
     }
     .card-title {
         font-size: 1.5rem;
@@ -841,9 +824,12 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     .miku-honey-card .card-title {
         font-size: 2rem;
     }
+    .thumb-link {
+        width: 72px;
+        height: 44px;
+    }
 }
 
-/* Short itch viewports (e.g. 720px tall): tighten vertical spacing so more fits before scroll */
 @media screen and (max-height: 800px) {
     header {
         margin: 14px auto 6px;
@@ -856,20 +842,9 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     header p {
         font-size: 0.9rem;
     }
-    .gallery-grid {
-        gap: 14px;
-        padding-top: 10px;
+    .character-roster {
+        padding-top: 8px;
         padding-bottom: 24px;
-    }
-    .grid-wrapper {
-        padding: 10px;
-    }
-    .character-box {
-        height: 120px;
-    }
-    .thumbnail-row {
-        margin-top: 8px;
-        gap: 6px;
     }
 }
 
@@ -926,7 +901,8 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     grid-template-columns: 1fr 220px;
     gap: 18px;
     align-items: center;
-    background: rgba(10, 20, 30, 0.82);
+    background:
+        linear-gradient(135deg, rgba(0, 255, 204, 0.18), rgba(6, 12, 20, 0.82));
     border: 2px solid #00ffcc;
     border-radius: 16px;
     padding: 16px 20px;

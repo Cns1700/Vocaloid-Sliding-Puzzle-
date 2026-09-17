@@ -21,7 +21,9 @@ It runs in the browser. Nothing to install, no account, no ads. Clears and perso
 
 ## What’s here
 
-Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Grids go from 3×3 up to 8×8, and you can set rows and columns separately.
+Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Grids go from 3×3 up to 8×8, and you can set rows and columns separately. The gallery is a stacked list of character rows — not the old dice layout.
+
+The home page slowly crossfades through each character’s background, the same way Miku Fever does. Open a puzzle and that character’s scene stays put, with a little motion in the lights behind the board.
 
 There’s a timer, a move counter, pause, numbered hints, and a **Peek** that flashes the finished picture for a second. Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
 
@@ -51,7 +53,7 @@ No build step. Open `index.html`, or serve the folder with any static server.
 
 ## Credits
 
-Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work.
+Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work. Character-card backgrounds are from Magnific (formerly Freepik). Full-page scene photos are non-AI photographs.
 
 ## License
 

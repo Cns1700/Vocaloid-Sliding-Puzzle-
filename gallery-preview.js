@@ -56,30 +56,33 @@ document.addEventListener('DOMContentLoaded', () => {
             imgNode.getAttribute('data-preview') ||
             imgNode.getAttribute('src');
 
-        thumb.addEventListener('mouseenter', () => {
-            previewDiv.style.backgroundImage = `url('${previewSrc}')`;
-            const rect = thumb.getBoundingClientRect();
-            const previewWidth = 280;
-            const previewHeight = 200;
-            const clearance = 14;
-            let centerX = rect.left + window.scrollX + rect.width / 2 - previewWidth / 2;
-            let topY = rect.top + window.scrollY - previewHeight - clearance;
-            const minX = window.scrollX + 8;
-            const maxX = window.scrollX + window.innerWidth - previewWidth - 8;
-            centerX = Math.max(minX, Math.min(maxX, centerX));
-            if (topY < window.scrollY + 8) {
-                topY = rect.bottom + window.scrollY + clearance;
-            }
-            previewDiv.style.width = `${previewWidth}px`;
-            previewDiv.style.height = `${previewHeight}px`;
-            previewDiv.style.left = `${centerX}px`;
-            previewDiv.style.top = `${topY}px`;
-            previewDiv.style.opacity = '1';
-        });
+        const canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+        if (canHover) {
+            thumb.addEventListener('mouseenter', () => {
+                previewDiv.style.backgroundImage = `url('${previewSrc}')`;
+                const rect = thumb.getBoundingClientRect();
+                const previewWidth = 280;
+                const previewHeight = 200;
+                const clearance = 14;
+                let centerX = rect.left + window.scrollX + rect.width / 2 - previewWidth / 2;
+                let topY = rect.top + window.scrollY - previewHeight - clearance;
+                const minX = window.scrollX + 8;
+                const maxX = window.scrollX + window.innerWidth - previewWidth - 8;
+                centerX = Math.max(minX, Math.min(maxX, centerX));
+                if (topY < window.scrollY + 8) {
+                    topY = rect.bottom + window.scrollY + clearance;
+                }
+                previewDiv.style.width = `${previewWidth}px`;
+                previewDiv.style.height = `${previewHeight}px`;
+                previewDiv.style.left = `${centerX}px`;
+                previewDiv.style.top = `${topY}px`;
+                previewDiv.style.opacity = '1';
+            });
 
-        thumb.addEventListener('mouseleave', () => {
-            previewDiv.style.opacity = '0';
-        });
+            thumb.addEventListener('mouseleave', () => {
+                previewDiv.style.opacity = '0';
+            });
+        }
     });
 
     const progress = document.getElementById('gallery-progress');

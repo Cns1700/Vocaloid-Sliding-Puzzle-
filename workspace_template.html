@@ -6,7 +6,18 @@
     <title>Sliding Puzzle Workspace</title>
     <link rel="stylesheet" href="style_sheet.css">
 </head>
-<body>
+<body class="workspace-page">
+    <div id="bgImageLayerA" class="bg-image-layer active"></div>
+    <div id="bgImageLayerB" class="bg-image-layer"></div>
+    <div class="bg-wash" aria-hidden="true"></div>
+    <div id="particleField" class="particle-field" aria-hidden="true"></div>
+    <div class="fx-layer" aria-hidden="true">
+        <span class="fx-orb fx-orb-1"></span>
+        <span class="fx-orb fx-orb-2"></span>
+        <span class="fx-orb fx-orb-3"></span>
+        <span class="fx-ring"></span>
+    </div>
+
     <header>
         <h1 id="game-title">Loading Puzzle...</h1>
     </header>
@@ -79,6 +90,7 @@
     <div id="toast-notification" class="toast-container" role="alert" aria-live="assertive"></div>
 
     <script src="records.js"></script>
+    <script src="ambient.js"></script>
     <script src="engine_logic.js"></script>
 </body>
 </html>

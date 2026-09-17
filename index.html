@@ -5,13 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocaloid Puzzle Gallery</title>
     <link rel="stylesheet" href="style_sheet.css">
+    <link rel="preload" as="image" href="BG-themes/miku-original.webp">
 </head>
-<body>
+<body class="gallery-page">
+    <div id="bgImageLayerA" class="bg-image-layer active" style="background-image:url('BG-themes/miku-original.webp')"></div>
+    <div id="bgImageLayerB" class="bg-image-layer"></div>
+    <div class="bg-wash" aria-hidden="true"></div>
+    <div id="particleField" class="particle-field" aria-hidden="true"></div>
+    <div class="fx-layer" aria-hidden="true">
+        <span class="fx-orb fx-orb-1"></span>
+        <span class="fx-orb fx-orb-2"></span>
+        <span class="fx-orb fx-orb-3"></span>
+        <span class="fx-ring"></span>
+    </div>
 
     <header>
         <h1>VOCALOID PUZZLE GALLERY</h1>
         <p>Pick a character, then an illustration. Clears and personal bests stay on this browser.</p>
-        <p id="gallery-progress" class="gallery-progress">Cleared 0 / 24</p>
+        <p id="gallery-progress" class="gallery-progress">Cleared 0 / 29</p>
     </header>
 
     <section id="daily-stage" class="daily-stage" aria-label="Today's featured puzzle">
@@ -26,10 +37,9 @@
         </div>
     </section>
 
-    <main class="gallery-grid">
+    <main class="character-roster">
 
-        <!-- Center: Hatsune Miku (Original) -->
-        <div class="grid-wrapper pos-center">
+        <article class="character-panel theme-miku-original">
             <div class="character-box miku-original-card">
                 <div class="card-title">Hatsune Miku</div>
             </div>
@@ -49,11 +59,25 @@
                 <a data-preview="previews/Hatsune-Miku__Hatsune-Miku-images__Miku-V2.webp" href="workspace_template.html?char=miku-original&puzzle=Miku-V2.jpg" class="thumb-link">
                     <img src="thumbs/Hatsune-Miku__Hatsune-Miku-images__Miku-V2.webp" loading="lazy" decoding="async" alt="Miku Hexagons" class="thumb-img">
                 </a>
+                <a data-preview="previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Cafe.webp" href="workspace_template.html?char=miku-original&puzzle=Miku-Birthday-Cafe.jpg" class="thumb-link">
+                    <img src="thumbs/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Cafe.webp" loading="lazy" decoding="async" alt="Miku Birthday Cafe" class="thumb-img">
+                </a>
+                <a data-preview="previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Gifts.webp" href="workspace_template.html?char=miku-original&puzzle=Miku-Birthday-Gifts.jpg" class="thumb-link">
+                    <img src="thumbs/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Gifts.webp" loading="lazy" decoding="async" alt="Miku Birthday Gifts" class="thumb-img">
+                </a>
+                <a data-preview="previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Message.webp" href="workspace_template.html?char=miku-original&puzzle=Miku-Birthday-Message.jpg" class="thumb-link">
+                    <img src="thumbs/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Message.webp" loading="lazy" decoding="async" alt="Miku Birthday Message" class="thumb-img">
+                </a>
+                <a data-preview="previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Trio.webp" href="workspace_template.html?char=miku-original&puzzle=Miku-Beach-Trio.jpg" class="thumb-link">
+                    <img src="thumbs/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Trio.webp" loading="lazy" decoding="async" alt="Miku Beach Trio" class="thumb-img">
+                </a>
+                <a data-preview="previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Water.webp" href="workspace_template.html?char=miku-original&puzzle=Miku-Beach-Water.jpg" class="thumb-link">
+                    <img src="thumbs/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Water.webp" loading="lazy" decoding="async" alt="Miku Beach Water" class="thumb-img">
+                </a>
             </div>
-        </div>
+        </article>
 
-        <!-- Top Right: Hatsune Miku (Supreme) -->
-        <div class="grid-wrapper pos-top-right">
+        <article class="character-panel theme-miku-supreme">
             <div class="character-box miku-supreme-card">
                 <div class="card-title">Supreme</div>
             </div>
@@ -71,10 +95,9 @@
                     <img src="thumbs/Hatsune-Miku__Supreme-images__Supreme-V2.webp" loading="lazy" decoding="async" alt="Supreme Palace" class="thumb-img">
                 </a>
             </div>
-        </div>
+        </article>
 
-        <!-- Top Left: Hatsune Miku (Honey Whip) -->
-        <div class="grid-wrapper pos-top-left">
+        <article class="character-panel theme-miku-honey">
             <div class="character-box miku-honey-card">
                 <div class="card-title">Honey Whip</div>
             </div>
@@ -95,10 +118,9 @@
                     <img src="thumbs/Hatsune-Miku__Honey-Whip-images__Honey-Whip-V4.webp" loading="lazy" decoding="async" alt="Honey Whip Leisure" class="thumb-img">
                 </a>
             </div>
-        </div>
+        </article>
 
-        <!-- Bottom Left: Hatsune Miku (25-ji) -->
-        <div class="grid-wrapper pos-bottom-left">
+        <article class="character-panel theme-miku-25ji">
             <div class="character-box miku-25ji-card">
                 <div class="card-title">25-ji</div>
             </div>
@@ -119,10 +141,9 @@
                     <img src="thumbs/Hatsune-Miku__25-ji-images__25-ji-V2.webp" loading="lazy" decoding="async" alt="25-ji Miku - Time" class="thumb-img">
                 </a>
             </div>
-        </div>
+        </article>
 
-        <!-- Bottom Right: VFlower V3 -->
-        <div class="grid-wrapper pos-bottom-right">
+        <article class="character-panel theme-vflower">
             <div class="character-box vflower-card">
                 <div class="card-title">VFlower V3</div>
             </div>
@@ -143,10 +164,11 @@
                     <img src="thumbs/VFlower-V3__VFlower-V2.webp" loading="lazy" decoding="async" alt="VFlower V3 - Guitar" class="thumb-img">
                 </a>
             </div>
-        </div>
+        </article>
 
     </main>
     <script src="records.js"></script>
+    <script src="ambient.js"></script>
     <script src="gallery-preview.js" defer></script>
 </body>
 </html>

@@ -5,13 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocaloid Puzzle Gallery</title>
     <link rel="stylesheet" href="style_sheet.css">
-<script type='text/javascript' src='https://storage.googleapis.com/CSvp_HWbAgNsMg0J3jrewlB6s0h_cLuxxRxPFehkwMy-ZDJCnFXVEKLTPp9f4gVm7VQ0Je-mrTLKxo4LFh0QlI1_cYFPqmCoO1I734JswKHJW1QLNLRPWRhENe3XQKNzzVZPRlt3tmXqbb5OUDeFYg08bSfotKcODv4SIv7XNF_jgUj-dAbGJB51MbM2JAmeyAfnLqR1w0b6ayfBDtDKMK9y8JuOhRfEMV6wmkSwTjZ03Ckarp7CHBh6rmEiHslHCWVP9e_kKwMiGVtqb1YeZOPezshuq7yqSJPcBfhOauDSc1Bc7qeGbvCalV-khTOoINaYKgnlcnDMswWabZfb3YX_f_Q2mGBTDK1kejTMw40S0yf5sh8_jGWzKKjqo0cfmOwbffHIDRDKjESGTozq2TvD7GZlqts7Zjrs_5PneHcnwHMmGNlzNFBF27MG2FouSjYtXQbXRn38SWV9jypQ7H9GBKgD_L62dTk5NAlwa7Faj3aX2_66rHwjBNHaxq01spBvkDY2Hcq3Xq5hGMcKeFIRFVuawuBpzwUGW77w8usDQSbxksvo0N_5LOaqg3bRbFhmjA1Sj29uNdd5AgNEUYz8dMGBvMB4zPBtw-PIEhN4ZmeIcOfPKQb_pf6NIuJQ4WX1e6Rjz_cWrB7BgSsnlN8Oqa7g8RNLV3VUb1g7WR2qmdtQbatM9xEtGh7MsCeANgSfxfNjICZ27cCuhBN_heZ5dwqo8vxOKUvJBa3oGHGrQAdD8geANk-fVVbdHPCF-r3g76lsDmxyNLlIJAMgg6mhvWnDE4vqoKz_h0cZTZkn5MU8E2A0NqrNEjqpBJaFs8AfBgpPEv0ysNlPStUvwOURkPxxkjhMM-jdjOYmU6pF1RvC6vPWchbzl8_2YitJne7WGtVGKbAczqlhDznn0GO8jLrb0lzhxTR09kUJfD89B6w-JXfrTzQu_HCwSniYcjOGBxcTDSHTRyOlz33soOSBR648siIM-BeO53ap7gxjiQixT9nEXTcOg3DY92BvfEuZ5O5xq2L3VRx84Gq4137tmT6Ag9lh6dshcTplgk13Gjgdj9S9VCxYlS6a0MLNrHyDOC_2AmFO8QbejJ9GQBiCI-snuv4FfEjM1ZtB1S9m4aCVzxfH5m0b7Cb6gj8AwfF1c_qSILyeF3u70ufY0EfSDQ0Q-iEqqMpujhcwCpdPI6Ththgd2d5xkr6qHNruBgVrBVgdblfp4bS9wGgafFm91EF-BeNd-gUhjCgG2Z7JKMljwWHxlFO6ACa25ZHJo6AltPFvkgomiTu589klO6HYd9wr6nCjaGvpHjDDi-YyB6sOHYua3PneGsXwBJGar_iUm9Uvly9a55OhJXwYgz6KBbJD0gdhmZnM3piRT_Xa0vH5Et_zWmzqRidjfxqXEFhw0HI--zZBf6Ed1h_ikNnBfhcH_GHnx5A4ZtMZ5WsYMSRb8p1o5cd46bFwF-9r6UzpcSU506s1_BHnpsbSNq-mFZcwyHW5pxicdh1NDbI9Q4G0JuHEG-1fOfwTroijMdldlUYVTqlGrJ78AQo69Pz6XGo69vW1lG27HUSFM2FkXvqPIajmnM2fBOqOnrI'></script></head>
+</head>
 <body>
 
     <header>
         <h1>VOCALOID PUZZLE GALLERY</h1>
-        <p>Select a character's puzzle to begin playing.</p>
+        <p>Pick a character, then an illustration. Clears and personal bests stay on this browser.</p>
+        <p id="gallery-progress" class="gallery-progress">Cleared 0 / 24</p>
     </header>
+
+    <section id="daily-stage" class="daily-stage" aria-label="Today's featured puzzle">
+        <div class="daily-copy">
+            <p class="daily-kicker">Today’s stage</p>
+            <h2 id="daily-title">Loading…</h2>
+            <p id="daily-meta" class="daily-meta"></p>
+            <a id="daily-play" class="daily-play" href="#">Play today’s puzzle</a>
+        </div>
+        <div class="daily-art-wrap">
+            <img id="daily-art" class="daily-art" alt="Today’s featured illustration">
+        </div>
+    </section>
 
     <main class="gallery-grid">
 
@@ -133,6 +146,7 @@
         </div>
 
     </main>
+    <script src="records.js"></script>
     <script src="gallery-preview.js" defer></script>
 </body>
 </html>

@@ -2,19 +2,15 @@
 
 *[日本語版はこちら (Japanese version)](README.ja.md)*
 
-A free, non-commercial fanmade sliding-puzzle gallery featuring **Hatsune Miku** (and several of her modules) plus **VFlower V3**. Choose a character, pick an illustration, and slide the tiles back into place.
+A free, unofficial sliding-puzzle gallery of Hatsune Miku (a handful of her modules) and VFlower V3. You pick a character, pick a picture, and slide the tiles until the illustration comes back together.
 
-Plays entirely in the browser — no install, no account, no ads.
+It runs in the browser. Nothing to install, no account, no ads. Clears and personal bests stay on this computer.
 
-**Live demo:** [cns1700.github.io/Vocaloid-Sliding-Puzzle-](https://cns1700.github.io/Vocaloid-Sliding-Puzzle-/)
+**Play:** [GitHub Pages](https://cns1700.github.io/Vocaloid-Sliding-Puzzle-/) · [itch.io](https://mizuchisylph.itch.io/vocaloid-sliding-puzzle)
 
 ## Screenshots
 
-<!--
-  Drop your captured PNGs into the screenshots/ folder using these exact
-  filenames and the images below will show up automatically on GitHub.
-  Caption style matches the Miku Fever project: Japanese first, English in parentheses.
--->
+<!-- Drop PNGs into screenshots/ using these filenames. -->
 
 | | |
 |---|---|
@@ -23,48 +19,49 @@ Plays entirely in the browser — no install, no account, no ads.
 | ![Hint numbers visible](screenshots/hint.png) | ![Victory + certificate](screenshots/victory.png) |
 | **ヒント表示中**<br>*(Hint numbers visible)* | **クリア＆証明書**<br>*(Victory + certificate)* |
 
-## Features
+## What’s here
 
-- **5 character themes** — Hatsune Miku (Original), Supreme, Honey Whip, 25-ji, and VFlower V3 — each with its own accent color and illustration set.
-- **Adjustable grid** — change difficulty from 3×3 up to 8×8 (rows and columns independent).
-- **Timer & move counter** with pause support.
-- **Hint system** — shows the correct tile numbers for 4 seconds (limited uses).
-- **Auto Solve** — a real A* search (Manhattan heuristic) that finds a solution path and animates it. On very large grids it may fall back to the recorded shuffle path so the browser never freezes.
-- **Downloadable / copyable result certificates** that mark whether the clear was manual or auto-solved.
-- Keyboard accessible (tiles are real buttons; Enter/Space to slide).
+Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Grids go from 3×3 up to 8×8, and you can set rows and columns separately.
+
+There’s a timer, a move counter, pause, numbered hints, and a **Peek** that flashes the finished picture for a second. Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
+
+When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a gold star, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
+
+On a win you can download or copy a certificate. Manual clears get a 1–3 star rank; Auto Solve is marked unranked.
 
 ## How to play
 
-1. From the **gallery**, click any thumbnail to open that illustration as a sliding puzzle.
-2. Click (or keyboard-activate) a tile **adjacent to the empty space** to slide it.
-3. Rearrange every tile into its correct position to complete the picture.
-4. Use the control bar for:
-   - **Grid Settings** — change rows/columns (3–8)
-   - **Pause** — freezes the timer and hides the board
-   - **Hint** — briefly shows guide numbers
-   - **Auto Solve** — lets the solver finish the board for you
-5. When you finish, a victory panel appears with your time, move count, and a shareable certificate image.
+1. Open any thumbnail from the gallery, or hit **Play today’s puzzle**.
+2. Slide a tile that’s next to the empty space.
+3. Put every tile back. That’s the whole game.
+
+Controls:
+
+- **Grid Settings** — 3–8 rows and columns
+- **Pause** — stops the clock and hides the board
+- **Hint** — numbers on the tiles for a few seconds (limited)
+- **Peek** — the full picture for about a second (limited)
+- **Auto Solve** — lets the solver finish it
+
+Stars are a private score on this machine, not a global leaderboard. Three stars means you were fairly quick and tidy for that grid size.
 
 ## Running it locally
 
-No build step or dependencies.
-
-- Open `index.html` directly in a browser, **or**
-- Serve the folder with any static file server, e.g. `python -m http.server`, then visit `http://localhost:8000`
+No build step. Open `index.html`, or serve the folder with any static server.
 
 ## Credits
 
-Illustrations and character designs belong to their respective creators and copyright holders (Crypton Future Media, Piapro, etc.). This is an unofficial fan work.
+Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work.
 
 ## License
 
-Free, non-commercial fanmade project. Not affiliated with or endorsed by Crypton Future Media or any official Vocaloid rights holders. Not for sale or commercial use.
+Free, non-commercial. Not affiliated with Crypton or any Vocaloid rights holder. Don’t sell it.
 
-## Find this project
+## Links
 
 - GitHub: https://github.com/Cns1700/Vocaloid-Sliding-Puzzle-
-- X / Twitter: https://x.com/MizuchiSylph
+- X: https://x.com/MizuchiSylph
 
 ---
 
-*For internal development notes (architecture, how to add new puzzles, solver details), see `DEVELOPER.md`.*
+*How shuffle, Auto Solve, records, and thumbs work is in `DEVELOPER.md`.*

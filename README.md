@@ -29,7 +29,7 @@ There’s a timer, a move counter, pause, numbered hints, and a **Peek** that fl
 
 When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a trophy, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
 
-On a win you can download or copy a certificate. Manual clears rank Gold, Silver, or Bronze. Auto Solve is marked unranked. Trophy counts for the week sit on the home page and beside the board; they reset every Monday. Monthly and yearly collection certificates become available at the end of those periods.
+On a win you can download or copy a result certificate. Manual clears rank Gold, Silver, or Bronze. Auto Solve is marked unranked. The puzzle page shows the time and move caps for the current grid. Weekly trophy counts and week/month/year collection downloads live on the home page and reset every Monday.
 
 ## How to play
 
@@ -45,7 +45,7 @@ Controls:
 - **Peek** — the full picture for about a second (limited)
 - **Auto Solve** — lets the solver finish it
 
-Trophies are a private score on this machine, not a global leaderboard. Gold means you were fairly quick and tidy for that grid size. The side window tracks how many Gold, Silver, and Bronze clears you earned this week.
+Trophies are a private score on this machine, not a global leaderboard. Gold means you were fairly quick and tidy for that grid size. The side window on the puzzle shows the exact time and move caps. Home tracks how many of each trophy you earned this week.
 
 ## Running it locally
 

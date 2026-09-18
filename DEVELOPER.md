@@ -120,7 +120,7 @@ Full-page backgrounds in `BG-themes/` keep their native aspect and use CSS `back
 
 Hover previews on the gallery use `position: fixed` and sit directly above the hovered thumbnail. Grid Settings pauses the timer while the modal is open; Pause includes Reset Puzzle.
 
-The rank panel no longer lists time/move caps. It shows this week’s Gold / Silver / Bronze counts, a reset notice, and collection-certificate downloads (week always; month on the last day plus two days into the next month; year on Dec 31 plus two days into January). `records.js` stores running tallies in `localStorage` under `collections`.
+The puzzle rank panel lists Gold / Silver / Bronze time and move caps for the current grid. Weekly trophy counts and week / month / year collection-certificate downloads live on the home page only. `records.js` stores running tallies in `localStorage` under `collections`. Monthly certificates stay available through the 2nd of the next month; yearly through Jan 2.
 
 When you add a puzzle, append it to `VSP_CATALOG` in `records.js` **and** the gallery HTML.
 

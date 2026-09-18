@@ -28,13 +28,20 @@
     </main>
 
     <div class="workspace-stage">
-        <aside id="rank-panel" class="rank-panel" aria-label="Trophy collection">
+        <aside id="rank-panel" class="rank-panel" aria-label="Rank requirements for this grid">
             <h2>Ranks</h2>
-            <p id="rank-grid-label" class="rank-grid-label">This week</p>
-            <ul id="rank-tally" class="rank-tally"></ul>
-            <p class="rank-note">Total is reset every Monday(weekly), new month, & new year (time zone varies). Total of trophy types will be totaled at the end of the month and at the end of the year (Dec. 31).</p>
-            <div id="rank-notices" class="rank-notices"></div>
-            <div id="rank-downloads" class="rank-downloads"></div>
+            <p id="rank-grid-label" class="rank-grid-label">This grid: 3×3</p>
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Trophy</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Moves</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-table-body"></tbody>
+            </table>
+            <p class="rank-note">Hit both the time and the move cap for that trophy. Bronze is any manual finish. Auto Solve stays unranked.</p>
         </aside>
         <div id="puzzle-container" role="grid" aria-label="Sliding Puzzle Grid Board"></div>
     </div>

@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
             thumb.classList.add('is-cleared');
             const badge = document.createElement('span');
             badge.className = 'thumb-badge';
-            badge.textContent = vspStarGlyphs(rec.bestStars || 1);
+            const stars = rec.bestStars || 1;
+            badge.innerHTML = typeof vspTrophySvg === 'function' ? vspTrophySvg(stars, 12) : vspStarGlyphs(stars);
             thumb.appendChild(badge);
 
             const grids = rec.bests || {};
@@ -80,18 +81,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     previewImg.style.width = `${previewWidth}px`;
                     previewImg.style.height = `${previewHeight}px`;
 
-                    const rect = thumb.getBoundingClientRect();
-                    const clearance = 12;
-                    let centerX = rect.left + window.scrollX + rect.width / 2 - previewWidth / 2;
-                    let topY = rect.top + window.scrollY - previewHeight - clearance;
-                    const minX = window.scrollX + 8;
-                    const maxX = window.scrollX + window.innerWidth - previewWidth - 8;
-                    centerX = Math.max(minX, Math.min(maxX, centerX));
-                    if (topY < window.scrollY + 8) {
-                        topY = rect.bottom + window.scrollY + clearance;
+                    const imgEl = thumb.querySelector('.thumb-img') || thumb;
+                    const rect = imgEl.getBoundingClientRect();
+                    const border = 2;
+                    const gap = 8;
+                    const popW = previewWidth + border * 2;
+                    const popH = previewHeight + border * 2;
+                    let left = rect.left + rect.width / 2 - popW / 2;
+                    let top = rect.top - popH - gap;
+                    left = Math.max(8, Math.min(window.innerWidth - popW - 8, left));
+                    if (top < 8) top = rect.bottom + gap;
+                    if (top + popH > window.innerHeight - 8) {
+                        top = Math.max(8, window.innerHeight - popH - 8);
                     }
-                    previewDiv.style.left = `${centerX}px`;
-                    previewDiv.style.top = `${topY}px`;
+                    previewDiv.style.position = 'fixed';
+                    previewDiv.style.left = `${Math.round(left)}px`;
+                    previewDiv.style.top = `${Math.round(top)}px`;
                     previewDiv.style.opacity = '1';
                 };
 

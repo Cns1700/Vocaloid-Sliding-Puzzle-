@@ -27,7 +27,24 @@
         <button id="solve-btn" class="size-btn" onclick="triggerAutoSolve()">Auto Solve</button>
     </main>
 
-    <div id="puzzle-container" role="grid" aria-label="Sliding Puzzle Grid Board"></div>
+    <div class="workspace-stage">
+        <aside id="rank-panel" class="rank-panel" aria-label="Rank requirements for this grid">
+            <h2>Ranks</h2>
+            <p id="rank-grid-label" class="rank-grid-label">This grid: 3×3</p>
+            <table class="rank-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Trophy</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Moves</th>
+                    </tr>
+                </thead>
+                <tbody id="rank-table-body"></tbody>
+            </table>
+            <p class="rank-note">Hit both the time and the move cap for that trophy. Bronze is any manual finish. Auto Solve stays unranked.</p>
+        </aside>
+        <div id="puzzle-container" role="grid" aria-label="Sliding Puzzle Grid Board"></div>
+    </div>
 
     <div id="peek-overlay" class="peek-overlay" aria-hidden="true">
         <img id="peek-image" alt="Full illustration reference">
@@ -59,9 +76,10 @@
     <div id="pause-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-modal-title" aria-describedby="pause-modal-desc" aria-hidden="true">
         <div class="modal-card">
             <h2 id="pause-modal-title">Paused</h2>
-            <p id="pause-modal-desc">Timer is frozen and the board is hidden.</p>
+            <p id="pause-modal-desc">Timer is frozen and the board is hidden. Reset shuffles a new board at this grid size.</p>
             <div class="modal-actions">
-                <button class="modal-btn confirm" onclick="togglePauseGame()">Resume</button>
+                <button class="modal-btn retry" type="button" onclick="resetPuzzleFromPause()">Reset Puzzle</button>
+                <button class="modal-btn confirm" type="button" onclick="togglePauseGame()">Resume</button>
             </div>
         </div>
     </div>

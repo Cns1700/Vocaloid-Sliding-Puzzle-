@@ -41,6 +41,8 @@ let elapsedSeconds = 0;
 let stopwatchInterval = null;
 let stopwatchStarted = false;
 let isPaused = false;
+let pausedForGridModal = false;
+let heldPauseOverlay = false;
 let gameWon = false;
 let wasAutoSolved = false;
 let isAutoSolving = false;
@@ -85,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.documentElement.style.setProperty('--modal-theme-color', currentTheme.color);
     setupVictoryModalMinimizeButton();
+    if (typeof updateRankPanel === 'function') updateRankPanel();
     if (isDailyRun) {
         const titleNode = document.getElementById('game-title');
         if (titleNode) {
@@ -173,8 +176,8 @@ function setupSlidingPuzzle() {
         // Fit board inside a shared "play area" so landscape and portrait
         // both land at similar on-screen sizes (no giant portrait boards).
         // Leave room for header + control bar + itch embed chrome.
-        const maxW = Math.min(window.innerWidth * 0.92, 640);
-        const maxH = Math.min(window.innerHeight * 0.62, 560);
+        const maxW = Math.min(window.innerWidth * 0.72, 600);
+        const maxH = Math.min(window.innerHeight * 0.58, 520);
 
         const scale = Math.min(maxW / imageWidth, maxH / imageHeight);
         const viewWidth = Math.max(180, Math.round(imageWidth * scale));
@@ -184,6 +187,7 @@ function setupSlidingPuzzle() {
         container.style.height = `${viewHeight}px`;
 
         buildGrid(viewWidth, viewHeight);
+        if (typeof updateRankPanel === 'function') updateRankPanel();
     };
     targetImage.src = fullImageURL;
 }
@@ -641,8 +645,10 @@ function checkVictory() {
                 if (titleNode) titleNode.innerHTML = `Congratulations!`;
                 if (msgNode) {
                     const starN = vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols);
+                    const rank = typeof vspRankMeta === 'function' ? vspRankMeta(starN) : { label: 'Rank ' + starN };
+                    const trophy = typeof vspTrophySvg === 'function' ? vspTrophySvg(starN, 22) : '';
                     msgNode.innerHTML = `You finished in <strong>${timeString}</strong> with <strong>${movesCount}</strong> moves.<br>
-                    Rank: <strong class="star-rank">${vspStarGlyphs(starN)}</strong>${isDailyRun ? '<br>Daily stage recorded.' : ''}`;
+                    Rank: <strong class="star-rank">${trophy} ${rank.label}</strong>${isDailyRun ? '<br>Daily stage recorded.' : ''}`;
                 }
             }
 
@@ -936,7 +942,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         const rightX = boxX + boxW - Math.round(22 * s);
 
         const starN = vspComputeStars(isAuto, movesVal, elapsedSeconds, gridRows, gridCols);
-        const rankText = isAuto ? 'UNRANKED' : vspStarGlyphs(starN);
+        const rankText = isAuto ? 'UNRANKED' : (typeof vspRankMeta === 'function' ? vspRankMeta(starN).label.toUpperCase() : vspStarGlyphs(starN));
 
         ctx.textAlign = "left";
         ctx.fillStyle = "#a0aec0";
@@ -1044,6 +1050,8 @@ function resetStopwatch() {
     elapsedSeconds = 0;
     stopwatchStarted = false;
     isPaused = false;
+    pausedForGridModal = false;
+    heldPauseOverlay = false;
     updateTimerDisplay();
 
     const pauseBtn = document.getElementById('pause-btn');
@@ -1067,6 +1075,27 @@ function updateMovesDisplay() {
     }
 }
 
+function updateRankPanel() {
+    const body = document.getElementById('rank-table-body');
+    const label = document.getElementById('rank-grid-label');
+    if (label) label.textContent = `This grid: ${gridRows}×${gridCols}`;
+    if (!body || typeof vspRankThresholds !== 'function') return;
+    const t = vspRankThresholds(gridRows, gridCols);
+    const rows = [
+        { rank: 3, time: '≤ ' + vspFormatRankTime(t.gold.time), moves: '≤ ' + t.gold.moves },
+        { rank: 2, time: '≤ ' + vspFormatRankTime(t.silver.time), moves: '≤ ' + t.silver.moves },
+        { rank: 1, time: 'any clear', moves: 'any clear' }
+    ];
+    body.innerHTML = rows.map((row) => {
+        const meta = vspRankMeta(row.rank);
+        return `<tr class="rank-row-${meta.key}">
+            <th scope="row">${vspTrophySvg(row.rank, 20)} <span>${meta.label}</span></th>
+            <td>${row.time}</td>
+            <td>${row.moves}</td>
+        </tr>`;
+    }).join('');
+}
+
 function formatTime(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -1077,6 +1106,7 @@ function formatTime(totalSeconds) {
 
 function togglePauseGame() {
     if (!stopwatchStarted || gameWon) return;
+    if (pausedForGridModal) return;
 
     const pauseBtn = document.getElementById('pause-btn');
     const pauseOverlay = document.getElementById('pause-modal-overlay');
@@ -1095,6 +1125,20 @@ function togglePauseGame() {
         if (pauseOverlay) pauseOverlay.classList.remove('show');
         pieces.forEach(p => p.style.opacity = '1');
     }
+}
+
+function resetPuzzleFromPause() {
+    const pauseOverlay = document.getElementById('pause-modal-overlay');
+    if (pauseOverlay) {
+        pauseOverlay.classList.remove('show');
+        pauseOverlay.setAttribute('aria-hidden', 'true');
+    }
+    isPaused = false;
+    pausedForGridModal = false;
+    heldPauseOverlay = false;
+    const pieces = container.querySelectorAll('.puzzle-piece');
+    pieces.forEach(p => p.style.opacity = '1');
+    setupSlidingPuzzle();
 }
 
 function triggerHint() {
@@ -1158,6 +1202,18 @@ function showModificationModal() {
     const colsInput = document.getElementById('grid-cols-input');
     if (rowsInput) rowsInput.value = gridRows;
     if (colsInput) colsInput.value = gridCols;
+
+    const pauseOverlay = document.getElementById('pause-modal-overlay');
+    if (isPaused && pauseOverlay && pauseOverlay.classList.contains('show')) {
+        pauseOverlay.classList.remove('show');
+        heldPauseOverlay = true;
+    }
+
+    if (stopwatchStarted && !isPaused && !gameWon && !pausedForGridModal) {
+        pauseStopwatch();
+        pausedForGridModal = true;
+    }
+
     if (overlay) {
         overlay.classList.add('show');
         overlay.setAttribute('aria-hidden', 'false');
@@ -1170,6 +1226,16 @@ function hideModificationModal() {
     if (overlay) {
         overlay.classList.remove('show');
         overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    if (pausedForGridModal) {
+        pausedForGridModal = false;
+        if (!isPaused && !gameWon) startStopwatch();
+    }
+    if (heldPauseOverlay && isPaused) {
+        const pauseOverlay = document.getElementById('pause-modal-overlay');
+        if (pauseOverlay) pauseOverlay.classList.add('show');
+        heldPauseOverlay = false;
     }
     if (lastFocusedElement) lastFocusedElement.focus();
 }
@@ -1208,6 +1274,8 @@ function submitGridModification() {
     const overlay = document.getElementById('mod-modal-overlay');
     if (overlay) overlay.setAttribute('aria-hidden', 'true');
 
+    pausedForGridModal = false;
+    heldPauseOverlay = false;
     hideModificationModal();
     setupSlidingPuzzle();
 }

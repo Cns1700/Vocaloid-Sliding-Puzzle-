@@ -27,9 +27,9 @@ The home page slowly crossfades through each character’s background, the same 
 
 There’s a timer, a move counter, pause, numbered hints, and a **Peek** that flashes the finished picture for a second. Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
 
-When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a gold star, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
+When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a trophy, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
 
-On a win you can download or copy a certificate. Manual clears get a 1–3 star rank; Auto Solve is marked unranked.
+On a win you can download or copy a certificate. Manual clears rank Gold, Silver, or Bronze from a table on the left of the board. Auto Solve is marked unranked.
 
 ## How to play
 
@@ -39,13 +39,13 @@ On a win you can download or copy a certificate. Manual clears get a 1–3 star 
 
 Controls:
 
-- **Grid Settings** — 3–8 rows and columns
-- **Pause** — stops the clock and hides the board
+- **Grid Settings** — 3–8 rows and columns (timer pauses while this is open)
+- **Pause** — stops the clock and hides the board; Reset Puzzle is on this menu
 - **Hint** — numbers on the tiles for a few seconds (limited)
 - **Peek** — the full picture for about a second (limited)
 - **Auto Solve** — lets the solver finish it
 
-Stars are a private score on this machine, not a global leaderboard. Three stars means you were fairly quick and tidy for that grid size.
+Trophies are a private score on this machine, not a global leaderboard. Gold means you were fairly quick and tidy for that grid size. The left-hand table shows the exact time and move caps for the grid you picked.
 
 ## Running it locally
 
@@ -53,7 +53,7 @@ No build step. Open `index.html`, or serve the folder with any static server.
 
 ## Credits
 
-Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work. Character-card and full-page backgrounds are Magnific (formerly Freepik) illustrations — not photographs and not AI.
+Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work. Character cards use Magnific (formerly Freepik) illustrations. Full-page scenes are the chosen illustrations for each set — they fill the window, with no photographs.
 
 ## License
 

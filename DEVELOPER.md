@@ -21,7 +21,7 @@ Live builds:
 | `gallery-preview.js` | Hover preview, daily banner, gallery PB badges. |
 | `records.js` | Shared catalog, `localStorage` records, daily hash, star math. |
 | `ambient.js` | Home-page background crossfade + color wash. Same layer on the puzzle page, locked to the selected character. |
-| `BG-themes/` | Compressed WebP **illustrations** (Magnific / Freepik, non-AI) for the ambient layers. |
+| `BG-themes/` | Compressed WebP **illustrations** (public-domain museum prints + Magnific hub) for the ambient layers. |
 | `Puzzles/` | Full-resolution illustrations (loaded only when a puzzle is opened). |
 | `thumbs/` | Small WebP gallery strip thumbnails. **Required** on the gallery page. |
 | `previews/` | Medium WebP hover previews (~15–90 KB). Used by `data-preview` on thumb links. |
@@ -74,20 +74,21 @@ Per puzzle id (`char|filename`):
 - `bestStars` (max 1–3 across grids)
 - `bests["RxC"]` → `{ time, moves, stars }`
 
-The gallery paints a star badge on cleared thumbs and a short PB line (`4x4 · 32m`). Progress text is `Cleared n / 24`.
+The gallery paints a trophy badge on cleared thumbs and a short PB line (`4x4 · 32m`). Progress text is `Cleared n / 29`.
 
-### Stars
+### Ranks (gold / silver / bronze)
 
-`vspComputeStars(isAuto, moves, seconds, rows, cols)`:
+`vspRankThresholds(rows, cols)` builds a table shown on the left of the board:
 
-| Result | When |
-|---|---|
-| 0 / UNRANKED | Auto Solve |
-| 3 | `moves ≤ cells×3` and `time ≤ cells×6` seconds |
-| 2 | `moves ≤ cells×8` and `time ≤ cells×14` |
-| 1 | any other manual clear |
+| Trophy | Time | Moves |
+|---|---|---|
+| Gold | ≤ fair cap for this grid | ≤ fair cap |
+| Silver | ≤ looser cap | ≤ looser cap |
+| Bronze | any manual finish | any manual finish |
 
-Shown on the victory copy and as a **RANK** row on the certificate.
+Caps scale with `cells × max(rows,cols)` from a 3×3 baseline of about **2:00 / 80 moves** (gold) and **~5:00 / 190 moves** (silver). Both time **and** moves must land in the band. Auto Solve is unranked.
+
+`vspComputeStars(...)` returns 3 / 2 / 1 / 0 for gold / silver / bronze / unranked. Shown as trophy icons on the rank table, victory copy, certificate RANK row, and gallery thumbs.
 
 ### Peek
 
@@ -107,7 +108,17 @@ The gallery is a **stacked roster** (one row per character: name banner + thumbs
 
 Character name banners no longer change a dark overlay on hover. Panels use the character color instead of a grey box.
 
-Full-page backgrounds in `BG-themes/` are Magnific (formerly Freepik) **illustrations** — the same art family as the character cards (cyan hub, diamond, floral arrangement, clocks, gothic balcony). No photographs, no AI images. Hover previews on the gallery size the window to the picture’s aspect so portraits do not sit in a letterbox.
+Full-page backgrounds in `BG-themes/` keep their native aspect and use CSS `background-size: cover` (plus a slight scale) so they fill the window with no letterbox. Current set (player-supplied illustrations):
+
+| Theme | File |
+|---|---|
+| Original Miku | cyan circuit panel |
+| Supreme | dark gold diamond |
+| Honey Whip | violet heart tunnel |
+| 25-ji | dark gold/blue fractal |
+| VFlower | neon purple floral |
+
+Hover previews on the gallery use `position: fixed` and sit directly above the hovered thumbnail. Grid Settings pauses the timer while the modal is open; Pause includes Reset Puzzle.
 
 When you add a puzzle, append it to `VSP_CATALOG` in `records.js` **and** the gallery HTML.
 

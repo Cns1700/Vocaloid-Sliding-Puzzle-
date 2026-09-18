@@ -76,14 +76,65 @@ function vspStarGlyphs(n) {
     return '★'.repeat(filled) + '☆'.repeat(3 - filled);
 }
 
+function vspRankMeta(n) {
+    if (n >= 3) return { key: 'gold', label: 'Gold', color: '#f5c542' };
+    if (n === 2) return { key: 'silver', label: 'Silver', color: '#c5cdd8' };
+    if (n === 1) return { key: 'bronze', label: 'Bronze', color: '#d08a4a' };
+    return { key: 'none', label: 'Unranked', color: '#e74c3c' };
+}
+
+function vspTrophySvg(rank, size) {
+    const s = size || 18;
+    const meta = vspRankMeta(rank);
+    const cup = meta.color;
+    const stem = rank >= 3 ? '#c48a12' : rank === 2 ? '#7d8694' : rank === 1 ? '#8a5424' : '#555';
+    return `<svg class="trophy-icon trophy-${meta.key}" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="${cup}" d="M6 4h12v2.2c0 3.4-2.4 6.2-6 6.2S6 9.6 6 6.2V4z"/>
+        <path fill="${cup}" d="M4 5h2.1C6.4 8.4 8.8 11 12 11s5.6-2.6 5.9-6H20c.6 2.8-1.1 6.2-4.2 7.4L15 15H9l-.8-2.6C5.1 11.2 3.4 7.8 4 5z"/>
+        <path fill="${stem}" d="M10 15h4l.6 2.1H9.4z"/>
+        <rect x="8" y="17.2" width="8" height="1.6" rx="0.4" fill="${stem}"/>
+        <rect x="7" y="19" width="10" height="2.2" rx="0.6" fill="${cup}"/>
+    </svg>`;
+}
+
+function vspFormatRankTime(totalSeconds) {
+    const sec = Math.max(0, totalSeconds | 0);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+/**
+ * Fair casual targets. Gold is focused play, silver is unhurried,
+ * bronze is any manual finish. Both time AND moves must land in a band.
+ * Scales with cells × longest side so 4×4 is not scored like 3×3.
+ */
+function vspRankThresholds(rows, cols) {
+    const r = Math.max(3, Math.min(8, rows | 0));
+    const c = Math.max(3, Math.min(8, cols | 0));
+    const cells = r * c;
+    const n = Math.max(r, c);
+    const factor = (cells * n) / 27;
+    const roundStep = (value, step) => Math.max(step, Math.round(value / step) * step);
+    const goldMoves = roundStep(80 * factor, factor < 1.5 ? 5 : 10);
+    const goldTime = roundStep(120 * factor, 15);
+    const silverMoves = roundStep(goldMoves * 2.4, 10);
+    const silverTime = roundStep(goldTime * 2.6, 15);
+    return {
+        gold: { time: goldTime, moves: goldMoves },
+        silver: { time: silverTime, moves: silverMoves }
+    };
+}
+
 /** Manual clears only. Auto-solve is 0 (unranked). */
 function vspComputeStars(isAuto, moves, seconds, rows, cols) {
     if (isAuto) return 0;
-    const cells = rows * cols;
-    if (moves <= cells * 3 && seconds <= cells * 6) return 3;
-    if (moves <= cells * 8 && seconds <= cells * 14) return 2;
+    const t = vspRankThresholds(rows, cols);
+    if (moves <= t.gold.moves && seconds <= t.gold.time) return 3;
+    if (moves <= t.silver.moves && seconds <= t.silver.time) return 2;
     return 1;
 }
+
 
 function vspTodayFeatured() {
     const dateKey = vspLocalDateKey();

@@ -33,9 +33,10 @@ body {
     z-index: -2;
     background-color: #071018;
     background-size: cover;
-    background-position: center;
+    background-position: center center;
+    background-repeat: no-repeat;
     opacity: 0;
-    transform: scale(1.04);
+    transform: scale(1.06);
     transition: opacity 2.4s ease;
     pointer-events: none;
     will-change: opacity;
@@ -52,7 +53,7 @@ body {
     pointer-events: none;
     background:
         radial-gradient(ellipse at 50% 0%, var(--ambient-color-soft) 0%, transparent 58%),
-        linear-gradient(180deg, rgba(5, 10, 16, 0.45) 0%, rgba(5, 10, 16, 0.72) 100%);
+        linear-gradient(180deg, rgba(5, 10, 16, 0.18) 0%, rgba(5, 10, 16, 0.42) 100%);
     transition: background 2.4s ease;
 }
 
@@ -60,7 +61,7 @@ body {
     .bg-image-layer { transition: none; }
 }
 
-header, main, .daily-stage, .character-roster, .controls, #puzzle-container {
+header, main, .daily-stage, .character-roster, .controls, .workspace-stage, .rank-panel, #puzzle-container {
     position: relative;
     z-index: 2;
 }
@@ -326,7 +327,7 @@ header p {
 }
 
 .thumb-link:hover {
-    transform: scale(1.18);
+    transform: scale(1.06);
     border-color: #ffffff;
     box-shadow: 0 6px 12px rgba(255, 255, 255, 0.4);
 }
@@ -340,7 +341,7 @@ header p {
 
 /* Gallery Hover Pop Preview Window — window matches image aspect, no letterbox */
 .hover-preview-pop {
-    position: absolute;
+    position: fixed;
     width: auto;
     height: auto;
     padding: 0;
@@ -351,7 +352,7 @@ header p {
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.72);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.12s ease;
     z-index: 1000;
 }
 
@@ -420,14 +421,118 @@ header p {
 }
 
 /* Immersive Puzzle Workspace Board Wrapper */
+.workspace-stage {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 16px;
+    width: min(1180px, 96vw);
+    margin: 8px auto 20px;
+    position: relative;
+    z-index: 2;
+    box-sizing: border-box;
+}
+
+.rank-panel {
+    flex: 0 0 228px;
+    width: 228px;
+    background: rgba(8, 16, 24, 0.9);
+    border: 2px solid var(--modal-theme-color, #00ffcc);
+    border-radius: 14px;
+    padding: 14px 12px 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    box-sizing: border-box;
+}
+
+.rank-panel h2 {
+    margin: 0 0 6px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+    color: #fff;
+    text-align: center;
+}
+
+.rank-grid-label {
+    margin: 0 0 10px;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    color: #a0aec0;
+}
+
+.rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+}
+
+.rank-table th,
+.rank-table td {
+    padding: 7px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    vertical-align: middle;
+}
+
+.rank-table thead th {
+    font-size: 0.7rem;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #8ab4f8;
+    font-weight: 700;
+}
+
+.rank-table tbody th {
+    text-align: left;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.rank-table tbody th span {
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.trophy-icon {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.rank-row-gold th,
+.rank-row-gold td { color: #f5c542; }
+.rank-row-silver th,
+.rank-row-silver td { color: #d5dbe6; }
+.rank-row-bronze th,
+.rank-row-bronze td { color: #e0a36a; }
+
+.rank-note {
+    margin: 10px 0 0;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #9aa7b5;
+}
+
 #puzzle-container {
     position: relative;
     background: #2c3e50;     
     border: 4px solid #1a252f;
     border-radius: 12px;
     overflow: hidden;        
-    margin: 15px auto;
+    margin: 0;
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
+}
+
+@media screen and (max-width: 900px) {
+    .workspace-stage {
+        flex-direction: column;
+        align-items: center;
+    }
+    .rank-panel {
+        flex: none;
+        width: min(440px, 92vw);
+    }
 }
 
 /* Square Sliding puzzle tiles with smooth transitions */

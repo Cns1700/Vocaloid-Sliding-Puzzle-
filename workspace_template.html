@@ -11,7 +11,6 @@
     <div id="bgImageLayerB" class="bg-image-layer"></div>
     <div class="bg-wash" aria-hidden="true"></div>
 
-
     <header>
         <h1 id="game-title">Loading Puzzle...</h1>
     </header>
@@ -41,17 +40,17 @@
                 </thead>
                 <tbody id="rank-table-body">
                     <tr class="rank-row-gold">
-                        <th scope="row"><span class="plain-emoji">🥇</span> Gold</th>
+                        <th scope="row"><img class="trophy-icon" src="icons/trophy-gold.svg" width="20" height="20" alt=""> Gold</th>
                         <td>≤ 3:00</td>
                         <td>≤ 70</td>
                     </tr>
                     <tr class="rank-row-silver">
-                        <th scope="row"><span class="plain-emoji">🥈</span> Silver</th>
+                        <th scope="row"><img class="trophy-icon" src="icons/trophy-silver.svg" width="20" height="20" alt=""> Silver</th>
                         <td>≤ 8:00</td>
                         <td>≤ 160</td>
                     </tr>
                     <tr class="rank-row-bronze">
-                        <th scope="row"><span class="plain-emoji">🥉</span> Bronze</th>
+                        <th scope="row"><img class="trophy-icon" src="icons/trophy-bronze.svg" width="20" height="20" alt=""> Bronze</th>
                         <td>≤ 20:00</td>
                         <td>≤ 400</td>
                     </tr>
@@ -117,8 +116,16 @@
 
     <div id="toast-notification" class="toast-container" role="alert" aria-live="assertive"></div>
 
-    <script src="records.js?v=rank2"></script>
-    <script src="ambient.js?v=rank2"></script>
-    <script src="engine_logic.js?v=rank2"></script>
+    <footer class="site-footer">
+        <details class="credits-menu">
+            <summary>Credits</summary>
+            <p>Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). Unofficial fan work.</p>
+            <p>Rank trophies are the same cup in gold, silver, and bronze (<code>icons/trophy-*.svg</code>). Replace those files with Flaticon trophies if you want; add the Flaticon author here if you do.</p>
+        </details>
+    </footer>
+
+    <script src="records.js?v=trophy1"></script>
+    <script src="ambient.js?v=trophy1"></script>
+    <script src="engine_logic.js?v=trophy1"></script>
 </body>
 </html>

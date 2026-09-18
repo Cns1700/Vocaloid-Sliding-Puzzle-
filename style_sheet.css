@@ -514,6 +514,12 @@ header p {
     white-space: nowrap;
 }
 
+.rank-table tbody td {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
 .rank-table tbody th span {
     margin-left: 4px;
     vertical-align: middle;

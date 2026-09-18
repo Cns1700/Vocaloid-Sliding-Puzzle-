@@ -1079,22 +1079,35 @@ function updateMovesDisplay() {
 function updateRankPanel() {
     const body = document.getElementById('rank-table-body');
     const label = document.getElementById('rank-grid-label');
-    if (label) label.textContent = `This grid: ${gridRows}×${gridCols}`;
-    if (!body || typeof vspRankThresholds !== 'function') return;
-    const t = vspRankThresholds(gridRows, gridCols);
+    const rowsN = (typeof gridRows === 'number' && gridRows >= 3) ? gridRows : 3;
+    const colsN = (typeof gridCols === 'number' && gridCols >= 3) ? gridCols : 3;
+    if (label) label.textContent = `This grid: ${rowsN}×${colsN}`;
+    if (!body) return;
+
+    const fallback = {
+        gold: { time: 180, moves: 70 },
+        silver: { time: 480, moves: 160 },
+        bronze: { time: 1200, moves: 400 }
+    };
+    const t = (typeof vspRankThresholds === 'function') ? vspRankThresholds(rowsN, colsN) : fallback;
+    const fmt = (typeof vspFormatRankTime === 'function')
+        ? vspFormatRankTime
+        : (sec) => {
+            const s = Math.max(0, sec | 0);
+            return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+        };
     const rows = [
-        { rank: 3, time: '≤ ' + vspFormatRankTime(t.gold.time), moves: '≤ ' + t.gold.moves },
-        { rank: 2, time: '≤ ' + vspFormatRankTime(t.silver.time), moves: '≤ ' + t.silver.moves },
-        { rank: 1, time: 'any clear', moves: 'any clear' }
+        { rank: 3, emoji: '🥇', name: 'Gold', time: t.gold.time, moves: t.gold.moves },
+        { rank: 2, emoji: '🥈', name: 'Silver', time: t.silver.time, moves: t.silver.moves },
+        { rank: 1, emoji: '🥉', name: 'Bronze', time: t.bronze.time, moves: t.bronze.moves }
     ];
-    body.innerHTML = rows.map((row) => {
-        const meta = vspRankMeta(row.rank);
-        return `<tr class="rank-row-${meta.key}">
-            <th scope="row">${vspTrophySvg(row.rank, 20)} <span>${meta.label}</span></th>
-            <td>${row.time}</td>
-            <td>${row.moves}</td>
-        </tr>`;
-    }).join('');
+    const keys = ['gold', 'silver', 'bronze'];
+    body.innerHTML = rows.map((row, i) => `
+        <tr class="rank-row-${keys[i]}">
+            <th scope="row"><span class="plain-emoji">${row.emoji}</span> ${row.name}</th>
+            <td>≤ ${fmt(row.time)}</td>
+            <td>≤ ${row.moves}</td>
+        </tr>`).join('');
 }
 
 function formatTime(totalSeconds) {

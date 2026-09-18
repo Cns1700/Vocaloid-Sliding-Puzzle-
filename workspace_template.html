@@ -39,7 +39,23 @@
                         <th scope="col">Moves</th>
                     </tr>
                 </thead>
-                <tbody id="rank-table-body"></tbody>
+                <tbody id="rank-table-body">
+                    <tr class="rank-row-gold">
+                        <th scope="row"><span class="plain-emoji">🥇</span> Gold</th>
+                        <td>≤ 3:00</td>
+                        <td>≤ 70</td>
+                    </tr>
+                    <tr class="rank-row-silver">
+                        <th scope="row"><span class="plain-emoji">🥈</span> Silver</th>
+                        <td>≤ 8:00</td>
+                        <td>≤ 160</td>
+                    </tr>
+                    <tr class="rank-row-bronze">
+                        <th scope="row"><span class="plain-emoji">🥉</span> Bronze</th>
+                        <td>≤ 20:00</td>
+                        <td>≤ 400</td>
+                    </tr>
+                </tbody>
             </table>
             <p class="rank-note">Hit both the time and the move cap for that trophy. Bronze is any manual finish. Auto Solve stays unranked.</p>
         </aside>
@@ -101,8 +117,8 @@
 
     <div id="toast-notification" class="toast-container" role="alert" aria-live="assertive"></div>
 
-    <script src="records.js"></script>
-    <script src="ambient.js"></script>
-    <script src="engine_logic.js"></script>
+    <script src="records.js?v=rank2"></script>
+    <script src="ambient.js?v=rank2"></script>
+    <script src="engine_logic.js?v=rank2"></script>
 </body>
 </html>

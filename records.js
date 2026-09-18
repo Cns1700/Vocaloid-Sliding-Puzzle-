@@ -110,23 +110,21 @@ function vspFormatRankTime(totalSeconds) {
 
 /**
  * Fair casual targets. Gold is focused play, silver is unhurried,
- * bronze is any manual finish. Both time AND moves must land in a band.
- * Scales with cells × longest side so 4×4 is not scored like 3×3.
+ * bronze is a very roomy cap so finishing is not punishing.
+ * Scales with cell count and the longer side.
  */
 function vspRankThresholds(rows, cols) {
     const r = Math.max(3, Math.min(8, rows | 0));
     const c = Math.max(3, Math.min(8, cols | 0));
     const cells = r * c;
-    const n = Math.max(r, c);
-    const factor = (cells * n) / 27;
-    const roundStep = (value, step) => Math.max(step, Math.round(value / step) * step);
-    const goldMoves = roundStep(80 * factor, factor < 1.5 ? 5 : 10);
-    const goldTime = roundStep(120 * factor, 15);
-    const silverMoves = roundStep(goldMoves * 2.4, 10);
-    const silverTime = roundStep(goldTime * 2.6, 15);
+    const long = Math.max(r, c);
+    const factor = (cells / 9) * (1 + Math.max(0, long - 3) * 0.15);
+    const roundMoves = (n) => Math.max(40, Math.round(n / 10) * 10);
+    const roundTime = (n) => Math.max(60, Math.round(n / 15) * 15);
     return {
-        gold: { time: goldTime, moves: goldMoves },
-        silver: { time: silverTime, moves: silverMoves }
+        gold: { time: roundTime(180 * factor), moves: roundMoves(70 * factor) },
+        silver: { time: roundTime(480 * factor), moves: roundMoves(160 * factor) },
+        bronze: { time: roundTime(1200 * factor), moves: roundMoves(400 * factor) }
     };
 }
 
@@ -552,52 +550,9 @@ function vspTallyRowsHtml(counts) {
 }
 
 function vspRenderCollectionUi(opts) {
+    opts = opts || {};
+    if (!document.getElementById('week-tally')) return null;
     const windows = vspCertWindows();
-    const tally = document.getElementById(opts.tallyId || '');
-    if (tally) tally.innerHTML = vspTallyRowsHtml(windows.weekCounts);
-
-    const weekLabel = document.getElementById(opts.labelId || '');
-    if (weekLabel) weekLabel.textContent = `This week · ${windows.weekly.period}`;
-
-    const noticeBox = document.getElementById(opts.noticeId || '');
-    if (noticeBox) {
-        const notes = [windows.weekly.notice];
-        if (windows.monthPrev.notice) notes.push(windows.monthPrev.notice);
-        if (windows.monthNow.notice) notes.push(windows.monthNow.notice);
-        if (windows.yearPrev.notice) notes.push(windows.yearPrev.notice);
-        if (windows.yearNow.notice) notes.push(windows.yearNow.notice);
-        noticeBox.innerHTML = notes.map((n) => `<p>${n}</p>`).join('');
-    }
-
-    const dl = document.getElementById(opts.downloadId || '');
-    if (dl) {
-        const buttons = [];
-        const addBtn = (win, extraLabel) => {
-            if (!win.available) return;
-            const id = `dl-${win.kind}`;
-            buttons.push(`<button type="button" class="rank-dl-btn" data-kind="${win.kind}">${extraLabel || win.title}</button>`);
-        };
-        addBtn(windows.weekly, 'Download week certificate');
-        addBtn(windows.monthPrev, `Download ${windows.monthPrev.period}`);
-        addBtn(windows.monthNow, `Download ${windows.monthNow.period}`);
-        addBtn(windows.yearPrev, `Download ${windows.yearPrev.period}`);
-        addBtn(windows.yearNow, `Download ${windows.yearNow.period}`);
-        dl.innerHTML = buttons.join('');
-        dl.querySelectorAll('button[data-kind]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const kind = btn.getAttribute('data-kind');
-                const map = {
-                    week: windows.weekly,
-                    month: windows.monthNow,
-                    'month-prev': windows.monthPrev,
-                    year: windows.yearNow,
-                    'year-prev': windows.yearPrev
-                };
-                const spec = map[kind];
-                if (spec) vspDownloadCollectionCert(spec);
-            });
-        });
-    }
 
     const homeGold = document.getElementById('week-gold');
     const homeSilver = document.getElementById('week-silver');

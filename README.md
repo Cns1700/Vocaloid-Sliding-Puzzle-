@@ -1,6 +1,6 @@
 # Vocaloid Sliding Puzzle
 
-*[日本語版はこちら (Japanese version)](README.ja.md)*
+*[Japanese version](README.ja.md)*
 
 A free, unofficial sliding-puzzle gallery of Hatsune Miku (a handful of her modules) and VFlower V3. You pick a character, pick a picture, and slide the tiles until the illustration comes back together.
 
@@ -15,27 +15,27 @@ It runs in the browser. Nothing to install, no account, no ads. Clears and perso
 | | |
 |---|---|
 | ![Gallery select screen](screenshots/gallery.png) | ![Puzzle workspace mid-game](screenshots/workspace.png) |
-| **ギャラリー選択画面**<br>*(Gallery / character select)* | **パズルプレイ中**<br>*(Puzzle workspace mid-game)* |
+| **Gallery / character select** | **Puzzle workspace mid-game** |
 | ![Hint numbers visible](screenshots/hint.png) | ![Victory + certificate](screenshots/victory.png) |
-| **ヒント表示中**<br>*(Hint numbers visible)* | **クリア＆証明書**<br>*(Victory + certificate)* |
+| **Hint numbers visible** | **Victory + certificate** |
 
-## What’s here
+## What's here
 
 Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Grids go from 3×3 up to 8×8, and you can set rows and columns separately. The gallery is a stacked list of character rows — not the old dice layout.
 
-The home page slowly crossfades through each character’s background, the same way Miku Fever does. Open a puzzle and that character’s scene stays put, with a little motion in the lights behind the board.
+The home page slowly crossfades through each character's background, the same way Miku Fever does. Open a puzzle and that character's scene stays put, with a little motion in the lights behind the board.
 
-There’s a timer, a move counter, pause, numbered hints, and a **Peek** that flashes the finished picture for a second. Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
+There's a timer, a move counter, pause, numbered hints, and a **Peek** that flashes the finished picture for a second. Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
 
-When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a trophy, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
+When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a trophy, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren't ranked.
 
-On a win you can download or copy a result certificate. Manual clears rank Gold, Silver, or Bronze. Auto Solve is marked unranked. The puzzle page shows the time and move caps for the current grid. Weekly trophy counts and week/month/year collection downloads live on the home page and reset every Monday.
+On a win you can download or copy a result certificate. Manual clears rank Gold, Silver, or Bronze. The certificate RANK line is written as trophy | GOLD (or SILVER / BRONZE). Auto Solve is marked unranked. The puzzle page shows the time and move caps for the current grid. Weekly trophy counts and week/month/year collection downloads live on the home page and reset every Monday.
 
 ## How to play
 
-1. Open any thumbnail from the gallery, or hit **Play today’s puzzle**.
-2. Slide a tile that’s next to the empty space.
-3. Put every tile back. That’s the whole game.
+1. Open any thumbnail from the gallery, or hit **Play today's puzzle**.
+2. Slide a tile that's next to the empty space.
+3. Put every tile back. That's the whole game.
 
 Controls:
 
@@ -45,7 +45,7 @@ Controls:
 - **Peek** — the full picture for about a second (limited)
 - **Auto Solve** — lets the solver finish it
 
-Trophies are a private score on this machine, not a global leaderboard. Gold means you were fairly quick and tidy for that grid size. The side window on the puzzle shows the exact time and move caps. Home tracks how many of each trophy you earned this week.
+Trophies are a private score on this machine, not a global leaderboard. Gold, silver, and bronze use the same cup icon — only the color changes. Gold means you were fairly quick and tidy for that grid size. The side window on the puzzle shows the exact time and move caps. Home tracks how many of each trophy you earned this week.
 
 ## Running it locally
 
@@ -55,9 +55,11 @@ No build step. Open `index.html`, or serve the folder with any static server.
 
 Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work. Character cards use Magnific (formerly Freepik) illustrations. Full-page scenes are the chosen illustrations for each set — they fill the window, with no photographs.
 
+Rank trophies are one cup drawn three times in gold, silver, and bronze (`icons/trophy-gold.svg`, `icons/trophy-silver.svg`, `icons/trophy-bronze.svg`). The same files are listed under Credits on the home page and the puzzle page. You can drop matching Flaticon trophy SVGs over those filenames later; if you do, add the Flaticon author in that Credits menu.
+
 ## License
 
-Free, non-commercial. Not affiliated with Crypton or any Vocaloid rights holder. Don’t sell it.
+Free, non-commercial. Not affiliated with Crypton or any Vocaloid rights holder. Don't sell it.
 
 ## Links
 

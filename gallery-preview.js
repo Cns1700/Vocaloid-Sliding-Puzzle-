@@ -141,4 +141,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (meta) meta.textContent = `${featured.rows} × ${featured.cols} · cleared today ${vspStarGlyphs(dailyRec.stars || 1)}`;
         }
     }
+
+    if (typeof vspRenderCollectionUi === 'function') {
+        vspRenderCollectionUi({});
+    }
 });

@@ -61,7 +61,7 @@ body {
     .bg-image-layer { transition: none; }
 }
 
-header, main, .daily-stage, .character-roster, .controls, .workspace-stage, .rank-panel, #puzzle-container {
+header, main, .daily-stage, .character-roster, .controls, .workspace-stage, .rank-panel, #puzzle-container, .week-tally {
     position: relative;
     z-index: 2;
 }
@@ -422,77 +422,68 @@ header p {
 
 /* Immersive Puzzle Workspace Board Wrapper */
 .workspace-stage {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 300px minmax(0, auto) 300px;
     justify-content: center;
-    gap: 16px;
-    width: min(1180px, 96vw);
-    margin: 8px auto 20px;
+    justify-items: stretch;
+    align-items: start;
+    column-gap: 56px;
+    width: min(1320px, 98vw);
+    margin: 8px auto 24px;
     position: relative;
     z-index: 2;
     box-sizing: border-box;
 }
 
 .rank-panel {
-    flex: 0 0 228px;
-    width: 228px;
-    background: rgba(8, 16, 24, 0.9);
+    width: 300px;
+    max-width: 300px;
+    background: rgba(8, 16, 24, 0.92);
     border: 2px solid var(--modal-theme-color, #00ffcc);
-    border-radius: 14px;
-    padding: 14px 12px 16px;
+    border-radius: 16px;
+    padding: 18px 16px 18px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     box-sizing: border-box;
+    grid-column: 1;
 }
 
 .rank-panel h2 {
     margin: 0 0 6px;
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.05rem;
+    font-size: 1.18rem;
     letter-spacing: 1px;
     color: #fff;
     text-align: center;
 }
 
 .rank-grid-label {
-    margin: 0 0 10px;
+    margin: 0 0 12px;
     text-align: center;
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     color: #a0aec0;
 }
 
-.rank-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.82rem;
+.rank-tally {
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-.rank-table th,
-.rank-table td {
-    padding: 7px 6px;
+.rank-tally-row {
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 6px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    text-align: center;
-    vertical-align: middle;
-}
-
-.rank-table thead th {
-    font-size: 0.7rem;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-    color: #8ab4f8;
     font-weight: 700;
 }
 
-.rank-table tbody th {
-    text-align: left;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.rank-table tbody th span {
-    margin-left: 4px;
-    vertical-align: middle;
+.rank-tally-label { text-align: left; }
+.rank-tally-count {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.05rem;
 }
 
 .trophy-icon {
@@ -500,38 +491,75 @@ header p {
     vertical-align: middle;
 }
 
-.rank-row-gold th,
-.rank-row-gold td { color: #f5c542; }
-.rank-row-silver th,
-.rank-row-silver td { color: #d5dbe6; }
-.rank-row-bronze th,
-.rank-row-bronze td { color: #e0a36a; }
+.rank-row-gold, .rank-row-gold th, .rank-row-gold td { color: #f5c542; }
+.rank-row-silver, .rank-row-silver th, .rank-row-silver td { color: #d5dbe6; }
+.rank-row-bronze, .rank-row-bronze th, .rank-row-bronze td { color: #e0a36a; }
 
 .rank-note {
-    margin: 10px 0 0;
+    margin: 12px 0 0;
     font-size: 0.72rem;
-    line-height: 1.4;
+    line-height: 1.45;
     color: #9aa7b5;
 }
 
+.rank-notices {
+    margin-top: 10px;
+    font-size: 0.72rem;
+    line-height: 1.4;
+    color: #bfeff5;
+}
+.rank-notices p { margin: 0 0 6px; }
+
+.rank-downloads {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.rank-dl-btn {
+    background: rgba(0, 255, 204, 0.12);
+    border: 1px solid var(--modal-theme-color, #00ffcc);
+    color: #e8fffb;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.78rem;
+}
+.rank-dl-btn:hover { filter: brightness(1.12); }
+
 #puzzle-container {
     position: relative;
-    background: #2c3e50;     
+    background: #2c3e50;
     border: 4px solid #1a252f;
     border-radius: 12px;
-    overflow: hidden;        
-    margin: 0;
+    overflow: hidden;
+    margin: 0 auto;
+    grid-column: 2;
+    justify-self: center;
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.6);
 }
 
-@media screen and (max-width: 900px) {
+@media screen and (max-width: 980px) {
     .workspace-stage {
+        display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: flex-start;
+        gap: 22px;
+        width: min(640px, 96vw);
+        column-gap: 0;
+    }
+    #puzzle-container {
+        order: 1;
+        grid-column: auto;
     }
     .rank-panel {
-        flex: none;
-        width: min(440px, 92vw);
+        order: 2;
+        width: min(520px, 92vw);
+        max-width: min(520px, 92vw);
+        grid-column: auto;
     }
 }
 
@@ -934,11 +962,69 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     color: #bfeff5;
 }
 
+.week-tally {
+    width: min(920px, 92vw);
+    margin: 10px auto 8px;
+    background: rgba(8, 16, 24, 0.88);
+    border: 2px solid rgba(0, 255, 204, 0.55);
+    border-radius: 16px;
+    padding: 14px 18px 16px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.week-tally-kicker {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #00ffcc;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+.week-tally-range {
+    margin: 4px 0 10px;
+    color: #bfeff5;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.week-tally-row {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin: 0;
+    padding: 0;
+    flex-wrap: wrap;
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+.week-tally-row strong {
+    font-family: 'Share Tech Mono', monospace;
+    margin-left: 6px;
+}
+
+.week-emoji { margin-right: 4px; }
+
+.week-tally-reset {
+    margin: 10px 0 0;
+    color: #9aa7b5;
+    font-size: 0.8rem;
+}
+
+.week-tally .rank-downloads {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .daily-stage {
     width: min(920px, 92vw);
     margin: 8px auto 6px;
     display: grid;
-    grid-template-columns: 1fr 220px;
+    grid-template-columns: 1fr minmax(160px, 240px);
     gap: 18px;
     align-items: center;
     background:
@@ -984,17 +1070,28 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
 .daily-play:hover { filter: brightness(1.08); }
 
 .daily-art-wrap {
+    width: 100%;
+    max-width: 240px;
+    height: 180px;
+    margin-left: auto;
     border-radius: 12px;
     overflow: hidden;
     border: 2px solid rgba(0,255,204,0.45);
-    min-height: 110px;
+    background: rgba(4, 10, 16, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .daily-art {
     display: block;
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center;
 }
 
 .daily-stage.is-cleared {
@@ -1065,5 +1162,10 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
         grid-template-columns: 1fr;
         width: 92%;
     }
-    .daily-art { height: 160px; }
+    .daily-art-wrap {
+        max-width: 100%;
+        width: 100%;
+        height: 220px;
+        margin: 0 auto;
+    }
 }

@@ -663,6 +663,7 @@ function checkVictory() {
                     stars: vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols),
                     isDaily: isDailyRun
                 });
+                if (typeof updateRankPanel === 'function') updateRankPanel();
             }
 
             generateCertificateImage(wasAutoSolved, timeString, movesCount);
@@ -1076,24 +1077,14 @@ function updateMovesDisplay() {
 }
 
 function updateRankPanel() {
-    const body = document.getElementById('rank-table-body');
-    const label = document.getElementById('rank-grid-label');
-    if (label) label.textContent = `This grid: ${gridRows}×${gridCols}`;
-    if (!body || typeof vspRankThresholds !== 'function') return;
-    const t = vspRankThresholds(gridRows, gridCols);
-    const rows = [
-        { rank: 3, time: '≤ ' + vspFormatRankTime(t.gold.time), moves: '≤ ' + t.gold.moves },
-        { rank: 2, time: '≤ ' + vspFormatRankTime(t.silver.time), moves: '≤ ' + t.silver.moves },
-        { rank: 1, time: 'any clear', moves: 'any clear' }
-    ];
-    body.innerHTML = rows.map((row) => {
-        const meta = vspRankMeta(row.rank);
-        return `<tr class="rank-row-${meta.key}">
-            <th scope="row">${vspTrophySvg(row.rank, 20)} <span>${meta.label}</span></th>
-            <td>${row.time}</td>
-            <td>${row.moves}</td>
-        </tr>`;
-    }).join('');
+    if (typeof vspRenderCollectionUi === 'function') {
+        vspRenderCollectionUi({
+            tallyId: 'rank-tally',
+            labelId: 'rank-grid-label',
+            noticeId: 'rank-notices',
+            downloadId: 'rank-downloads'
+        });
+    }
 }
 
 function formatTime(totalSeconds) {

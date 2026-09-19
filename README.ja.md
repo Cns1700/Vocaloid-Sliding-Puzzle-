@@ -10,14 +10,16 @@
 
 ## スクリーンショット
 
+<!-- 3 rows × 3 cells. 画像は screenshots/ にあります。 -->
+
 | | | |
 |---|---|---|
 | ![ホーム](screenshots/home-page.png) | ![パズル選択](screenshots/puzzle-selection.png) | ![ヒント表示中](screenshots/hint.png) |
-| **ホーム**<br>*(Home / this week’s ranks)* | **パズル選択**<br>*(Character rows)* | **ヒント表示中**<br>*(Hint numbers on)* |
+| **ホーム**<br>ギャラリー、今週のランク、今日のステージ | **パズル選択**<br>5キャラの横列＋ホバープレビュー | **ヒント**<br>盤面に番号を表示 |
 | ![Peek](screenshots/peek-reference.png) | ![グリッド設定](screenshots/grid-size-selection.png) | ![名前ピッカー](screenshots/name-picker.png) |
-| **Peek**<br>*(Full-picture reference)* | **グリッド設定**<br>*(3×3–8×8)* | **名前ピッカー**<br>*(Achieved By)* |
-| ![クリア＆証明書](screenshots/certificate-download-window.png) | ![オートソルブ](screenshots/auto-solver.png) | ![週間コレクション](screenshots/trophy-collection.png) |
-| **クリア＆証明書**<br>*(Victory + download)* | **オートソルブ**<br>*(Unranked clear)* | **週間コレクション**<br>*(Week certificate)* |
+| **Peek**<br>完成絵の参照（表示中はタイマー停止） | **グリッドサイズ**<br>正方形 3×3〜8×8 | **名前ピッカー**<br>ロック／リロール／Achieved By |
+| ![クリア](screenshots/certificate-download-window.png) | ![証明書](screenshots/player-certificate.png) | ![週間コレクション](screenshots/trophy-collection.png) |
+| **クリア**<br>ランク、ダウンロード、コピー | **証明書**<br>トロフィー＋GOLD / SILVER / BRONZE | **週間コレクション**<br>ダウンロードできる週次集計 |
 
 ## できること
 

@@ -1247,7 +1247,7 @@ function triggerPeek() {
     }
     img.src = fullImageURL;
     peekActive = true;
-    if (stopwatchStarted && !pausedForGridModal) {
+    if (stopwatchInterval) {
         pauseStopwatch();
         pausedForPeek = true;
     }

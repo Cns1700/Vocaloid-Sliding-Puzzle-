@@ -10,14 +10,16 @@ It runs in the browser. Nothing to install, no account, no ads. Clears and perso
 
 ## Screenshots
 
+<!-- 3 rows × 3 cells. Files live in screenshots/. -->
+
 | | | |
 |---|---|---|
-| ![Home gallery](screenshots/home-page.png) | ![Puzzle selection](screenshots/puzzle-selection.png) | ![Board with hints](screenshots/hint.png) |
-| **ホーム**<br>*(Home / this week’s ranks)* | **パズル選択**<br>*(Character rows)* | **ヒント表示中**<br>*(Hint numbers on)* |
+| ![Home gallery](screenshots/home-page.png) | ![Puzzle selection](screenshots/puzzle-selection.png) | ![Hints on the board](screenshots/hint.png) |
+| **Home**<br>Gallery, this week’s ranks, today’s stage | **Puzzle select**<br>Five character rows + hover preview | **Hints**<br>Numbered tiles on the board |
 | ![Peek reference](screenshots/peek-reference.png) | ![Grid size](screenshots/grid-size-selection.png) | ![Name picker](screenshots/name-picker.png) |
-| **Peek**<br>*(Full-picture reference)* | **グリッド設定**<br>*(3×3–8×8)* | **名前ピッカー**<br>*(Achieved By)* |
-| ![Victory certificate](screenshots/certificate-download-window.png) | ![Auto Solve](screenshots/auto-solver.png) | ![Week collection](screenshots/trophy-collection.png) |
-| **クリア＆証明書**<br>*(Victory + download)* | **オートソルブ**<br>*(Unranked clear)* | **週間コレクション**<br>*(Week certificate)* |
+| **Peek**<br>Full-picture reference (timer frozen) | **Grid size**<br>Square grids 3×3–8×8 | **Name picker**<br>Lock / reroll / Achieved By |
+| ![Victory](screenshots/certificate-download-window.png) | ![Result certificate](screenshots/player-certificate.png) | ![Week collection](screenshots/trophy-collection.png) |
+| **Clear**<br>Rank, download, copy | **Certificate**<br>Trophy + GOLD / SILVER / BRONZE | **Week collection**<br>Downloadable weekly tally |
 
 ## What’s here
 

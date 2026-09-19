@@ -99,9 +99,11 @@ Grid Settings offers square sizes only (`3×3` … `8×8`) as rounded square but
 
 ### Peek
 
-Three uses per board setup (same reset as hints: new shuffle / Play Again / Apply Grid). Shows `#peek-overlay` for 1.2s. The stopwatch **pauses** for that window (`pausedForPeek`) and the board does not accept moves (`peekActive`). Overlay uses `pointer-events: auto` so clicks do not hit tiles. Timer resumes when the overlay hides, unless Pause or Grid Settings is holding it.
+Three uses per board setup (same reset as hints: new shuffle / Play Again / Apply Grid). Shows `#peek-overlay` for 1.2s. If the stopwatch interval is running, it **pauses** for that window (`pausedForPeek`) and the board does not accept moves (`peekActive`). Overlay uses `pointer-events: auto` so clicks do not hit tiles. Timer resumes when the overlay hides, unless Pause or Grid Settings is holding it.
 
-Footer credits live on both `index.html` and `workspace_template.html` (Magnific, Pixabay, Flaticon trophy attribution).
+Footer credits live on both `index.html` and `workspace_template.html`: [magnific.com](https://magnific.com), [pixabay.com](https://pixabay.com), and [Gold trophy icons created by Md Tanvirul Haque - Flaticon](https://www.flaticon.com/free-icons/gold-trophy).
+
+Player README screenshots (3×3 grid) live in `screenshots/`: `home-page.png`, `puzzle-selection.png`, `hint.png`, `peek-reference.png`, `grid-size-selection.png`, `name-picker.png`, `certificate-download-window.png`, `player-certificate.png`, `trophy-collection.png`. `auto-solver.png` is kept alongside for Auto Solve.
 
 ### Daily stage
 

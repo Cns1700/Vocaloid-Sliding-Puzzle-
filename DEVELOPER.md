@@ -99,7 +99,9 @@ Grid Settings offers square sizes only (`3×3` … `8×8`) as rounded square but
 
 ### Peek
 
-Three uses per board setup (same reset as hints: new shuffle / Play Again / Apply Grid). Shows `#peek-overlay` for 1.2s. Does not pause the timer.
+Three uses per board setup (same reset as hints: new shuffle / Play Again / Apply Grid). Shows `#peek-overlay` for 1.2s. The stopwatch **pauses** for that window (`pausedForPeek`) and the board does not accept moves (`peekActive`). Overlay uses `pointer-events: auto` so clicks do not hit tiles. Timer resumes when the overlay hides, unless Pause or Grid Settings is holding it.
+
+Footer credits live on both `index.html` and `workspace_template.html` (Magnific, Pixabay, Flaticon trophy attribution).
 
 ### Daily stage
 

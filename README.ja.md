@@ -10,14 +10,14 @@
 
 ## スクリーンショット
 
-<!-- PNG を screenshots/ に同じファイル名で入れてください。 -->
-
-| | |
-|---|---|
-| ![ギャラリー選択画面](screenshots/gallery.png) | ![パズルプレイ中](screenshots/workspace.png) |
-| **ギャラリー選択画面**<br>*(Gallery / character select)* | **パズルプレイ中**<br>*(Puzzle workspace mid-game)* |
-| ![ヒント表示中](screenshots/hint.png) | ![クリア＆証明書](screenshots/victory.png) |
-| **ヒント表示中**<br>*(Hint numbers visible)* | **クリア＆証明書**<br>*(Victory + certificate)* |
+| | | |
+|---|---|---|
+| ![ホーム](screenshots/home-page.png) | ![パズル選択](screenshots/puzzle-selection.png) | ![ヒント表示中](screenshots/hint.png) |
+| **ホーム**<br>*(Home / this week’s ranks)* | **パズル選択**<br>*(Character rows)* | **ヒント表示中**<br>*(Hint numbers on)* |
+| ![Peek](screenshots/peek-reference.png) | ![グリッド設定](screenshots/grid-size-selection.png) | ![名前ピッカー](screenshots/name-picker.png) |
+| **Peek**<br>*(Full-picture reference)* | **グリッド設定**<br>*(3×3–8×8)* | **名前ピッカー**<br>*(Achieved By)* |
+| ![クリア＆証明書](screenshots/certificate-download-window.png) | ![オートソルブ](screenshots/auto-solver.png) | ![週間コレクション](screenshots/trophy-collection.png) |
+| **クリア＆証明書**<br>*(Victory + download)* | **オートソルブ**<br>*(Unranked clear)* | **週間コレクション**<br>*(Week certificate)* |
 
 ## できること
 
@@ -25,7 +25,7 @@
 
 ホームではキャラ背景がゆっくり切り替わります。パズル画面では、そのキャラの背景のまま、光がゆるく動きます。
 
-タイマー、手数、一時停止、番号ヒントに加えて、完成絵を一瞬出す **Peek** があります。日付が変わると **今日のステージ** も変わります。その日は、同じタイムゾーンなら全員同じイラストとグリッドです。
+タイマー、手数、一時停止、番号ヒントに加えて、完成絵を出す **Peek** があります（表示中はタイマー停止）。日付が変わると **今日のステージ** も変わります。その日は、同じタイムゾーンなら全員同じイラストとグリッドです。
 
 自分でクリアしたパズルはギャラリーが覚えます。サムネにトロフィーが付き、タイムと手数の自己ベストがこのブラウザに残ります。オートソルブでも盤面は揃いますが、ランクには入りません。
 
@@ -42,7 +42,7 @@
 - **グリッド設定** — 3×3〜8×8（開いている間はタイマー停止）
 - **一時停止** — 時計を止めて盤面を隠す。リセットもここから
 - **ヒント** — 番号を短時間表示（回数制限あり）
-- **Peek** — 完成絵を約1秒（回数制限あり）
+- **Peek** — 完成絵を約1秒（表示中はタイマー停止、回数制限あり）
 - **オートソルブ** — ソルバーに任せる
 
 トロフィーはこの端末の中だけの成績です。ゴールドは、そのグリッドサイズにしては速くて手数も抑えめ、という目安です。パズル横の表に条件が出ます。ホームに今週何回ずつ取ったかが出ます。
@@ -53,7 +53,13 @@
 
 ## クレジット
 
-イラストとキャラクターの権利は各権利者（Crypton Future Media、Piapro など）にあります。非公式のファン作品です。キャラカードは Magnific（旧 Freepik）のイラストです。画面いっぱいの背景は各セット用に選んだイラストで、窓いっぱいに広がります。実写写真ではありません。
+イラストとキャラクターの権利は各権利者（Crypton Future Media、Piapro など）にあります。非公式のファン作品です。
+
+- [magnific.com](https://magnific.com)
+- [pixabay.com](https://pixabay.com)
+- [Gold trophy icons created by Md Tanvirul Haque - Flaticon](https://www.flaticon.com/free-icons/gold-trophy)
+
+画面いっぱいの背景は各セット用に選んだイラストで、窓いっぱいに広がります。実写写真ではありません。
 
 ## ライセンス
 

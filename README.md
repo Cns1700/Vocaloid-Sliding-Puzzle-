@@ -10,14 +10,14 @@ It runs in the browser. Nothing to install, no account, no ads. Clears and perso
 
 ## Screenshots
 
-<!-- Drop PNGs into screenshots/ using these filenames. -->
-
-| | |
-|---|---|
-| ![Gallery select screen](screenshots/gallery.png) | ![Puzzle workspace mid-game](screenshots/workspace.png) |
-| **ギャラリー選択画面**<br>*(Gallery / character select)* | **パズルプレイ中**<br>*(Puzzle workspace mid-game)* |
-| ![Hint numbers visible](screenshots/hint.png) | ![Victory + certificate](screenshots/victory.png) |
-| **ヒント表示中**<br>*(Hint numbers visible)* | **クリア＆証明書**<br>*(Victory + certificate)* |
+| | | |
+|---|---|---|
+| ![Home gallery](screenshots/home-page.png) | ![Puzzle selection](screenshots/puzzle-selection.png) | ![Board with hints](screenshots/hint.png) |
+| **ホーム**<br>*(Home / this week’s ranks)* | **パズル選択**<br>*(Character rows)* | **ヒント表示中**<br>*(Hint numbers on)* |
+| ![Peek reference](screenshots/peek-reference.png) | ![Grid size](screenshots/grid-size-selection.png) | ![Name picker](screenshots/name-picker.png) |
+| **Peek**<br>*(Full-picture reference)* | **グリッド設定**<br>*(3×3–8×8)* | **名前ピッカー**<br>*(Achieved By)* |
+| ![Victory certificate](screenshots/certificate-download-window.png) | ![Auto Solve](screenshots/auto-solver.png) | ![Week collection](screenshots/trophy-collection.png) |
+| **クリア＆証明書**<br>*(Victory + download)* | **オートソルブ**<br>*(Unranked clear)* | **週間コレクション**<br>*(Week certificate)* |
 
 ## What’s here
 
@@ -25,7 +25,7 @@ Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Gri
 
 The home page slowly crossfades through each character’s background, the same way Miku Fever does. Open a puzzle and that character’s scene stays put, with a little motion in the lights behind the board.
 
-There’s a timer, a move counter, pause, numbered hints, and a **Peek** that flashes the finished picture for a second. Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
+There’s a timer, a move counter, pause, numbered hints, and a **Peek** that shows the finished picture (the timer freezes while it’s up). Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
 
 When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a trophy, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
 
@@ -42,7 +42,7 @@ Controls:
 - **Grid Settings** — 3×3 through 8×8 (timer pauses while this is open)
 - **Pause** — stops the clock and hides the board; Reset Puzzle is on this menu
 - **Hint** — numbers on the tiles for a few seconds (limited)
-- **Peek** — the full picture for about a second (limited)
+- **Peek** — the full picture for about a second (timer pauses; limited uses)
 - **Auto Solve** — lets the solver finish it
 
 Trophies are a private score on this machine, not a global leaderboard. Gold means you were fairly quick and tidy for that grid size. The side window on the puzzle shows the exact time and move caps. Home tracks how many of each trophy you earned this week. Trophy art lives in `icons/trophy-gold.png`, `icons/trophy-silver.png`, and `icons/trophy-bronze.png`.
@@ -53,7 +53,13 @@ No build step. Open `index.html`, or serve the folder with any static server.
 
 ## Credits
 
-Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work. Character cards use Magnific (formerly Freepik) illustrations. Full-page scenes are the chosen illustrations for each set — they fill the window, with no photographs.
+Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). This is unofficial fan work.
+
+- [magnific.com](https://magnific.com)
+- [pixabay.com](https://pixabay.com)
+- [Gold trophy icons created by Md Tanvirul Haque - Flaticon](https://www.flaticon.com/free-icons/gold-trophy)
+
+Full-page scenes are the chosen illustrations for each set — they fill the window, with no photographs.
 
 ## License
 

@@ -43,6 +43,8 @@ let stopwatchInterval = null;
 let stopwatchStarted = false;
 let isPaused = false;
 let pausedForGridModal = false;
+let pausedForPeek = false;
+let peekActive = false;
 let heldPauseOverlay = false;
 let gameWon = false;
 let wasAutoSolved = false;
@@ -236,14 +238,14 @@ function buildGrid(boardWidth, boardHeight) {
         };
 
         tile.addEventListener('click', () => {
-            if (isPaused || gameWon || isAutoSolving) return;
+            if (isPaused || gameWon || isAutoSolving || peekActive) return;
             tryMoveTile(tileData);
         });
 
         tile.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                if (isPaused || gameWon || isAutoSolving) return;
+                if (isPaused || gameWon || isAutoSolving || peekActive) return;
                 tryMoveTile(tileData);
             }
         });
@@ -361,6 +363,7 @@ function repositionAllTiles(tileWidth, tileHeight) {
 // ============================================================
 
 function tryMoveTile(tile, isInteractive = true) {
+    if (isInteractive && (isPaused || gameWon || peekActive)) return;
     const rowDiff = Math.abs(tile.currentRow - blankRow);
     const colDiff = Math.abs(tile.currentCol - blankCol);
 
@@ -553,7 +556,7 @@ function animateSolutionPath(path, onDone) {
 }
 
 function triggerAutoSolve() {
-    if (isPaused || gameWon || isAutoSolving) return;
+    if (isPaused || gameWon || isAutoSolving || peekActive) return;
 
     attemptTime = formatTime(elapsedSeconds);
     attemptMoves = movesCount;
@@ -1095,8 +1098,16 @@ function resetStopwatch() {
     stopwatchStarted = false;
     isPaused = false;
     pausedForGridModal = false;
+    pausedForPeek = false;
+    peekActive = false;
     heldPauseOverlay = false;
     updateTimerDisplay();
+
+    const peekOverlay = document.getElementById('peek-overlay');
+    if (peekOverlay) {
+        peekOverlay.classList.remove('show');
+        peekOverlay.setAttribute('aria-hidden', 'true');
+    }
 
     const pauseBtn = document.getElementById('pause-btn');
     if (pauseBtn) pauseBtn.innerHTML = '⏸ Pause';
@@ -1195,6 +1206,8 @@ function resetPuzzleFromPause() {
     }
     isPaused = false;
     pausedForGridModal = false;
+    pausedForPeek = false;
+    peekActive = false;
     heldPauseOverlay = false;
     const pieces = container.querySelectorAll('.puzzle-piece');
     pieces.forEach(p => p.style.opacity = '1');
@@ -1202,7 +1215,7 @@ function resetPuzzleFromPause() {
 }
 
 function triggerHint() {
-    if (isPaused || gameWon || hintsLeft <= 0) return;
+    if (isPaused || gameWon || peekActive || hintsLeft <= 0) return;
 
     hintsLeft--;
     const hintCountNode = document.getElementById('hints-count');
@@ -1219,7 +1232,7 @@ function triggerHint() {
 }
 
 function triggerPeek() {
-    if (isPaused || gameWon || isAutoSolving || peeksLeft <= 0) return;
+    if (isPaused || gameWon || isAutoSolving || peekActive || peeksLeft <= 0) return;
     peeksLeft--;
     const peekCountNode = document.getElementById('peeks-count');
     if (peekCountNode) peekCountNode.textContent = peeksLeft;
@@ -1233,11 +1246,21 @@ function triggerPeek() {
         return;
     }
     img.src = fullImageURL;
+    peekActive = true;
+    if (stopwatchStarted && !pausedForGridModal) {
+        pauseStopwatch();
+        pausedForPeek = true;
+    }
     overlay.classList.add('show');
     overlay.setAttribute('aria-hidden', 'false');
     setTimeout(() => {
         overlay.classList.remove('show');
         overlay.setAttribute('aria-hidden', 'true');
+        peekActive = false;
+        if (pausedForPeek) {
+            pausedForPeek = false;
+            if (!isPaused && !gameWon && !pausedForGridModal) startStopwatch();
+        }
     }, 1200);
 }
 

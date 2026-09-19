@@ -21,12 +21,13 @@ Live builds:
 | `gallery-preview.js` | Hover preview, daily banner, gallery PB badges. |
 | `records.js` | Shared catalog, `localStorage` records, daily hash, star math. |
 | `ambient.js` | Home-page background crossfade + color wash. Same layer on the puzzle page, locked to the selected character. |
-| `BG-themes/` | Compressed WebP **illustrations** (public-domain museum prints + Magnific hub) for the ambient layers. |
+| `name-picker.js` | Manual-clear name picker (lock / reroll / submit). |
+| `icons/` | Shared gold / silver / bronze trophy PNGs. |
+| `BG-themes/` | Compressed WebP illustrations for the ambient layers. |
 | `Puzzles/` | Full-resolution illustrations (loaded only when a puzzle is opened). |
 | `thumbs/` | Small WebP gallery strip thumbnails. **Required** on the gallery page. |
 | `previews/` | Medium WebP hover previews (~15–90 KB). Used by `data-preview` on thumb links. |
-| `BG-character-cards/` | Card background art for the gallery. |
-| `BG-Freepik/` | Page background art. |
+| `BG-character-cards/` | Card background art for the gallery (WebP only). |
 | `screenshots/` | PNGs for the player READMEs (GitHub). |
 | `README.md` / `README.ja.md` | Player-facing English / Japanese. |
 | `DEVELOPER.md` | This file. |

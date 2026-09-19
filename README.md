@@ -21,7 +21,7 @@ It runs in the browser. Nothing to install, no account, no ads. Clears and perso
 
 ## What’s here
 
-Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Grids go from 3×3 up to 8×8, and you can set rows and columns separately. The gallery is a stacked list of character rows — not the old dice layout.
+Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Grids go from 3×3 up to 8×8 in even squares. The gallery is a stacked list of character rows — not the old dice layout.
 
 The home page slowly crossfades through each character’s background, the same way Miku Fever does. Open a puzzle and that character’s scene stays put, with a little motion in the lights behind the board.
 
@@ -39,7 +39,7 @@ On a win you can download or copy a result certificate. Manual clears rank Gold,
 
 Controls:
 
-- **Grid Settings** — 3–8 rows and columns (timer pauses while this is open)
+- **Grid Settings** — 3×3 through 8×8 (timer pauses while this is open)
 - **Pause** — stops the clock and hides the board; Reset Puzzle is on this menu
 - **Hint** — numbers on the tiles for a few seconds (limited)
 - **Peek** — the full picture for about a second (limited)

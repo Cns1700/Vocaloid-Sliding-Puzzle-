@@ -23,6 +23,7 @@ const container = document.getElementById('puzzle-container');
 // Core grid & state parameters
 let gridRows = 3;
 let gridCols = 3;
+let pendingGridSize = 3;
 let tiles = [];          // array of tile objects (or null for blank slot in the logical array)
 let blankRow = 2;
 let blankCol = 2;
@@ -647,10 +648,10 @@ function checkVictory() {
                     const starN = vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols);
                     const rank = typeof vspRankMeta === 'function' ? vspRankMeta(starN) : { label: 'Rank ' + starN };
                     const trophy = typeof vspTrophyMarkup === 'function'
-                        ? vspTrophyMarkup(starN, 22)
-                        : (typeof vspTrophySvg === 'function' ? vspTrophySvg(starN, 22) : '');
+                        ? vspTrophyMarkup(starN, 16)
+                        : (typeof vspTrophySvg === 'function' ? vspTrophySvg(starN, 16) : '');
                     msgNode.innerHTML = `You finished in <strong>${timeString}</strong> with <strong>${movesCount}</strong> moves.<br>
-                    Rank: <strong class="star-rank">${trophy} ${rank.label}</strong>${isDailyRun ? '<br>Daily stage recorded.' : ''}`;
+                    <span class="victory-rank-line">Rank: <strong class="star-rank">${trophy}${rank.label}</strong></span>${isDailyRun ? '<br>Daily stage recorded.' : ''}`;
                 }
             }
 
@@ -992,10 +993,11 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
         const rankW = ctx.measureText(rankText).width;
         const trophyImg = (!isAuto && typeof vspTrophyImg === 'function') ? vspTrophyImg(starN) : null;
         if (trophyImg && trophyImg.complete && trophyImg.naturalWidth) {
-            const cupSize = Math.max(Math.round(valueSize * 3.1), Math.round(36 * s));
+            const cupSize = Math.round(valueSize * 1.38);
             const cupGap = Math.round(6 * s);
             const cupX = rightX - rankW - cupGap - cupSize;
-            const cupY = row4 - cupSize * 0.78;
+            const textMid = row4 - valueSize * 0.35;
+            const cupY = textMid - cupSize / 2;
             ctx.drawImage(trophyImg, cupX, cupY, cupSize, cupSize);
         }
         ctx.fillText(rankText, rightX, row4);
@@ -1256,10 +1258,8 @@ function showToast(message) {
 function showModificationModal() {
     lastFocusedElement = document.activeElement;
     const overlay = document.getElementById('mod-modal-overlay');
-    const rowsInput = document.getElementById('grid-rows-input');
-    const colsInput = document.getElementById('grid-cols-input');
-    if (rowsInput) rowsInput.value = gridRows;
-    if (colsInput) colsInput.value = gridCols;
+    pendingGridSize = (gridRows === gridCols && gridRows >= 3 && gridRows <= 8) ? gridRows : 0;
+    syncGridSizeButtons();
 
     const pauseOverlay = document.getElementById('pause-modal-overlay');
     if (isPaused && pauseOverlay && pauseOverlay.classList.contains('show')) {
@@ -1275,8 +1275,25 @@ function showModificationModal() {
     if (overlay) {
         overlay.classList.add('show');
         overlay.setAttribute('aria-hidden', 'false');
-        setTimeout(() => { if (rowsInput) rowsInput.focus(); }, 100);
+        const firstBtn = overlay.querySelector('.grid-size-btn.is-selected') || overlay.querySelector('.grid-size-btn');
+        setTimeout(() => { if (firstBtn) firstBtn.focus(); }, 100);
     }
+}
+
+function syncGridSizeButtons() {
+    document.querySelectorAll('.grid-size-btn').forEach((btn) => {
+        const n = Number(btn.getAttribute('data-size'));
+        const on = n === pendingGridSize;
+        btn.classList.toggle('is-selected', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+}
+
+function selectGridSize(n) {
+    const size = n | 0;
+    if (size < 3 || size > 8) return;
+    pendingGridSize = size;
+    syncGridSizeButtons();
 }
 
 function hideModificationModal() {
@@ -1299,30 +1316,18 @@ function hideModificationModal() {
 }
 
 function submitGridModification() {
-    const rowsInput = document.getElementById('grid-rows-input');
-    const colsInput = document.getElementById('grid-cols-input');
-    const rows = parseInt(rowsInput.value);
-    const cols = parseInt(colsInput.value);
-
-    let hasError = false;
-    if (isNaN(rows) || rows < 3 || rows > 8) {
-        rowsInput.style.borderColor = "#ff007f";
-        setTimeout(() => { rowsInput.style.borderColor = ""; }, 1000);
-        hasError = true;
+    const size = pendingGridSize | 0;
+    if (size < 3 || size > 8) {
+        showToast('Pick a grid size first.');
+        return;
     }
-    if (isNaN(cols) || cols < 3 || cols > 8) {
-        colsInput.style.borderColor = "#ff007f";
-        setTimeout(() => { colsInput.style.borderColor = ""; }, 1000);
-        hasError = true;
-    }
-    if (hasError) return;
 
-    gridRows = rows;
-    gridCols = cols;
+    gridRows = size;
+    gridCols = size;
 
     if (isDailyRun && typeof vspTodayFeatured === 'function') {
         const featured = vspTodayFeatured();
-        if (!featured || featured.rows !== rows || featured.cols !== cols) {
+        if (!featured || featured.rows !== size || featured.cols !== size) {
             isDailyRun = false;
             const titleNode = document.getElementById('game-title');
             if (titleNode) titleNode.innerHTML = wrapEmojis(currentTheme.title);

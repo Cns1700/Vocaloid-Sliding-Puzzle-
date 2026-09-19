@@ -760,6 +760,51 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     border-color: var(--modal-theme-color, #00ffcc);
 }
 
+.grid-size-picker {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin: 4px 0 22px;
+}
+
+.grid-size-btn {
+    aspect-ratio: 1;
+    width: 100%;
+    min-height: 68px;
+    border-radius: 16px;
+    border: 2px solid rgba(0, 255, 204, 0.32);
+    background: #101820;
+    color: #e8f7f4;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(1rem, 3.4vw, 1.2rem);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.grid-size-btn:hover {
+    border-color: var(--modal-theme-color, #00ffcc);
+    color: #fff;
+}
+
+.grid-size-btn:focus-visible {
+    outline: 2px solid var(--modal-theme-color, #00ffcc);
+    outline-offset: 2px;
+}
+
+.grid-size-btn.is-selected,
+.grid-size-btn[aria-pressed="true"] {
+    background: var(--modal-theme-color, #00ffcc);
+    color: #04222a;
+    border-color: var(--modal-theme-color, #00ffcc);
+    box-shadow: 0 0 16px rgba(0, 255, 204, 0.28);
+}
+
+.grid-size-btn:active {
+    transform: scale(0.97);
+}
+
 .modal-actions {
     display: flex;
     gap: 15px;
@@ -1179,11 +1224,29 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
 .thumb-badge { top: 0; letter-spacing: 1px; }
 .thumb-pb { bottom: 0; color: #e2e8f0; font-family: 'Share Tech Mono', monospace; }
 
-.star-rank { color: #ffd76a; letter-spacing: 2px; }
+.star-rank {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #ffd76a;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.victory-rank-line {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    line-height: 1;
+}
+
 .star-rank .trophy-icon {
-    width: 22px;
-    height: 22px;
-    margin-right: 6px;
+    width: 1em;
+    height: 1em;
+    margin: 0;
+    flex-shrink: 0;
 }
 
 .thumb-badge .trophy-icon {
@@ -1404,6 +1467,10 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
         width: 100%;
         height: 220px;
         margin: 0 auto;
+    }
+    .grid-size-btn {
+        min-height: 60px;
+        border-radius: 14px;
     }
     .name-picker-card {
         width: min(520px, 94vw);

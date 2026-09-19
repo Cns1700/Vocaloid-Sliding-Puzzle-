@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sliding Puzzle Workspace</title>
-    <link rel="stylesheet" href="style_sheet.css?v=trophypng2">
+    <link rel="stylesheet" href="style_sheet.css?v=grid1">
     <link rel="preload" as="image" href="icons/trophy-gold.png?v=crop2">
     <link rel="preload" as="image" href="icons/trophy-silver.png?v=crop2">
     <link rel="preload" as="image" href="icons/trophy-bronze.png?v=crop2">
@@ -72,18 +72,15 @@
 
     <div id="mod-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mod-modal-title" aria-describedby="mod-modal-desc" aria-hidden="true">
         <div class="modal-card" id="mod-modal-card">
-            <h2 id="mod-modal-title">Grid Customization</h2>
-            <p id="mod-modal-desc">Pick rows and columns independently (3 to 8).</p>
-            <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; align-items: center;">
-                <div>
-                    <label id="rows-label" for="grid-rows-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Rows</label>
-                    <input type="number" id="grid-rows-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;" aria-labelledby="rows-label">
-                </div>
-                <div style="font-size: 1.5rem; font-weight: bold; color: var(--modal-theme-color); margin-top: 15px;" aria-hidden="true">✕</div>
-                <div>
-                    <label id="cols-label" for="grid-cols-input" style="display: block; font-size: 0.85rem; color: #a0aec0; margin-bottom: 5px; font-weight: bold;">Columns</label>
-                    <input type="number" id="grid-cols-input" min="3" max="8" value="3" style="width: 100px; margin-bottom: 0;" aria-labelledby="cols-label">
-                </div>
+            <h2 id="mod-modal-title">Grid Size</h2>
+            <p id="mod-modal-desc">Pick a square grid. The timer stays paused while this is open.</p>
+            <div class="grid-size-picker" role="group" aria-label="Grid size">
+                <button type="button" class="grid-size-btn" data-size="3" aria-pressed="false" onclick="selectGridSize(3)">3×3</button>
+                <button type="button" class="grid-size-btn" data-size="4" aria-pressed="false" onclick="selectGridSize(4)">4×4</button>
+                <button type="button" class="grid-size-btn" data-size="5" aria-pressed="false" onclick="selectGridSize(5)">5×5</button>
+                <button type="button" class="grid-size-btn" data-size="6" aria-pressed="false" onclick="selectGridSize(6)">6×6</button>
+                <button type="button" class="grid-size-btn" data-size="7" aria-pressed="false" onclick="selectGridSize(7)">7×7</button>
+                <button type="button" class="grid-size-btn" data-size="8" aria-pressed="false" onclick="selectGridSize(8)">8×8</button>
             </div>
             <div class="modal-actions">
                 <button class="modal-btn cancel" onclick="hideModificationModal()">Cancel</button>
@@ -153,9 +150,9 @@
 
     <div id="toast-notification" class="toast-container" role="alert" aria-live="assertive"></div>
 
-    <script src="records.js?v=trophypng2"></script>
-    <script src="name-picker.js?v=trophypng2"></script>
-    <script src="ambient.js?v=trophypng2"></script>
-    <script src="engine_logic.js?v=trophypng2"></script>
+    <script src="records.js?v=grid1"></script>
+    <script src="name-picker.js?v=grid1"></script>
+    <script src="ambient.js?v=grid1"></script>
+    <script src="engine_logic.js?v=grid1"></script>
 </body>
 </html>

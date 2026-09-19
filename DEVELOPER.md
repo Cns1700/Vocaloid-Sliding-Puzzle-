@@ -92,7 +92,9 @@ Caps scale with `cells × max(rows,cols)` from a 3×3 baseline of about **2:00 /
 
 Manual clears open `name-picker.js` before the certificate. Names are `Adjective Theme Noun` from curated arrays (no free text). Lock a slot, reroll unlocked words, then **Submit Score**. The last name is stored in `localStorage` (`vsp-player-name`) and written as **Achieved By** on the certificate. Auto Solve skips the picker and stays `Auto Solver System`.
 
-The puzzle-result stats box is sized to four rows with even line spacing (no empty band under RANK). RANK draws the cup immediately left of GOLD / SILVER / BRONZE.
+The puzzle-result stats box is sized to four rows with even line spacing (no empty band under RANK). RANK draws a small cup immediately left of GOLD / SILVER / BRONZE, sized to the rank text so it stays on that line.
+
+Grid Settings offers square sizes only (`3×3` … `8×8`) as rounded square buttons. Timer still pauses while the modal is open. Daily stages may still use a rectangular grid from `vspTodayFeatured()`; changing size there drops the daily flag.
 
 ### Peek
 
@@ -122,7 +124,7 @@ Full-page backgrounds in `BG-themes/` keep their native aspect and use CSS `back
 | 25-ji | dark gold/blue fractal |
 | VFlower | neon purple floral |
 
-Hover previews on the gallery use `position: fixed` and sit directly above the hovered thumbnail. Grid Settings pauses the timer while the modal is open; Pause includes Reset Puzzle.
+Hover previews on the gallery use `position: fixed` and sit directly above the hovered thumbnail. Grid Settings pauses the timer while the modal is open and applies a square size (`3×3`–`8×8`). Pause includes Reset Puzzle.
 
 The puzzle rank panel lists Gold / Silver / Bronze time and move caps for the current grid. Weekly trophy counts and week / month / year collection-certificate downloads live on the home page only. `records.js` stores running tallies in `localStorage` under `collections`. Monthly certificates stay available through the 2nd of the next month; yearly through Jan 2.
 

@@ -646,7 +646,9 @@ function checkVictory() {
                 if (msgNode) {
                     const starN = vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols);
                     const rank = typeof vspRankMeta === 'function' ? vspRankMeta(starN) : { label: 'Rank ' + starN };
-                    const trophy = typeof vspTrophySvg === 'function' ? vspTrophySvg(starN, 22) : '';
+                    const trophy = typeof vspTrophyMarkup === 'function'
+                        ? vspTrophyMarkup(starN, 22)
+                        : (typeof vspTrophySvg === 'function' ? vspTrophySvg(starN, 22) : '');
                     msgNode.innerHTML = `You finished in <strong>${timeString}</strong> with <strong>${movesCount}</strong> moves.<br>
                     Rank: <strong class="star-rank">${trophy} ${rank.label}</strong>${isDailyRun ? '<br>Daily stage recorded.' : ''}`;
                 }
@@ -666,8 +668,20 @@ function checkVictory() {
                 if (typeof updateRankPanel === 'function') updateRankPanel();
             }
 
-            generateCertificateImage(wasAutoSolved, timeString, movesCount);
-            showVictoryModal();
+            const openCert = (playerName) => {
+                generateCertificateImage(wasAutoSolved, timeString, movesCount, playerName);
+                showVictoryModal();
+            };
+            if (wasAutoSolved) {
+                openCert('Auto Solver System');
+            } else if (typeof vspOpenNamePicker === 'function') {
+                vspOpenNamePicker(openCert);
+            } else {
+                const fallbackName = (typeof vspFormatPlayerName === 'function' && typeof vspNameState !== 'undefined')
+                    ? (vspFormatPlayerName(vspNameState) || 'Player')
+                    : 'Player';
+                openCert(fallbackName);
+            }
         }, 600);
     }
 }
@@ -679,7 +693,7 @@ function checkVictory() {
  * - Image is drawn with “contain” inside the frame (letterbox/pillarbox if needed)
  * - Text scale is clamped so titles never spill outside the border
  */
-function generateCertificateImage(isAuto, timeStr, movesVal) {
+function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
     const certWrapper = document.getElementById('certificate-render-area');
     if (!certWrapper) return;
     certWrapper.innerHTML = `<p style="font-size: 0.85rem; color: #a0aec0;">Generating secure result certificate... 🎨</p>`;
@@ -687,6 +701,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
     const bgImg = new Image();
     bgImg.crossOrigin = "anonymous";
     bgImg.onload = function () {
+        const paintCert = () => {
         const natW = bgImg.naturalWidth || 1920;
         const natH = bgImg.naturalHeight || 1080;
 
@@ -853,7 +868,11 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
             /[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g,
             ''
         ).trim();
-        const masterGreeting = isAuto ? "Auto Solver System" : "Player";
+        const masterGreeting = isAuto
+            ? "Auto Solver System"
+            : String(playerName || (typeof vspFormatPlayerName === 'function' && typeof vspNameState !== 'undefined'
+                ? vspFormatPlayerName(vspNameState)
+                : '') || "Player");
 
         // Vertical metrics for the centered stack
         const titleBlockH = useTwoLineTitle
@@ -863,7 +882,9 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         const gapLineToTarget = Math.round(26 * s);
         const gapTargetToAchieved = Math.round(26 * s);
         const gapAchievedToBox = Math.round(20 * s);
-        const boxH = Math.round((isPortrait ? 148 : 162) * s);
+        const rowGap = Math.round((isPortrait ? 36 : 40) * s);
+        const boxPadY = Math.round(18 * s);
+        const boxH = boxPadY * 2 + Math.round(valueSize * 0.9) + rowGap * 3;
         const gapBoxToStamp = Math.round(26 * s);
         const gapStampToStatus = Math.round(22 * s);
 
@@ -921,7 +942,14 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         y += gapTargetToAchieved + bodySize;
         ctx.fillStyle = "#ffffff";
         ctx.font = `bold ${bodySize}px 'Segoe UI', sans-serif`;
-        ctx.fillText(`Achieved By: ${masterGreeting}`, cx, y);
+        const achievedLabel = `Achieved By: ${masterGreeting}`;
+        let achievedSize = bodySize;
+        ctx.font = `bold ${achievedSize}px 'Segoe UI', sans-serif`;
+        while (achievedSize > 9 && ctx.measureText(achievedLabel).width > maxTextW * 0.96) {
+            achievedSize -= 1;
+            ctx.font = `bold ${achievedSize}px 'Segoe UI', sans-serif`;
+        }
+        ctx.fillText(achievedLabel, cx, y);
 
         // Stats box
         y += gapAchievedToBox;
@@ -935,10 +963,10 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         ctx.fillRect(boxX, boxY, boxW, boxH);
         ctx.strokeRect(boxX, boxY, boxW, boxH);
 
-        const row1 = boxY + Math.round(30 * s);
-        const row2 = boxY + Math.round(54 * s);
-        const row3 = boxY + Math.round(78 * s);
-        const row4 = boxY + Math.round(102 * s);
+        const row1 = boxY + boxPadY + Math.round(valueSize * 0.82);
+        const row2 = row1 + rowGap;
+        const row3 = row2 + rowGap;
+        const row4 = row3 + rowGap;
         const leftX = boxX + Math.round(22 * s);
         const rightX = boxX + boxW - Math.round(22 * s);
 
@@ -960,6 +988,16 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
         ctx.fillText(timeStr, rightX, row2);
         ctx.fillText(String(movesVal), rightX, row3);
         ctx.fillStyle = isAuto ? "#e74c3c" : "#ffd76a";
+        ctx.font = `bold ${valueSize}px 'Share Tech Mono', monospace`;
+        const rankW = ctx.measureText(rankText).width;
+        const trophyImg = (!isAuto && typeof vspTrophyImg === 'function') ? vspTrophyImg(starN) : null;
+        if (trophyImg && trophyImg.complete && trophyImg.naturalWidth) {
+            const cupSize = Math.max(Math.round(valueSize * 3.1), Math.round(36 * s));
+            const cupGap = Math.round(6 * s);
+            const cupX = rightX - rankW - cupGap - cupSize;
+            const cupY = row4 - cupSize * 0.78;
+            ctx.drawImage(trophyImg, cupX, cupY, cupSize, cupSize);
+        }
         ctx.fillText(rankText, rightX, row4);
 
         // Stamp + status
@@ -1012,6 +1050,9 @@ function generateCertificateImage(isAuto, timeStr, movesVal) {
                 }
             };
         }
+        };
+        if (typeof vspWhenTrophiesReady === 'function') vspWhenTrophiesReady(paintCert);
+        else paintCert();
     };
     bgImg.src = fullImageURL;
 }
@@ -1097,17 +1138,20 @@ function updateRankPanel() {
             return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
         };
     const rows = [
-        { rank: 3, emoji: '🥇', name: 'Gold', time: t.gold.time, moves: t.gold.moves },
-        { rank: 2, emoji: '🥈', name: 'Silver', time: t.silver.time, moves: t.silver.moves },
-        { rank: 1, emoji: '🥉', name: 'Bronze', time: t.bronze.time, moves: t.bronze.moves }
+        { rank: 3, name: 'Gold', time: t.gold.time, moves: t.gold.moves },
+        { rank: 2, name: 'Silver', time: t.silver.time, moves: t.silver.moves },
+        { rank: 1, name: 'Bronze', time: t.bronze.time, moves: t.bronze.moves }
     ];
     const keys = ['gold', 'silver', 'bronze'];
-    body.innerHTML = rows.map((row, i) => `
+    body.innerHTML = rows.map((row, i) => {
+        const cup = typeof vspTrophyMarkup === 'function' ? vspTrophyMarkup(row.rank, 22) : '';
+        return `
         <tr class="rank-row-${keys[i]}">
-            <th scope="row"><span class="plain-emoji">${row.emoji}</span> ${row.name}</th>
+            <th scope="row">${cup} ${row.name}</th>
             <td>≤ ${fmt(row.time)}</td>
             <td>≤ ${row.moves}</td>
-        </tr>`).join('');
+        </tr>`;
+    }).join('');
 }
 
 function formatTime(totalSeconds) {

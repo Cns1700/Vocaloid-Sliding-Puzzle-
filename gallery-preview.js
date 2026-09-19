@@ -32,7 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const badge = document.createElement('span');
             badge.className = 'thumb-badge';
             const stars = rec.bestStars || 1;
-            badge.innerHTML = typeof vspTrophySvg === 'function' ? vspTrophySvg(stars, 12) : vspStarGlyphs(stars);
+            badge.innerHTML = typeof vspTrophyMarkup === 'function'
+                ? vspTrophyMarkup(stars, 14)
+                : (typeof vspTrophySvg === 'function' ? vspTrophySvg(stars, 14) : vspStarGlyphs(stars));
             thumb.appendChild(badge);
 
             const grids = rec.bests || {};

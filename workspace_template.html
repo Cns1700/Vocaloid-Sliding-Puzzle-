@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sliding Puzzle Workspace</title>
-    <link rel="stylesheet" href="style_sheet.css">
-    <link rel="stylesheet" href="trophy.css">
+    <link rel="stylesheet" href="style_sheet.css?v=trophypng2">
+    <link rel="preload" as="image" href="icons/trophy-gold.png?v=crop2">
+    <link rel="preload" as="image" href="icons/trophy-silver.png?v=crop2">
+    <link rel="preload" as="image" href="icons/trophy-bronze.png?v=crop2">
 </head>
 <body class="workspace-page">
     <div id="bgImageLayerA" class="bg-image-layer active"></div>
     <div id="bgImageLayerB" class="bg-image-layer"></div>
     <div class="bg-wash" aria-hidden="true"></div>
+
 
     <header>
         <h1 id="game-title">Loading Puzzle...</h1>
@@ -41,17 +44,17 @@
                 </thead>
                 <tbody id="rank-table-body">
                     <tr class="rank-row-gold">
-                        <th scope="row"><img class="trophy-icon" src="icons/trophy-gold.svg" width="20" height="20" alt=""> Gold</th>
+                        <th scope="row"><img class="trophy-icon" src="icons/trophy-gold.png?v=crop2" width="22" height="22" alt=""> Gold</th>
                         <td>≤ 3:00</td>
                         <td>≤ 70</td>
                     </tr>
                     <tr class="rank-row-silver">
-                        <th scope="row"><img class="trophy-icon" src="icons/trophy-silver.svg" width="20" height="20" alt=""> Silver</th>
+                        <th scope="row"><img class="trophy-icon" src="icons/trophy-silver.png?v=crop2" width="22" height="22" alt=""> Silver</th>
                         <td>≤ 8:00</td>
                         <td>≤ 160</td>
                     </tr>
                     <tr class="rank-row-bronze">
-                        <th scope="row"><img class="trophy-icon" src="icons/trophy-bronze.svg" width="20" height="20" alt=""> Bronze</th>
+                        <th scope="row"><img class="trophy-icon" src="icons/trophy-bronze.png?v=crop2" width="22" height="22" alt=""> Bronze</th>
                         <td>≤ 20:00</td>
                         <td>≤ 400</td>
                     </tr>
@@ -115,19 +118,44 @@
         </div>
     </div>
 
+    <div id="name-picker-overlay" class="modal-overlay name-picker-overlay" role="dialog" aria-modal="true" aria-labelledby="name-picker-title" aria-describedby="name-picker-desc" aria-hidden="true">
+        <div class="modal-card name-picker-card" id="name-picker-card">
+            <p class="name-picker-kicker">Stage Clear</p>
+            <h2 id="name-picker-title">Pick your name</h2>
+            <p id="name-picker-desc" class="name-picker-desc">Tap a word to lock it. Reroll unlocked words, then submit for the certificate.</p>
+            <p class="name-picker-preview" id="name-picker-preview" aria-live="polite">Neon Synth Rabbit</p>
+            <div class="name-picker-slots">
+                <div class="name-slot" id="name-slot-0" role="button" tabindex="0" aria-pressed="false">
+                    <span class="name-slot-label">Adjective</span>
+                    <span class="name-slot-word" id="name-slot-word-0">Neon</span>
+                    <span class="name-slot-lock" id="name-slot-lock-0">Tap to lock</span>
+                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-0">Reroll</button>
+                </div>
+                <div class="name-slot" id="name-slot-1" role="button" tabindex="0" aria-pressed="false">
+                    <span class="name-slot-label">Theme</span>
+                    <span class="name-slot-word" id="name-slot-word-1">Synth</span>
+                    <span class="name-slot-lock" id="name-slot-lock-1">Tap to lock</span>
+                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-1">Reroll</button>
+                </div>
+                <div class="name-slot" id="name-slot-2" role="button" tabindex="0" aria-pressed="false">
+                    <span class="name-slot-label">Noun</span>
+                    <span class="name-slot-word" id="name-slot-word-2">Rabbit</span>
+                    <span class="name-slot-lock" id="name-slot-lock-2">Tap to lock</span>
+                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-2">Reroll</button>
+                </div>
+            </div>
+            <div class="name-picker-actions">
+                <button type="button" class="modal-btn name-reroll" id="name-reroll-btn">🎲 Reroll Name</button>
+                <button type="button" class="modal-btn confirm name-submit" id="name-submit-btn">💾 Submit Score</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-notification" class="toast-container" role="alert" aria-live="assertive"></div>
 
-    <footer class="site-footer">
-        <details class="credits-menu">
-            <summary>Credits</summary>
-            <p>Art and characters belong to their owners (Crypton Future Media, Piapro, and the illustrators). Unofficial fan work.</p>
-            <p>Rank trophies are the same cup in gold, silver, and bronze (<code>icons/trophy-*.svg</code>). Replace those files with Flaticon trophies if you want; add the Flaticon author here if you do.</p>
-        </details>
-    </footer>
-
-    <script src="records.js?v=trophy1"></script>
-    <script src="ambient.js?v=trophy1"></script>
-    <script src="engine_logic.js?v=trophy1"></script>
-    <script src="trophy-ui.js?v=trophy1"></script>
+    <script src="records.js?v=trophypng2"></script>
+    <script src="name-picker.js?v=trophypng2"></script>
+    <script src="ambient.js?v=trophypng2"></script>
+    <script src="engine_logic.js?v=trophypng2"></script>
 </body>
 </html>

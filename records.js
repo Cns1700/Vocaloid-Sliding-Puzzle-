@@ -87,19 +87,54 @@ function vspRankMeta(n) {
     return { key: 'none', label: 'Unranked', color: '#e74c3c' };
 }
 
-function vspTrophySvg(rank, size) {
+const VSP_TROPHY_IMGS = { gold: null, silver: null, bronze: null };
+
+function vspTrophySrc(rankOrKey) {
+    const key = typeof rankOrKey === 'string' ? rankOrKey : vspRankMeta(rankOrKey).key;
+    if (!key || key === 'none') return '';
+    return 'icons/trophy-' + key + '.png?v=crop2';
+}
+
+function vspTrophyMarkup(rank, size) {
     const s = size || 18;
     const meta = vspRankMeta(rank);
-    const cup = meta.color;
-    const stem = rank >= 3 ? '#c48a12' : rank === 2 ? '#7d8694' : rank === 1 ? '#8a5424' : '#555';
-    return `<svg class="trophy-icon trophy-${meta.key}" width="${s}" height="${s}" viewBox="0 0 24 24" aria-hidden="true">
-        <path fill="${cup}" d="M6 4h12v2.2c0 3.4-2.4 6.2-6 6.2S6 9.6 6 6.2V4z"/>
-        <path fill="${cup}" d="M4 5h2.1C6.4 8.4 8.8 11 12 11s5.6-2.6 5.9-6H20c.6 2.8-1.1 6.2-4.2 7.4L15 15H9l-.8-2.6C5.1 11.2 3.4 7.8 4 5z"/>
-        <path fill="${stem}" d="M10 15h4l.6 2.1H9.4z"/>
-        <rect x="8" y="17.2" width="8" height="1.6" rx="0.4" fill="${stem}"/>
-        <rect x="7" y="19" width="10" height="2.2" rx="0.6" fill="${cup}"/>
-    </svg>`;
+    if (meta.key === 'none') return '';
+    return `<img class="trophy-icon trophy-${meta.key}" src="${vspTrophySrc(meta.key)}" width="${s}" height="${s}" alt="" decoding="async">`;
 }
+
+function vspTrophySvg(rank, size) {
+    return vspTrophyMarkup(rank, size);
+}
+
+function vspPreloadTrophyImgs() {
+    ['gold', 'silver', 'bronze'].forEach((key) => {
+        const img = new Image();
+        img.src = vspTrophySrc(key);
+        VSP_TROPHY_IMGS[key] = img;
+    });
+}
+
+function vspTrophyImg(rank) {
+    return VSP_TROPHY_IMGS[vspRankMeta(rank).key] || null;
+}
+
+function vspWhenTrophiesReady(done) {
+    const imgs = ['gold', 'silver', 'bronze'].map((key) => VSP_TROPHY_IMGS[key]);
+    let left = imgs.length;
+    const tick = () => {
+        left -= 1;
+        if (left <= 0 && typeof done === 'function') done();
+    };
+    imgs.forEach((img) => {
+        if (!img || img.complete) tick();
+        else {
+            img.addEventListener('load', tick, { once: true });
+            img.addEventListener('error', tick, { once: true });
+        }
+    });
+}
+
+vspPreloadTrophyImgs();
 
 function vspFormatRankTime(totalSeconds) {
     const sec = Math.max(0, totalSeconds | 0);
@@ -429,35 +464,19 @@ function vspCertWindows(nowDate) {
 }
 
 function vspDrawTrophyCup(ctx, x, y, size, rank) {
+    const img = typeof vspTrophyImg === 'function' ? vspTrophyImg(rank) : null;
+    if (img && img.complete && img.naturalWidth) {
+        ctx.drawImage(img, x, y, size, size);
+        return;
+    }
     const meta = vspRankMeta(rank);
-    const cup = meta.color;
-    const stem = rank >= 3 ? '#c48a12' : rank === 2 ? '#7d8694' : '#8a5424';
     ctx.save();
-    ctx.translate(x, y);
-    const s = size / 24;
-    ctx.scale(s, s);
+    ctx.fillStyle = meta.color;
     ctx.beginPath();
-    ctx.moveTo(6, 4); ctx.lineTo(18, 4); ctx.lineTo(18, 6.2);
-    ctx.bezierCurveTo(18, 9.6, 15.6, 12.4, 12, 12.4);
-    ctx.bezierCurveTo(8.4, 12.4, 6, 9.6, 6, 6.2);
-    ctx.closePath();
-    ctx.fillStyle = cup;
+    ctx.arc(x + size * 0.5, y + size * 0.42, size * 0.28, 0, Math.PI * 2);
     ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(4, 5); ctx.lineTo(6.1, 5);
-    ctx.bezierCurveTo(6.4, 8.4, 8.8, 11, 12, 11);
-    ctx.bezierCurveTo(15.2, 11, 17.6, 8.4, 17.9, 5);
-    ctx.lineTo(20, 5);
-    ctx.bezierCurveTo(20.6, 7.8, 18.9, 11.2, 15.8, 12.4);
-    ctx.lineTo(15, 15); ctx.lineTo(9, 15); ctx.lineTo(8.2, 12.4);
-    ctx.bezierCurveTo(5.1, 11.2, 3.4, 7.8, 4, 5);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = stem;
-    ctx.fillRect(10, 15, 4, 2.1);
-    ctx.fillRect(8, 17.2, 8, 1.6);
-    ctx.fillStyle = cup;
-    ctx.fillRect(7, 19, 10, 2.2);
+    ctx.fillRect(x + size * 0.38, y + size * 0.62, size * 0.24, size * 0.18);
+    ctx.fillRect(x + size * 0.22, y + size * 0.8, size * 0.56, size * 0.12);
     ctx.restore();
 }
 
@@ -524,12 +543,16 @@ function vspDrawCollectionCert(spec) {
 }
 
 function vspDownloadCollectionCert(spec) {
-    const canvas = vspDrawCollectionCert(spec);
-    const link = document.createElement('a');
-    const safe = String(spec.period || spec.kind || 'collection').replace(/[^\w\-]+/g, '_');
-    link.download = `VSP-${spec.kind || 'collection'}-${safe}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const go = () => {
+        const canvas = vspDrawCollectionCert(spec);
+        const link = document.createElement('a');
+        const safe = String(spec.period || spec.kind || 'collection').replace(/[^\w\-]+/g, '_');
+        link.download = `VSP-${spec.kind || 'collection'}-${safe}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+    if (typeof vspWhenTrophiesReady === 'function') vspWhenTrophiesReady(go);
+    else go();
 }
 
 function vspTallyRowsHtml(counts) {

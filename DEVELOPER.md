@@ -88,7 +88,11 @@ The gallery paints a trophy badge on cleared thumbs and a short PB line (`4x4 ·
 
 Caps scale with `cells × max(rows,cols)` from a 3×3 baseline of about **2:00 / 80 moves** (gold) and **~5:00 / 190 moves** (silver). Both time **and** moves must land in the band. Auto Solve is unranked.
 
-`vspComputeStars(...)` returns 3 / 2 / 1 / 0 for gold / silver / bronze / unranked. Shown as trophy icons on the rank table, victory copy, certificate RANK row, and gallery thumbs.
+`vspComputeStars(...)` returns 3 / 2 / 1 / 0 for gold / silver / bronze / unranked. Shown as the shared PNG cups (`icons/trophy-gold.png`, `icons/trophy-silver.png`, `icons/trophy-bronze.png`) on the rank table, home week tally, gallery thumbs, victory copy, puzzle certificate RANK row, and collection certificates. Markup helper: `vspTrophyMarkup`. Canvas helper: `vspDrawTrophyCup` (`drawImage` of the preloaded PNG).
+
+Manual clears open `name-picker.js` before the certificate. Names are `Adjective Theme Noun` from curated arrays (no free text). Lock a slot, reroll unlocked words, then **Submit Score**. The last name is stored in `localStorage` (`vsp-player-name`) and written as **Achieved By** on the certificate. Auto Solve skips the picker and stays `Auto Solver System`.
+
+The puzzle-result stats box is sized to four rows with even line spacing (no empty band under RANK). RANK draws the cup immediately left of GOLD / SILVER / BRONZE.
 
 ### Peek
 

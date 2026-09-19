@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocaloid Puzzle Gallery</title>
-    <link rel="stylesheet" href="style_sheet.css">
+    <link rel="stylesheet" href="style_sheet.css?v=trophypng2">
     <link rel="preload" as="image" href="BG-themes/miku-original.webp">
+    <link rel="preload" as="image" href="icons/trophy-gold.png">
 </head>
 <body class="gallery-page">
     <div id="bgImageLayerA" class="bg-image-layer active" style="background-image:url('BG-themes/miku-original.webp')"></div>
@@ -23,9 +24,9 @@
         <p class="week-tally-kicker">This week’s ranks</p>
         <p id="week-tally-range" class="week-tally-range"></p>
         <ul class="week-tally-row">
-            <li class="rank-row-gold"><span class="week-emoji" aria-hidden="true">🥇</span> Gold <strong id="week-gold">0</strong></li>
-            <li class="rank-row-silver"><span class="week-emoji" aria-hidden="true">🥈</span> Silver <strong id="week-silver">0</strong></li>
-            <li class="rank-row-bronze"><span class="week-emoji" aria-hidden="true">🥉</span> Bronze <strong id="week-bronze">0</strong></li>
+            <li class="rank-row-gold"><img class="trophy-icon week-trophy" src="icons/trophy-gold.png?v=crop2" width="28" height="28" alt=""> Gold <strong id="week-gold">0</strong></li>
+            <li class="rank-row-silver"><img class="trophy-icon week-trophy" src="icons/trophy-silver.png?v=crop2" width="28" height="28" alt=""> Silver <strong id="week-silver">0</strong></li>
+            <li class="rank-row-bronze"><img class="trophy-icon week-trophy" src="icons/trophy-bronze.png?v=crop2" width="28" height="28" alt=""> Bronze <strong id="week-bronze">0</strong></li>
         </ul>
         <p class="week-tally-reset">Total is reset every Monday(weekly), new month, & new year (time zone varies). Total of trophy types will be totaled at the end of the month and at the end of the year (Dec. 31).</p>
         <div id="week-tally-notices" class="rank-notices"></div>
@@ -174,8 +175,8 @@
         </article>
 
     </main>
-    <script src="records.js"></script>
-    <script src="ambient.js"></script>
-    <script src="gallery-preview.js" defer></script>
+    <script src="records.js?v=trophypng2"></script>
+    <script src="ambient.js?v=trophypng2"></script>
+    <script src="gallery-preview.js?v=trophypng2" defer></script>
 </body>
 </html>

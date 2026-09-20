@@ -32,7 +32,6 @@ html[lang="ja"] body {
 }
 
 html[lang="ja"] header h1,
-html[lang="ja"] .card-title,
 html[lang="ja"] .daily-stage h2,
 html[lang="ja"] .modal-card h2,
 html[lang="ja"] .name-picker-desc,
@@ -46,6 +45,23 @@ html[lang="ja"] .week-tally,
 html[lang="ja"] .site-footer {
     font-family: 'Noto Sans JP', 'Orbitron', sans-serif;
     letter-spacing: 0.06em;
+}
+
+html[lang="ja"] header p,
+html[lang="ja"] .week-tally-kicker,
+html[lang="ja"] .week-tally-range,
+html[lang="ja"] .week-tally-reset,
+html[lang="ja"] .daily-kicker,
+html[lang="ja"] .daily-meta,
+html[lang="ja"] .gallery-progress {
+    font-family: 'Noto Sans JP', 'Share Tech Mono', sans-serif;
+    letter-spacing: 0.04em;
+}
+
+html[lang="ja"] .daily-kicker,
+html[lang="ja"] .week-tally-kicker {
+    letter-spacing: 0.08em;
+    text-transform: none;
 }
 
 .lang-toggle {
@@ -243,6 +259,8 @@ header p {
     background-position: center;
     box-shadow: 0 0 16px var(--glow-color, var(--theme-color));
     box-sizing: border-box;
+    container-type: inline-size;
+    container-name: charcard;
 }
 
 .character-box::after {
@@ -376,6 +394,41 @@ header p {
         3px 3px 0px #300060, 
         0px 0px 15px rgba(153, 51, 255, 0.95),
         0px 0px 25px rgba(153, 51, 255, 0.5);
+}
+
+/* Japanese names are wider than the Latin display fonts these sizes were built for. */
+html[lang="ja"] .card-title {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    padding: 0 12px;
+    max-width: 100%;
+    box-sizing: border-box;
+    line-height: 1.2;
+    text-align: center;
+}
+
+html[lang="ja"] .miku-original-card .card-title {
+    font-size: clamp(1.25rem, 14cqi, 1.85rem);
+}
+
+html[lang="ja"] .miku-supreme-card .card-title {
+    font-size: clamp(1.15rem, 12cqi, 1.7rem);
+}
+
+html[lang="ja"] .miku-honey-card .card-title {
+    font-size: clamp(1.05rem, 10.4cqi, 1.62rem);
+    letter-spacing: 0.02em;
+}
+
+html[lang="ja"] .miku-25ji-card .card-title {
+    font-size: clamp(1.35rem, 16cqi, 2rem);
+}
+
+html[lang="ja"] .vflower-card .card-title {
+    font-size: clamp(0.98rem, 9.4cqi, 1.48rem);
+    letter-spacing: 0.02em;
 }
 
 /* Horizontal Thumbnail Choice Track — wraps so puzzle picks are never clipped */
@@ -1048,6 +1101,15 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     }
     .miku-honey-card .card-title {
         font-size: 2rem;
+    }
+    html[lang="ja"] .card-title {
+        white-space: nowrap;
+    }
+    html[lang="ja"] .miku-honey-card .card-title {
+        font-size: clamp(1.15rem, 10.4cqi, 1.7rem);
+    }
+    html[lang="ja"] .vflower-card .card-title {
+        font-size: clamp(1.05rem, 9.4cqi, 1.55rem);
     }
     .thumb-link {
         width: 72px;

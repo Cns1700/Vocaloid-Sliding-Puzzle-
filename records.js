@@ -2,36 +2,42 @@
 const VSP_RECORD_KEY = 'vsp-records-v1';
 
 const VSP_CATALOG = [
-    { char: 'miku-original', puzzle: 'Cyber-Miku-Revamped2-1.jpg', title: 'Hatsune Miku — Cyber Bike', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Cyber-Miku-Revamped2-1.webp' },
-    { char: 'miku-original', puzzle: 'Cyber_Miku-Weapon_Engage.jpg', title: 'Hatsune Miku — Weapon Engage', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Cyber_Miku-Weapon_Engage.webp' },
-    { char: 'miku-original', puzzle: 'Miku_Witch.jpg', title: 'Hatsune Miku — Witch', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku_Witch.webp' },
-    { char: 'miku-original', puzzle: 'Miku-V!.jpg', title: 'Hatsune Miku — Cyber Life', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-V!.webp' },
-    { char: 'miku-original', puzzle: 'Miku-V2.jpg', title: 'Hatsune Miku — Hexagons', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-V2.webp' },
-    { char: 'miku-original', puzzle: 'Miku-Birthday-Cafe.jpg', title: 'Hatsune Miku — Birthday Cafe', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Cafe.webp' },
-    { char: 'miku-original', puzzle: 'Miku-Birthday-Gifts.jpg', title: 'Hatsune Miku — Birthday Gifts', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Gifts.webp' },
-    { char: 'miku-original', puzzle: 'Miku-Birthday-Message.jpg', title: 'Hatsune Miku — Birthday Message', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Message.webp' },
-    { char: 'miku-original', puzzle: 'Miku-Beach-Trio.jpg', title: 'Hatsune Miku — Beach Trio', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Trio.webp' },
-    { char: 'miku-original', puzzle: 'Miku-Beach-Water.jpg', title: 'Hatsune Miku — Beach Water', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Water.webp' },
-    { char: 'miku-supreme', puzzle: 'Supreme-V3.jpg', title: 'Supreme — Dessert', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-V3.webp' },
-    { char: 'miku-supreme', puzzle: 'Supreme-Swimsuit.png', title: 'Supreme — Swimsuit', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-Swimsuit.webp' },
-    { char: 'miku-supreme', puzzle: 'Supreme-V1.jpg', title: 'Supreme — Knight', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-V1.webp' },
-    { char: 'miku-supreme', puzzle: 'Supreme-V2.jpg', title: 'Supreme — Palace', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-V2.webp' },
-    { char: 'miku-honey', puzzle: 'Honey_Whip-1.png', title: 'Honey Whip — Tease', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey_Whip-1.webp' },
-    { char: 'miku-honey', puzzle: 'Honey_Whip_Hot_Tub.jpg', title: 'Honey Whip — Hot Tub', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey_Whip_Hot_Tub.webp' },
-    { char: 'miku-honey', puzzle: 'Honey_Whip-swimsuit.png', title: 'Honey Whip — Swimsuit', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey_Whip-swimsuit.webp' },
-    { char: 'miku-honey', puzzle: 'Honey-Whip-V2.jpg', title: 'Honey Whip — Intro', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey-Whip-V2.webp' },
-    { char: 'miku-honey', puzzle: 'Honey-Whip-V4.jpg', title: 'Honey Whip — Leisure', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey-Whip-V4.webp' },
-    { char: 'miku-25ji', puzzle: '25-ji-Miku-Moonlight-V1.jpg', title: '25-ji — Moonlight', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji-Miku-Moonlight-V1.webp' },
-    { char: 'miku-25ji', puzzle: '25-ji_Miku_soul_mistress.jpg', title: '25-ji — Soul Mistress', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji_Miku_soul_mistress.webp' },
-    { char: 'miku-25ji', puzzle: '25-jiMiku_Night-Water.jpg', title: '25-ji — Night Water', preview: 'previews/Hatsune-Miku__25-ji-images__25-jiMiku_Night-Water.webp' },
-    { char: 'miku-25ji', puzzle: '25-ji-V1.jpg', title: '25-ji — Mystic', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji-V1.webp' },
-    { char: 'miku-25ji', puzzle: '25-ji-V2.jpg', title: '25-ji — Time', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji-V2.webp' },
-    { char: 'vflower', puzzle: 'Black_Window_VFlower1.jpg', title: 'VFlower — Widow Lily 1', preview: 'previews/VFlower-V3__Black_Window_VFlower1.webp' },
-    { char: 'vflower', puzzle: 'Black_Window_VFlower2.jpg', title: 'VFlower — Widow Lily 2', preview: 'previews/VFlower-V3__Black_Window_VFlower2.webp' },
-    { char: 'vflower', puzzle: 'VFlower_Amaryllis_Fountain.jpg', title: 'VFlower — Amaryllis Fountain', preview: 'previews/VFlower-V3__VFlower_Amaryllis_Fountain.webp' },
-    { char: 'vflower', puzzle: 'VFlower-V1.jpg', title: 'VFlower — Bloom Night', preview: 'previews/VFlower-V3__VFlower-V1.webp' },
-    { char: 'vflower', puzzle: 'VFlower-V2.jpg', title: 'VFlower — Guitar', preview: 'previews/VFlower-V3__VFlower-V2.webp' }
+    { char: 'miku-original', puzzle: 'Cyber-Miku-Revamped2-1.jpg', title: 'Hatsune Miku — Cyber Bike', titleJa: '初音ミク — サイバーバイク', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Cyber-Miku-Revamped2-1.webp' },
+    { char: 'miku-original', puzzle: 'Cyber_Miku-Weapon_Engage.jpg', title: 'Hatsune Miku — Weapon Engage', titleJa: '初音ミク — ウェポンエンゲージ', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Cyber_Miku-Weapon_Engage.webp' },
+    { char: 'miku-original', puzzle: 'Miku_Witch.jpg', title: 'Hatsune Miku — Witch', titleJa: '初音ミク — ウィッチ', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku_Witch.webp' },
+    { char: 'miku-original', puzzle: 'Miku-V!.jpg', title: 'Hatsune Miku — Cyber Life', titleJa: '初音ミク — サイバーライフ', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-V!.webp' },
+    { char: 'miku-original', puzzle: 'Miku-V2.jpg', title: 'Hatsune Miku — Hexagons', titleJa: '初音ミク — ヘキサゴン', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-V2.webp' },
+    { char: 'miku-original', puzzle: 'Miku-Birthday-Cafe.jpg', title: 'Hatsune Miku — Birthday Cafe', titleJa: '初音ミク — バースデーカフェ', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Cafe.webp' },
+    { char: 'miku-original', puzzle: 'Miku-Birthday-Gifts.jpg', title: 'Hatsune Miku — Birthday Gifts', titleJa: '初音ミク — バースデーギフト', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Gifts.webp' },
+    { char: 'miku-original', puzzle: 'Miku-Birthday-Message.jpg', title: 'Hatsune Miku — Birthday Message', titleJa: '初音ミク — バースデーメッセージ', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Birthday-Message.webp' },
+    { char: 'miku-original', puzzle: 'Miku-Beach-Trio.jpg', title: 'Hatsune Miku — Beach Trio', titleJa: '初音ミク — ビーチトリオ', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Trio.webp' },
+    { char: 'miku-original', puzzle: 'Miku-Beach-Water.jpg', title: 'Hatsune Miku — Beach Water', titleJa: '初音ミク — ビーチウォーター', preview: 'previews/Hatsune-Miku__Hatsune-Miku-images__Miku-Beach-Water.webp' },
+    { char: 'miku-supreme', puzzle: 'Supreme-V3.jpg', title: 'Supreme — Dessert', titleJa: 'スプリーム — デザート', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-V3.webp' },
+    { char: 'miku-supreme', puzzle: 'Supreme-Swimsuit.png', title: 'Supreme — Swimsuit', titleJa: 'スプリーム — スイムスーツ', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-Swimsuit.webp' },
+    { char: 'miku-supreme', puzzle: 'Supreme-V1.jpg', title: 'Supreme — Knight', titleJa: 'スプリーム — ナイト', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-V1.webp' },
+    { char: 'miku-supreme', puzzle: 'Supreme-V2.jpg', title: 'Supreme — Palace', titleJa: 'スプリーム — パレス', preview: 'previews/Hatsune-Miku__Supreme-images__Supreme-V2.webp' },
+    { char: 'miku-honey', puzzle: 'Honey_Whip-1.png', title: 'Honey Whip — Tease', titleJa: 'ハニーホイップ — ティーズ', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey_Whip-1.webp' },
+    { char: 'miku-honey', puzzle: 'Honey_Whip_Hot_Tub.jpg', title: 'Honey Whip — Hot Tub', titleJa: 'ハニーホイップ — ホットタブ', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey_Whip_Hot_Tub.webp' },
+    { char: 'miku-honey', puzzle: 'Honey_Whip-swimsuit.png', title: 'Honey Whip — Swimsuit', titleJa: 'ハニーホイップ — スイムスーツ', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey_Whip-swimsuit.webp' },
+    { char: 'miku-honey', puzzle: 'Honey-Whip-V2.jpg', title: 'Honey Whip — Intro', titleJa: 'ハニーホイップ — イントロ', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey-Whip-V2.webp' },
+    { char: 'miku-honey', puzzle: 'Honey-Whip-V4.jpg', title: 'Honey Whip — Leisure', titleJa: 'ハニーホイップ — レジャー', preview: 'previews/Hatsune-Miku__Honey-Whip-images__Honey-Whip-V4.webp' },
+    { char: 'miku-25ji', puzzle: '25-ji-Miku-Moonlight-V1.jpg', title: '25-ji — Moonlight', titleJa: '25時 — ムーンライト', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji-Miku-Moonlight-V1.webp' },
+    { char: 'miku-25ji', puzzle: '25-ji_Miku_soul_mistress.jpg', title: '25-ji — Soul Mistress', titleJa: '25時 — ソウルミストレス', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji_Miku_soul_mistress.webp' },
+    { char: 'miku-25ji', puzzle: '25-jiMiku_Night-Water.jpg', title: '25-ji — Night Water', titleJa: '25時 — ナイトウォーター', preview: 'previews/Hatsune-Miku__25-ji-images__25-jiMiku_Night-Water.webp' },
+    { char: 'miku-25ji', puzzle: '25-ji-V1.jpg', title: '25-ji — Mystic', titleJa: '25時 — ミスティック', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji-V1.webp' },
+    { char: 'miku-25ji', puzzle: '25-ji-V2.jpg', title: '25-ji — Time', titleJa: '25時 — タイム', preview: 'previews/Hatsune-Miku__25-ji-images__25-ji-V2.webp' },
+    { char: 'vflower', puzzle: 'Black_Window_VFlower1.jpg', title: 'VFlower — Widow Lily 1', titleJa: 'ブイフラワー — ウィドウリリー 1', preview: 'previews/VFlower-V3__Black_Window_VFlower1.webp' },
+    { char: 'vflower', puzzle: 'Black_Window_VFlower2.jpg', title: 'VFlower — Widow Lily 2', titleJa: 'ブイフラワー — ウィドウリリー 2', preview: 'previews/VFlower-V3__Black_Window_VFlower2.webp' },
+    { char: 'vflower', puzzle: 'VFlower_Amaryllis_Fountain.jpg', title: 'VFlower — Amaryllis Fountain', titleJa: 'ブイフラワー — アマリリスファウンテン', preview: 'previews/VFlower-V3__VFlower_Amaryllis_Fountain.webp' },
+    { char: 'vflower', puzzle: 'VFlower-V1.jpg', title: 'VFlower — Bloom Night', titleJa: 'ブイフラワー — ブルームナイト', preview: 'previews/VFlower-V3__VFlower-V1.webp' },
+    { char: 'vflower', puzzle: 'VFlower-V2.jpg', title: 'VFlower — Guitar', titleJa: 'ブイフラワー — ギター', preview: 'previews/VFlower-V3__VFlower-V2.webp' }
 ];
+
+function vspLocalizedTitle(item) {
+    if (!item) return '';
+    const ja = typeof vspGetLang === 'function' && vspGetLang() === 'ja';
+    return (ja && item.titleJa) ? item.titleJa : (item.title || '');
+}
 
 function vspRecordId(charKey, puzzleName) {
     return `${charKey}|${puzzleName}`;
@@ -81,10 +87,11 @@ function vspStarGlyphs(n) {
 }
 
 function vspRankMeta(n) {
-    if (n >= 3) return { key: 'gold', label: 'Gold', color: '#f5c542' };
-    if (n === 2) return { key: 'silver', label: 'Silver', color: '#c5cdd8' };
-    if (n === 1) return { key: 'bronze', label: 'Bronze', color: '#d08a4a' };
-    return { key: 'none', label: 'Unranked', color: '#e74c3c' };
+    const label = (key, fallback) => (typeof t === 'function' ? t(key) : fallback);
+    if (n >= 3) return { key: 'gold', label: label('rank.gold', 'Gold'), color: '#f5c542' };
+    if (n === 2) return { key: 'silver', label: label('rank.silver', 'Silver'), color: '#c5cdd8' };
+    if (n === 1) return { key: 'bronze', label: label('rank.bronze', 'Bronze'), color: '#d08a4a' };
+    return { key: 'none', label: label('rank.unranked', 'Unranked'), color: '#e74c3c' };
 }
 
 const VSP_TROPHY_IMGS = { gold: null, silver: null, bronze: null };
@@ -285,6 +292,9 @@ function vspMonthLabelFromKey(key) {
     const parts = key.split('-');
     const year = Number(parts[0]);
     const month = Number(parts[1]);
+    if (typeof vspGetLang === 'function' && vspGetLang() === 'ja') {
+        return `${year}年${month}月`;
+    }
     const names = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
     return `${names[month - 1] || ''} ${year}`.trim();
@@ -312,14 +322,15 @@ function vspYearCertExpiry(yearKey) {
 
 function vspRemainingPhrase(until) {
     const ms = until.getTime() - Date.now();
-    if (ms <= 0) return 'expired';
+    const tx = (key, fallback, vars) => (typeof t === 'function' ? t(key, vars) : fallback);
+    if (ms <= 0) return tx('time.expired', 'expired');
     const totalMin = Math.max(1, Math.floor(ms / 60000));
     const days = Math.floor(totalMin / 1440);
     const hours = Math.floor((totalMin % 1440) / 60);
     const mins = totalMin % 60;
-    if (days > 0) return `${days}d ${hours}h left`;
-    if (hours > 0) return `${hours}h ${mins}m left`;
-    return `${mins}m left`;
+    if (days > 0) return tx('time.daysHoursLeft', `${days}d ${hours}h left`, { days, hours });
+    if (hours > 0) return tx('time.hoursMinsLeft', `${hours}h ${mins}m left`, { hours, mins });
+    return tx('time.minsLeft', `${mins}m left`, { mins });
 }
 
 function vspEnsureCollectionPeriods(data) {
@@ -392,11 +403,9 @@ function vspCertWindows(nowDate) {
         kind: 'week',
         available: true,
         counts: col.week || vspEmptyTally(),
-        title: 'Collection for the Week',
+        titleKey: 'collect.weekTitle',
         period: vspWeekRangeLabel(now),
-        expiresAt: weeklyUntil,
-        remaining: vspRemainingPhrase(weeklyUntil),
-        notice: `Weekly certificate available until Monday midnight (${vspRemainingPhrase(weeklyUntil)}).`
+        expiresAt: weeklyUntil
     };
 
     const monthNowAvailable = isLastDay || inMonthGrace;
@@ -405,13 +414,9 @@ function vspCertWindows(nowDate) {
         kind: 'month',
         available: monthNowAvailable,
         counts: col.month || vspEmptyTally(),
-        title: 'Collection for the Month',
+        titleKey: 'collect.monthTitle',
         period: vspMonthLabelFromKey(col.monthKey),
-        expiresAt: monthNowUntil,
-        remaining: vspRemainingPhrase(monthNowUntil),
-        notice: monthNowAvailable
-            ? `${vspMonthLabelFromKey(col.monthKey)} certificate available until ${vspShortMDY(monthNowUntil)} (${vspRemainingPhrase(monthNowUntil)}).`
-            : ''
+        expiresAt: monthNowUntil
     };
 
     const prevUntil = col.prevMonthKey ? vspMonthCertExpiry(col.prevMonthKey) : new Date(0);
@@ -419,13 +424,9 @@ function vspCertWindows(nowDate) {
         kind: 'month-prev',
         available: !!(inMonthGrace && col.prevMonthKey),
         counts: col.prevMonth || vspEmptyTally(),
-        title: 'Collection for the Month',
+        titleKey: 'collect.monthTitle',
         period: vspMonthLabelFromKey(col.prevMonthKey),
-        expiresAt: prevUntil,
-        remaining: vspRemainingPhrase(prevUntil),
-        notice: (inMonthGrace && col.prevMonthKey)
-            ? `Previous month (${vspMonthLabelFromKey(col.prevMonthKey)}) still downloadable until ${vspShortMDY(prevUntil)} (${vspRemainingPhrase(prevUntil)}).`
-            : ''
+        expiresAt: prevUntil
     };
 
     const yearNowUntil = vspYearCertExpiry(col.yearKey);
@@ -434,13 +435,9 @@ function vspCertWindows(nowDate) {
         kind: 'year',
         available: yearNowAvailable,
         counts: col.year || vspEmptyTally(),
-        title: 'Collection for the Year',
+        titleKey: 'collect.yearTitle',
         period: String(col.yearKey || now.getFullYear()),
-        expiresAt: yearNowUntil,
-        remaining: vspRemainingPhrase(yearNowUntil),
-        notice: yearNowAvailable
-            ? `${col.yearKey} certificate available until ${vspShortMDY(yearNowUntil)} (${vspRemainingPhrase(yearNowUntil)}).`
-            : ''
+        expiresAt: yearNowUntil
     };
 
     const prevYearUntil = col.prevYearKey ? vspYearCertExpiry(col.prevYearKey) : new Date(0);
@@ -448,13 +445,9 @@ function vspCertWindows(nowDate) {
         kind: 'year-prev',
         available: !!(inYearGrace && col.prevYearKey),
         counts: col.prevYear || vspEmptyTally(),
-        title: 'Collection for the Year',
+        titleKey: 'collect.yearTitle',
         period: String(col.prevYearKey || ''),
-        expiresAt: prevYearUntil,
-        remaining: vspRemainingPhrase(prevYearUntil),
-        notice: (inYearGrace && col.prevYearKey)
-            ? `Previous year (${col.prevYearKey}) still downloadable until ${vspShortMDY(prevYearUntil)} (${vspRemainingPhrase(prevYearUntil)}).`
-            : ''
+        expiresAt: prevYearUntil
     };
 
     return { weekly, monthNow, monthPrev, yearNow, yearPrev, weekCounts: col.week || vspEmptyTally() };
@@ -500,22 +493,23 @@ function vspDrawCollectionCert(spec) {
     ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
 
     ctx.fillStyle = '#00ffcc';
-    ctx.font = '700 18px "Share Tech Mono", monospace';
+    ctx.font = '700 18px "Share Tech Mono", "Noto Sans JP", monospace';
     ctx.textAlign = 'center';
-    ctx.fillText('VOCALOID SLIDING PUZZLE', canvas.width / 2, 88);
+    ctx.fillText((typeof t === 'function' ? t('collect.certBrand') : 'VOCALOID SLIDING PUZZLE'), canvas.width / 2, 88);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '800 36px Orbitron, "Segoe UI", sans-serif';
-    ctx.fillText(spec.title || 'Collection', canvas.width / 2, 140);
+    ctx.font = '800 36px Orbitron, "Noto Sans JP", "Segoe UI", sans-serif';
+    const certTitle = spec.title || (typeof t === 'function' && spec.titleKey ? t(spec.titleKey) : 'Collection');
+    ctx.fillText(certTitle, canvas.width / 2, 140);
 
     ctx.fillStyle = '#bfeff5';
     ctx.font = '600 22px "Share Tech Mono", monospace';
     ctx.fillText(spec.period || '', canvas.width / 2, 178);
 
     const rows = [
-        { rank: 3, label: 'Gold', count: counts.gold || 0 },
-        { rank: 2, label: 'Silver', count: counts.silver || 0 },
-        { rank: 1, label: 'Bronze', count: counts.bronze || 0 }
+        { rank: 3, count: counts.gold || 0 },
+        { rank: 2, count: counts.silver || 0 },
+        { rank: 1, count: counts.bronze || 0 }
     ];
     rows.forEach((row, i) => {
         const y = 240 + i * 70;
@@ -525,8 +519,8 @@ function vspDrawCollectionCert(spec) {
         const meta = vspRankMeta(row.rank);
         ctx.fillStyle = meta.color;
         ctx.textAlign = 'left';
-        ctx.font = '700 26px "Segoe UI", sans-serif';
-        ctx.fillText(row.label, 250, y + 8);
+        ctx.font = '700 26px "Noto Sans JP", "Segoe UI", sans-serif';
+        ctx.fillText(meta.label, 250, y + 8);
         ctx.textAlign = 'right';
         ctx.font = '800 30px "Share Tech Mono", monospace';
         ctx.fillText('×  ' + row.count, 710, y + 10);
@@ -534,8 +528,8 @@ function vspDrawCollectionCert(spec) {
 
     ctx.textAlign = 'center';
     ctx.fillStyle = '#8aa0b2';
-    ctx.font = '14px "Segoe UI", sans-serif';
-    ctx.fillText('Private collection on this browser · unofficial fan work', canvas.width / 2, 500);
+    ctx.font = '14px "Noto Sans JP", "Segoe UI", sans-serif';
+    ctx.fillText(typeof t === 'function' ? t('collect.certFooter') : 'Private collection on this browser · unofficial fan work', canvas.width / 2, 500);
     return canvas;
 }
 
@@ -569,6 +563,19 @@ function vspTallyRowsHtml(counts) {
     }).join('');
 }
 
+function vspCollectNotice(win) {
+    if (!win || !win.available) return '';
+    const remaining = vspRemainingPhrase(win.expiresAt);
+    const until = vspShortMDY(win.expiresAt);
+    const tx = (key, vars) => (typeof t === 'function' ? t(key, vars) : key);
+    if (win.kind === 'week') return tx('collect.weekNotice', { remaining });
+    if (win.kind === 'month') return tx('collect.monthNotice', { period: win.period, until, remaining });
+    if (win.kind === 'month-prev') return tx('collect.monthPrevNotice', { period: win.period, until, remaining });
+    if (win.kind === 'year') return tx('collect.yearNotice', { period: win.period, until, remaining });
+    if (win.kind === 'year-prev') return tx('collect.yearPrevNotice', { period: win.period, until, remaining });
+    return '';
+}
+
 function vspRenderCollectionUi(opts) {
     opts = opts || {};
     if (!document.getElementById('week-tally')) return null;
@@ -584,11 +591,13 @@ function vspRenderCollectionUi(opts) {
     if (homeRange) homeRange.textContent = windows.weekly.period;
     const homeNotice = document.getElementById('week-tally-notices');
     if (homeNotice) {
-        const extra = [windows.weekly.notice];
-        if (windows.monthPrev.notice) extra.push(windows.monthPrev.notice);
-        if (windows.monthNow.notice) extra.push(windows.monthNow.notice);
-        if (windows.yearPrev.notice) extra.push(windows.yearPrev.notice);
-        if (windows.yearNow.notice) extra.push(windows.yearNow.notice);
+        const extra = [
+            vspCollectNotice(windows.weekly),
+            vspCollectNotice(windows.monthPrev),
+            vspCollectNotice(windows.monthNow),
+            vspCollectNotice(windows.yearPrev),
+            vspCollectNotice(windows.yearNow)
+        ].filter(Boolean);
         homeNotice.innerHTML = extra.map((n) => `<p>${n}</p>`).join('');
         const homeDl = document.getElementById('week-tally-downloads');
         if (homeDl) {
@@ -599,14 +608,18 @@ function vspRenderCollectionUi(opts) {
                 b.type = 'button';
                 b.className = 'rank-dl-btn';
                 b.textContent = label;
-                b.addEventListener('click', () => vspDownloadCollectionCert(win));
+                b.addEventListener('click', () => {
+                    win.title = typeof t === 'function' && win.titleKey ? t(win.titleKey) : win.title;
+                    vspDownloadCollectionCert(win);
+                });
                 homeDl.appendChild(b);
             };
-            add(windows.weekly, 'Download week certificate');
-            add(windows.monthPrev, `Download ${windows.monthPrev.period}`);
-            add(windows.monthNow, `Download ${windows.monthNow.period}`);
-            add(windows.yearPrev, `Download ${windows.yearPrev.period}`);
-            add(windows.yearNow, `Download ${windows.yearNow.period}`);
+            const tx = (key, vars) => (typeof t === 'function' ? t(key, vars) : key);
+            add(windows.weekly, tx('collect.downloadWeek'));
+            add(windows.monthPrev, tx('collect.downloadPeriod', { period: windows.monthPrev.period }));
+            add(windows.monthNow, tx('collect.downloadPeriod', { period: windows.monthNow.period }));
+            add(windows.yearPrev, tx('collect.downloadPeriod', { period: windows.yearPrev.period }));
+            add(windows.yearNow, tx('collect.downloadPeriod', { period: windows.yearNow.period }));
         }
     }
     return windows;

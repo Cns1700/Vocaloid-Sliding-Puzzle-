@@ -56,23 +56,40 @@ function vspSaveNameState(state) {
 let vspNameState = vspLoadNameState();
 let vspNameSubmitCb = null;
 
+function vspNameLabel(i) {
+    const keys = ['name.adjective', 'name.theme', 'name.noun'];
+    const fallback = ['Adjective', 'Theme', 'Noun'];
+    return typeof t === 'function' ? t(keys[i]) : fallback[i];
+}
+
 function vspRenderNamePicker() {
     const preview = document.getElementById('name-picker-preview');
     if (preview) preview.textContent = vspFormatPlayerName(vspNameState);
-    VSP_NAME_LABELS.forEach((label, i) => {
+    for (let i = 0; i < 3; i += 1) {
+        const label = vspNameLabel(i);
         const wordEl = document.getElementById('name-slot-word-' + i);
         const slot = document.getElementById('name-slot-' + i);
         const lockEl = document.getElementById('name-slot-lock-' + i);
         const reroll = document.getElementById('name-slot-reroll-' + i);
         if (wordEl) wordEl.textContent = vspNameState.words[i];
+        const locked = !!vspNameState.locks[i];
+        const state = typeof t === 'function'
+            ? t(locked ? 'name.locked' : 'name.unlocked')
+            : (locked ? 'Locked' : 'Unlocked');
         if (slot) {
-            slot.classList.toggle('is-locked', !!vspNameState.locks[i]);
-            slot.setAttribute('aria-pressed', vspNameState.locks[i] ? 'true' : 'false');
-            slot.setAttribute('aria-label', `${label} ${vspNameState.words[i]}. ${vspNameState.locks[i] ? 'Locked' : 'Unlocked'}.`);
+            slot.classList.toggle('is-locked', locked);
+            slot.setAttribute('aria-pressed', locked ? 'true' : 'false');
+            slot.setAttribute('aria-label', typeof t === 'function'
+                ? t('name.slotAria', { label, word: vspNameState.words[i], state })
+                : `${label} ${vspNameState.words[i]}. ${state}.`);
         }
-        if (lockEl) lockEl.textContent = vspNameState.locks[i] ? 'Locked' : 'Tap to lock';
-        if (reroll) reroll.disabled = !!vspNameState.locks[i];
-    });
+        if (lockEl) {
+            lockEl.textContent = locked
+                ? (typeof t === 'function' ? t('name.locked') : 'Locked')
+                : (typeof t === 'function' ? t('name.tapLock') : 'Tap to lock');
+        }
+        if (reroll) reroll.disabled = locked;
+    }
 }
 
 function vspRerollName(slotIndex) {
@@ -100,7 +117,7 @@ function vspCloseNamePicker() {
 }
 
 function vspSubmitPickedName() {
-    const name = vspFormatPlayerName(vspNameState) || 'Player';
+    const name = vspFormatPlayerName(vspNameState) || (typeof t === 'function' ? t('cert.player') : 'Player');
     vspSaveNameState(vspNameState);
     vspCloseNamePicker();
     const cb = vspNameSubmitCb;
@@ -114,7 +131,7 @@ function vspOpenNamePicker(onSubmit) {
     vspRenderNamePicker();
     const overlay = document.getElementById('name-picker-overlay');
     if (!overlay) {
-        if (vspNameSubmitCb) vspNameSubmitCb(vspFormatPlayerName(vspNameState) || 'Player');
+        if (vspNameSubmitCb) vspNameSubmitCb(vspFormatPlayerName(vspNameState) || (typeof t === 'function' ? t('cert.player') : 'Player'));
         return;
     }
     overlay.classList.add('show');
@@ -157,3 +174,6 @@ function vspBindNamePicker() {
 }
 
 document.addEventListener('DOMContentLoaded', vspBindNamePicker);
+window.addEventListener('vsp-langchange', () => {
+    if (typeof vspRenderNamePicker === 'function') vspRenderNamePicker();
+});

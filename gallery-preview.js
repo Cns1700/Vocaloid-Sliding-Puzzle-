@@ -119,32 +119,77 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
 
     const progress = document.getElementById('gallery-progress');
-    if (progress) progress.textContent = `Cleared ${cleared} / ${thumbs.length}`;
+    if (progress) {
+        const label = typeof t === 'function'
+            ? t('gallery.progress', { cleared, total: thumbs.length })
+            : `Cleared ${cleared} / ${thumbs.length}`;
+        progress.textContent = label;
+    }
 
-    const featured = typeof vspTodayFeatured === 'function' ? vspTodayFeatured() : null;
-    if (featured) {
+    function paintDailyStage() {
+        const featured = typeof vspTodayFeatured === 'function' ? vspTodayFeatured() : null;
+        if (!featured) return;
+        const titleText = typeof vspLocalizedTitle === 'function' ? vspLocalizedTitle(featured) : featured.title;
         const title = document.getElementById('daily-title');
         const meta = document.getElementById('daily-meta');
         const art = document.getElementById('daily-art');
         const play = document.getElementById('daily-play');
         const card = document.getElementById('daily-stage');
-        if (title) title.textContent = featured.title;
-        if (meta) meta.textContent = `${featured.rows} × ${featured.cols} · same stage for everyone today`;
+        if (title) title.textContent = titleText;
         if (art) {
             art.src = featured.preview;
-            art.alt = featured.title;
+            art.alt = titleText;
         }
         if (play) {
             play.href = `workspace_template.html?char=${encodeURIComponent(featured.char)}&puzzle=${encodeURIComponent(featured.puzzle)}&daily=1&rows=${featured.rows}&cols=${featured.cols}`;
         }
         const dailyRec = records.daily || {};
+        const tx = (key, vars) => (typeof t === 'function' ? t(key, vars) : key);
         if (card && dailyRec.date === featured.dateKey && dailyRec.cleared) {
             card.classList.add('is-cleared');
-            if (meta) meta.textContent = `${featured.rows} × ${featured.cols} · cleared today ${vspStarGlyphs(dailyRec.stars || 1)}`;
+            if (meta) {
+                meta.textContent = tx('daily.cleared', {
+                    rows: featured.rows,
+                    cols: featured.cols,
+                    stars: typeof vspStarGlyphs === 'function' ? vspStarGlyphs(dailyRec.stars || 1) : ''
+                });
+            }
+        } else if (meta) {
+            meta.textContent = tx('daily.meta', { rows: featured.rows, cols: featured.cols });
         }
     }
+
+    function refreshThumbAlts() {
+        if (typeof VSP_CATALOG === 'undefined' || typeof vspLocalizedTitle !== 'function') return;
+        thumbs.forEach((thumb) => {
+            const imgNode = thumb.querySelector('.thumb-img');
+            const href = thumb.getAttribute('href') || '';
+            try {
+                const u = new URL(href, window.location.href);
+                const charKey = u.searchParams.get('char') || '';
+                const puzzleName = u.searchParams.get('puzzle') || '';
+                const item = VSP_CATALOG.find((entry) => entry.char === charKey && entry.puzzle === puzzleName);
+                if (item && imgNode) imgNode.alt = vspLocalizedTitle(item);
+            } catch (e) { /* ignore */ }
+        });
+    }
+
+    paintDailyStage();
+    refreshThumbAlts();
 
     if (typeof vspRenderCollectionUi === 'function') {
         vspRenderCollectionUi({});
     }
+
+    window.addEventListener('vsp-langchange', () => {
+        if (progress) {
+            const label = typeof t === 'function'
+                ? t('gallery.progress', { cleared, total: thumbs.length })
+                : `Cleared ${cleared} / ${thumbs.length}`;
+            progress.textContent = label;
+        }
+        paintDailyStage();
+        refreshThumbAlts();
+        if (typeof vspRenderCollectionUi === 'function') vspRenderCollectionUi({});
+    });
 });

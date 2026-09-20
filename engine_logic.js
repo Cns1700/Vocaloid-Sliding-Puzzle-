@@ -58,11 +58,11 @@ let attemptMoves = 0;
 let lastFocusedElement = null;
 
 const themes = {
-    'miku-original': { title: 'Hatsune Miku (Original) 🎼', color: '#00ffcc', img: 'Puzzles/Hatsune-Miku/Hatsune-Miku-images/' },
-    'miku-supreme':  { title: 'Hatsune Miku (Supreme) 👑',  color: '#4da6ff', img: 'Puzzles/Hatsune-Miku/Supreme-images/' },
-    'miku-honey':    { title: 'Hatsune Miku (Honey Whip) 🦋', color: '#ff007f', img: 'Puzzles/Hatsune-Miku/Honey-Whip-images/' },
-    'miku-25ji':     { title: 'Hatsune Miku (25-ji) ⚫⚪',   color: '#ff00ff', img: 'Puzzles/Hatsune-Miku/25-ji-images/' },
-    'vflower':       { title: 'VFlower (V3) 🌺',            color: '#9933ff', img: 'Puzzles/VFlower-V3/' }
+    'miku-original': { title: 'Hatsune Miku (Original) 🎼', titleJa: '初音ミク（オリジナル）🎼', color: '#00ffcc', img: 'Puzzles/Hatsune-Miku/Hatsune-Miku-images/' },
+    'miku-supreme':  { title: 'Hatsune Miku (Supreme) 👑', titleJa: '初音ミク（スプリーム）👑', color: '#4da6ff', img: 'Puzzles/Hatsune-Miku/Supreme-images/' },
+    'miku-honey':    { title: 'Hatsune Miku (Honey Whip) 🦋', titleJa: '初音ミク（ハニーホイップ）🦋', color: '#ff007f', img: 'Puzzles/Hatsune-Miku/Honey-Whip-images/' },
+    'miku-25ji':     { title: 'Hatsune Miku (25-ji) ⚫⚪', titleJa: '初音ミク（25時）⚫⚪', color: '#ff00ff', img: 'Puzzles/Hatsune-Miku/25-ji-images/' },
+    'vflower':       { title: 'VFlower (V3) 🌺', titleJa: 'ブイフラワー（V3）🌺', color: '#9933ff', img: 'Puzzles/VFlower-V3/' }
 };
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -97,25 +97,134 @@ if (isDailyRun && typeof vspTodayFeatured === 'function') {
 // Helper: wrap emojis so text-shadow / effects do not recolor them
 function wrapEmojis(text) {
     const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
-    return text.replace(emojiRegex, '<span class="plain-emoji">$1</span>');
+    return String(text).replace(emojiRegex, '<span class="plain-emoji">$1</span>');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function vspTx(key, fallback, vars) {
+    return typeof t === 'function' ? t(key, vars) : fallback;
+}
+
+function vspThemeDisplayTitle() {
+    const ja = typeof vspGetLang === 'function' && vspGetLang() === 'ja';
+    return (ja && currentTheme.titleJa) ? currentTheme.titleJa : currentTheme.title;
+}
+
+function vspSetGameTitle() {
     const gameTitleNode = document.getElementById('game-title');
-    if (gameTitleNode) {
-        gameTitleNode.innerHTML = wrapEmojis(currentTheme.title);
-        gameTitleNode.style.textShadow = `0 0 15px ${currentTheme.color}`;
+    if (!gameTitleNode) return;
+    const name = vspThemeDisplayTitle();
+    const text = isDailyRun
+        ? `${vspTx('ws.dailyPrefix', 'Daily Stage')} · ${name}`
+        : name;
+    gameTitleNode.innerHTML = wrapEmojis(text);
+    gameTitleNode.style.textShadow = `0 0 15px ${currentTheme.color}`;
+}
+
+function vspPaintPauseBtn() {
+    const pauseBtn = document.getElementById('pause-btn');
+    if (!pauseBtn) return;
+    pauseBtn.textContent = isPaused
+        ? vspTx('ws.resume', '▶ Resume')
+        : vspTx('ws.pause', '⏸ Pause');
+}
+
+function vspPaintVictoryCopy(payload) {
+    if (!payload) return;
+    const msgNode = document.getElementById('victory-message');
+    const titleNode = document.getElementById('victory-title');
+    const timeString = payload.timeString;
+
+    if (payload.auto) {
+        if (titleNode) titleNode.innerHTML = vspTx('victory.autoTitle', '❌ Auto-Solved!');
+        if (msgNode) {
+            const attemptLine = vspTx('victory.timeMoves', '⏱ Time: {time} | 🔄 Moves: {moves}', {
+                time: payload.attemptTime,
+                moves: payload.attemptMoves
+            });
+            const solverLine = vspTx('victory.timeMoves', '⏱ Time: {time} | 🔄 Moves: {moves}', {
+                time: timeString,
+                moves: payload.moves
+            });
+            msgNode.innerHTML = `
+                        <strong>${vspTx('victory.autoAttempt', 'Your Personal Attempt:')}</strong><br>
+                        ${attemptLine}<br><br>
+                        <strong>${vspTx('victory.autoSolver', 'Auto Solver:')}</strong><br>
+                        ${solverLine}
+                    `;
+        }
+        return;
     }
+
+    if (titleNode) titleNode.innerHTML = vspTx('victory.congrats', 'Congratulations!');
+    if (!msgNode) return;
+    const starN = payload.starN != null
+        ? payload.starN
+        : vspComputeStars(false, payload.moves, elapsedSeconds, gridRows, gridCols);
+    const rank = typeof vspRankMeta === 'function' ? vspRankMeta(starN) : { label: 'Rank ' + starN };
+    const trophy = typeof vspTrophyMarkup === 'function'
+        ? vspTrophyMarkup(starN, 16)
+        : (typeof vspTrophySvg === 'function' ? vspTrophySvg(starN, 16) : '');
+    const finished = vspTx('victory.finishedLine', 'You finished in <strong>{time}</strong> with <strong>{moves}</strong> moves.', {
+        time: timeString,
+        moves: payload.moves
+    });
+    const daily = payload.isDaily ? '<br>' + vspTx('victory.dailyRecorded', 'Daily stage recorded.') : '';
+    msgNode.innerHTML = `${finished}<br>
+                    <span class="victory-rank-line">${vspTx('victory.rankLine', 'Rank: ')}<strong class="star-rank">${trophy}${rank.label}</strong></span>${daily}`;
+}
+
+function vspPaintVictoryChrome() {
+    const minBtn = document.getElementById('minimize-victory-btn');
+    if (minBtn) minBtn.innerHTML = vspTx('victory.viewBoard', 'View Board 🖼️');
+    const restoreBtn = document.getElementById('restore-victory-modal-btn');
+    if (restoreBtn) restoreBtn.innerHTML = vspTx('victory.showMenu', '🏆 Show Victory Menu');
+}
+
+function vspCertFont(stack) {
+    const ja = typeof vspGetLang === 'function' && vspGetLang() === 'ja';
+    return ja ? `'Noto Sans JP', ${stack}` : stack;
+}
+
+function vspCertRankLabel(isAuto, starN) {
+    if (isAuto || starN < 1) return vspTx('cert.unranked', 'UNRANKED');
+    if (starN >= 3) return vspTx('cert.gold', 'GOLD');
+    if (starN === 2) return vspTx('cert.silver', 'SILVER');
+    return vspTx('cert.bronze', 'BRONZE');
+}
+
+let lastVictoryPayload = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    vspSetGameTitle();
+    vspPaintPauseBtn();
+    if (typeof updateMovesDisplay === 'function') updateMovesDisplay();
     document.documentElement.style.setProperty('--modal-theme-color', currentTheme.color);
     setupVictoryModalMinimizeButton();
     if (typeof updateRankPanel === 'function') updateRankPanel();
-    if (isDailyRun) {
-        const titleNode = document.getElementById('game-title');
-        if (titleNode) {
-            titleNode.innerHTML = wrapEmojis('Daily Stage · ' + currentTheme.title);
+    setupSlidingPuzzle();
+});
+
+window.addEventListener('vsp-langchange', () => {
+    vspSetGameTitle();
+    vspPaintPauseBtn();
+    if (typeof updateMovesDisplay === 'function') updateMovesDisplay();
+    if (typeof updateRankPanel === 'function') updateRankPanel();
+    if (typeof vspRenderNamePicker === 'function') vspRenderNamePicker();
+    vspPaintVictoryChrome();
+    if (gameWon && lastVictoryPayload) {
+        vspPaintVictoryCopy(lastVictoryPayload);
+        const name = lastVictoryPayload.auto
+            ? vspTx('cert.autoName', 'Auto Solver System')
+            : lastVictoryPayload.playerName;
+        if (name) {
+            generateCertificateImage(
+                lastVictoryPayload.auto,
+                lastVictoryPayload.timeString,
+                lastVictoryPayload.moves,
+                name
+            );
         }
     }
-    setupSlidingPuzzle();
 });
 
 
@@ -211,7 +320,7 @@ function setupSlidingPuzzle() {
         if (typeof updateRankPanel === 'function') updateRankPanel();
     };
     targetImage.onerror = function () {
-        showToast('Could not load that illustration.');
+        showToast(vspTx('toast.loadFail', 'Could not load that illustration.'));
     };
     targetImage.src = fullImageURL;
 }
@@ -247,7 +356,11 @@ function buildGrid(boardWidth, boardHeight) {
         hintOverlay.style.display = 'none';
         tile.appendChild(hintOverlay);
 
-        tile.setAttribute('aria-label', `Tile ${i + 1}. Position: Row ${correctRow + 1}, Column ${correctCol + 1}`);
+        tile.setAttribute('aria-label', vspTx('ws.tileAria', `Tile ${i + 1}. Position: Row ${correctRow + 1}, Column ${correctCol + 1}`, {
+            n: i + 1,
+            row: correctRow + 1,
+            col: correctCol + 1
+        }));
 
         const tileData = {
             id: i,
@@ -599,7 +712,7 @@ function triggerAutoSolve() {
 
     // Immediate feedback so the UI does not feel frozen while A* runs
     const cells = gridRows * gridCols;
-    showToast(cells > 16 ? 'Solver searching…' : 'Solving…');
+    showToast(cells > 16 ? vspTx('toast.searching', 'Solver searching…') : vspTx('toast.solving', 'Solving…'));
 
     // Adaptive node budget — larger grids fail over to the recorded path
     // sooner so the tab stays responsive.
@@ -622,7 +735,7 @@ function triggerAutoSolve() {
             if (path !== null) {
                 animateSolutionPath(path, finish);
             } else {
-                showToast('Search budget reached — using recorded path');
+                showToast(vspTx('toast.budget', 'Search budget reached — using recorded path'));
                 const fallback = moveHistory.slice().reverse();
                 moveHistory = [];
                 animateSolutionPath(fallback, finish);
@@ -653,31 +766,17 @@ function checkVictory() {
 
         setTimeout(() => {
             const timeString = formatTime(elapsedSeconds);
-            const msgNode = document.getElementById('victory-message');
-            const titleNode = document.getElementById('victory-title');
-
-            if (wasAutoSolved) {
-                if (titleNode) titleNode.innerHTML = `❌ Auto-Solved!`;
-                if (msgNode) {
-                    msgNode.innerHTML = `
-                        <strong>Your Personal Attempt:</strong><br>
-                        ⏱ Time: ${attemptTime} | 🔄 Moves: ${attemptMoves}<br><br>
-                        <strong>Auto Solver:</strong><br>
-                        ⏱ Time: ${timeString} | 🔄 Moves: ${movesCount}
-                    `;
-                }
-            } else {
-                if (titleNode) titleNode.innerHTML = `Congratulations!`;
-                if (msgNode) {
-                    const starN = vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols);
-                    const rank = typeof vspRankMeta === 'function' ? vspRankMeta(starN) : { label: 'Rank ' + starN };
-                    const trophy = typeof vspTrophyMarkup === 'function'
-                        ? vspTrophyMarkup(starN, 16)
-                        : (typeof vspTrophySvg === 'function' ? vspTrophySvg(starN, 16) : '');
-                    msgNode.innerHTML = `You finished in <strong>${timeString}</strong> with <strong>${movesCount}</strong> moves.<br>
-                    <span class="victory-rank-line">Rank: <strong class="star-rank">${trophy}${rank.label}</strong></span>${isDailyRun ? '<br>Daily stage recorded.' : ''}`;
-                }
-            }
+            lastVictoryPayload = {
+                auto: wasAutoSolved,
+                timeString,
+                moves: movesCount,
+                attemptTime,
+                attemptMoves,
+                starN: wasAutoSolved ? 0 : vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols),
+                isDaily: isDailyRun,
+                playerName: null
+            };
+            vspPaintVictoryCopy(lastVictoryPayload);
 
             if (!wasAutoSolved) {
                 vspRecordManualClear({
@@ -687,24 +786,25 @@ function checkVictory() {
                     cols: gridCols,
                     seconds: elapsedSeconds,
                     moves: movesCount,
-                    stars: vspComputeStars(false, movesCount, elapsedSeconds, gridRows, gridCols),
+                    stars: lastVictoryPayload.starN,
                     isDaily: isDailyRun
                 });
                 if (typeof updateRankPanel === 'function') updateRankPanel();
             }
 
             const openCert = (playerName) => {
+                lastVictoryPayload.playerName = playerName;
                 generateCertificateImage(wasAutoSolved, timeString, movesCount, playerName);
                 showVictoryModal();
             };
             if (wasAutoSolved) {
-                openCert('Auto Solver System');
+                openCert(vspTx('cert.autoName', 'Auto Solver System'));
             } else if (typeof vspOpenNamePicker === 'function') {
                 vspOpenNamePicker(openCert);
             } else {
                 const fallbackName = (typeof vspFormatPlayerName === 'function' && typeof vspNameState !== 'undefined')
-                    ? (vspFormatPlayerName(vspNameState) || 'Player')
-                    : 'Player';
+                    ? (vspFormatPlayerName(vspNameState) || vspTx('cert.player', 'Player'))
+                    : vspTx('cert.player', 'Player');
                 openCert(fallbackName);
             }
         }, 600);
@@ -721,7 +821,7 @@ function checkVictory() {
 function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
     const certWrapper = document.getElementById('certificate-render-area');
     if (!certWrapper) return;
-    certWrapper.innerHTML = `<p style="font-size: 0.85rem; color: #a0aec0;">Generating secure result certificate... 🎨</p>`;
+    certWrapper.innerHTML = `<p style="font-size: 0.85rem; color: #a0aec0;">${vspTx('victory.generating', 'Generating secure result certificate... 🎨')}</p>`;
 
     const bgImg = new Image();
     bgImg.crossOrigin = "anonymous";
@@ -824,13 +924,19 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
             return size;
         }
 
-        const titleFull = "VOCALOID PUZZLE RECORD";
-        const titleLine1 = "VOCALOID";
-        const titleLine2 = "PUZZLE RECORD";
-        const stampText = isAuto ? "AUTO-SOLVED RECORD" : "LEGITIMATE MANUAL PLAY";
+        const titleFont = vspCertFont("'Orbitron', 'Segoe UI', sans-serif");
+        const bodyFont = vspCertFont("'Segoe UI', sans-serif");
+        const monoFont = vspCertFont("'Share Tech Mono', monospace");
+
+        const titleFull = vspTx('cert.titleFull', 'VOCALOID PUZZLE RECORD');
+        const titleLine1 = vspTx('cert.titleLine1', 'VOCALOID');
+        const titleLine2 = vspTx('cert.titleLine2', 'PUZZLE RECORD');
+        const stampText = isAuto
+            ? vspTx('cert.stampAuto', 'AUTO-SOLVED RECORD')
+            : vspTx('cert.stampManual', 'LEGITIMATE MANUAL PLAY');
         const statusLine = isAuto
-            ? "⚠ SECURITY STATUS: NOT ELIGIBLE FOR LEADERBOARD ⚠"
-            : "🏆 SECURITY STATUS: 100% VERIFIED AUTHENTIC 🏆";
+            ? vspTx('cert.statusAuto', '⚠ SECURITY STATUS: NOT ELIGIBLE FOR LEADERBOARD ⚠')
+            : vspTx('cert.statusManual', '🏆 SECURITY STATUS: 100% VERIFIED AUTHENTIC 🏆');
 
         // Portrait: prefer two-line title + tighter width-based sizes
         // Landscape: single-line title with more generous sizing
@@ -838,14 +944,14 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
         let titleSize;
         if (isPortrait) {
             const singleBase = Math.min(Math.round(canvasW * 0.048), Math.round(26 * s));
-            const singleFit = fitFont(singleBase, titleFull, "'Orbitron', 'Segoe UI', sans-serif", "bold");
+            const singleFit = fitFont(singleBase, titleFull, titleFont, "bold");
             // If a single line would shrink below a comfortable size, wrap to two lines
             if (singleFit < Math.round(canvasW * 0.038)) {
                 useTwoLineTitle = true;
                 titleSize = fitFont(
                     Math.min(Math.round(canvasW * 0.07), Math.round(30 * s)),
                     titleLine2, // longer of the two lines
-                    "'Orbitron', 'Segoe UI', sans-serif",
+                    titleFont,
                     "bold"
                 );
             } else {
@@ -855,7 +961,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
             titleSize = fitFont(
                 Math.min(Math.round(canvasW * 0.055), Math.round(34 * s)),
                 titleFull,
-                "'Orbitron', 'Segoe UI', sans-serif",
+                titleFont,
                 "bold"
             );
         }
@@ -877,7 +983,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
                 ? Math.min(Math.round(canvasW * 0.048), Math.round(24 * s))
                 : Math.min(Math.round(canvasW * 0.05), Math.round(30 * s)),
             stampText,
-            "'Orbitron', 'Segoe UI', sans-serif",
+            titleFont,
             "bold"
         );
         const statusSize = fitFont(
@@ -885,19 +991,19 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
                 ? Math.min(Math.round(canvasW * 0.028), Math.round(12 * s))
                 : Math.min(Math.round(canvasW * 0.03), Math.round(14 * s)),
             statusLine,
-            "'Segoe UI', sans-serif",
+            bodyFont,
             "bold"
         );
 
-        const cleanTitle = currentTheme.title.replace(
+        const cleanTitle = vspThemeDisplayTitle().replace(
             /[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g,
             ''
         ).trim();
         const masterGreeting = isAuto
-            ? "Auto Solver System"
+            ? vspTx('cert.autoName', 'Auto Solver System')
             : String(playerName || (typeof vspFormatPlayerName === 'function' && typeof vspNameState !== 'undefined'
                 ? vspFormatPlayerName(vspNameState)
-                : '') || "Player");
+                : '') || vspTx('cert.player', 'Player'));
 
         // Vertical metrics for the centered stack
         const titleBlockH = useTwoLineTitle
@@ -933,7 +1039,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
         // ---- Draw title ----
         let y = stackTop + (useTwoLineTitle ? titleSize : titleSize);
         ctx.fillStyle = "#ffffff";
-        ctx.font = `bold ${titleSize}px 'Orbitron', 'Segoe UI', sans-serif`;
+        ctx.font = `bold ${titleSize}px ${titleFont}`;
         ctx.textAlign = "center";
         if (useTwoLineTitle) {
             ctx.fillText(titleLine1, cx, y);
@@ -952,27 +1058,27 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
         // Target
         y += gapLineToTarget + subSize;
         ctx.fillStyle = "#e2e8f0";
-        ctx.font = `italic ${subSize}px 'Segoe UI', sans-serif`;
+        ctx.font = `italic ${subSize}px ${bodyFont}`;
         // Fit target line too (long character names)
-        const targetLabel = `Target: ${cleanTitle}`;
+        const targetLabel = vspTx('cert.target', 'Target: {title}', { title: cleanTitle });
         let targetDrawSize = subSize;
-        ctx.font = `italic ${targetDrawSize}px 'Segoe UI', sans-serif`;
+        ctx.font = `italic ${targetDrawSize}px ${bodyFont}`;
         while (targetDrawSize > 9 && ctx.measureText(targetLabel).width > maxTextW * 0.96) {
             targetDrawSize -= 1;
-            ctx.font = `italic ${targetDrawSize}px 'Segoe UI', sans-serif`;
+            ctx.font = `italic ${targetDrawSize}px ${bodyFont}`;
         }
         ctx.fillText(targetLabel, cx, y);
 
         // Achieved by
         y += gapTargetToAchieved + bodySize;
         ctx.fillStyle = "#ffffff";
-        ctx.font = `bold ${bodySize}px 'Segoe UI', sans-serif`;
-        const achievedLabel = `Achieved By: ${masterGreeting}`;
+        ctx.font = `bold ${bodySize}px ${bodyFont}`;
+        const achievedLabel = vspTx('cert.achieved', 'Achieved By: {name}', { name: masterGreeting });
         let achievedSize = bodySize;
-        ctx.font = `bold ${achievedSize}px 'Segoe UI', sans-serif`;
+        ctx.font = `bold ${achievedSize}px ${bodyFont}`;
         while (achievedSize > 9 && ctx.measureText(achievedLabel).width > maxTextW * 0.96) {
             achievedSize -= 1;
-            ctx.font = `bold ${achievedSize}px 'Segoe UI', sans-serif`;
+            ctx.font = `bold ${achievedSize}px ${bodyFont}`;
         }
         ctx.fillText(achievedLabel, cx, y);
 
@@ -996,24 +1102,24 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
         const rightX = boxX + boxW - Math.round(22 * s);
 
         const starN = vspComputeStars(isAuto, movesVal, elapsedSeconds, gridRows, gridCols);
-        const rankText = isAuto ? 'UNRANKED' : (typeof vspRankMeta === 'function' ? vspRankMeta(starN).label.toUpperCase() : vspStarGlyphs(starN));
+        const rankText = vspCertRankLabel(isAuto, starN);
 
         ctx.textAlign = "left";
         ctx.fillStyle = "#a0aec0";
-        ctx.font = `${labelSize}px 'Share Tech Mono', monospace`;
-        ctx.fillText("GRID DIMENSION:", leftX, row1);
-        ctx.fillText("ELAPSED TIME:", leftX, row2);
-        ctx.fillText("TOTAL MOVES:", leftX, row3);
-        ctx.fillText("RANK:", leftX, row4);
+        ctx.font = `${labelSize}px ${monoFont}`;
+        ctx.fillText(vspTx('cert.grid', 'GRID DIMENSION:'), leftX, row1);
+        ctx.fillText(vspTx('cert.elapsed', 'ELAPSED TIME:'), leftX, row2);
+        ctx.fillText(vspTx('cert.totalMoves', 'TOTAL MOVES:'), leftX, row3);
+        ctx.fillText(vspTx('cert.rank', 'RANK:'), leftX, row4);
 
         ctx.textAlign = "right";
         ctx.fillStyle = "#ffffff";
-        ctx.font = `bold ${valueSize}px 'Share Tech Mono', monospace`;
-        ctx.fillText(`${gridRows} x ${gridCols} Grid`, rightX, row1);
+        ctx.font = `bold ${valueSize}px ${monoFont}`;
+        ctx.fillText(vspTx('cert.gridValue', '{rows} x {cols} Grid', { rows: gridRows, cols: gridCols }), rightX, row1);
         ctx.fillText(timeStr, rightX, row2);
         ctx.fillText(String(movesVal), rightX, row3);
         ctx.fillStyle = isAuto ? "#e74c3c" : "#ffd76a";
-        ctx.font = `bold ${valueSize}px 'Share Tech Mono', monospace`;
+        ctx.font = `bold ${valueSize}px ${monoFont}`;
         const rankW = ctx.measureText(rankText).width;
         const trophyImg = (!isAuto && typeof vspTrophyImg === 'function') ? vspTrophyImg(starN) : null;
         if (trophyImg && trophyImg.complete && trophyImg.naturalWidth) {
@@ -1029,7 +1135,7 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
         // Stamp + status
         y = boxY + boxH + gapBoxToStamp + stampSize;
         ctx.textAlign = "center";
-        ctx.font = `bold ${stampSize}px 'Orbitron', 'Segoe UI', sans-serif`;
+        ctx.font = `bold ${stampSize}px ${titleFont}`;
         if (isAuto) {
             ctx.fillStyle = "rgba(250, 107, 91, 0.75)";
             ctx.fillText(stampText, cx, y);
@@ -1040,17 +1146,17 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
             ctx.fillStyle = "#2ecc71";
         }
         y += gapStampToStatus + statusSize;
-        ctx.font = `bold ${statusSize}px 'Segoe UI', sans-serif`;
+        ctx.font = `bold ${statusSize}px ${bodyFont}`;
         ctx.fillText(statusLine, cx, y);
 
         // ---- Output ----
         const finalImgUrl = canvas.toDataURL("image/png");
         certWrapper.innerHTML = `
             <div class="generated-cert-container">
-                <img src="${finalImgUrl}" alt="Certified Puzzle Result" class="cert-image-preview">
+                <img src="${finalImgUrl}" alt="${vspTx('victory.certAlt', 'Certified Puzzle Result')}" class="cert-image-preview">
                 <div class="cert-actions">
-                    <a href="${finalImgUrl}" download="Vocaloid_Puzzle_Result.png" class="modal-btn confirm" style="text-decoration:none; display:inline-block;">💾 Download Certificate</a>
-                    <button id="copy-cert-img-btn" class="modal-btn cancel">📋 Copy Image</button>
+                    <a href="${finalImgUrl}" download="Vocaloid_Puzzle_Result.png" class="modal-btn confirm" style="text-decoration:none; display:inline-block;">${vspTx('victory.download', '💾 Download Certificate')}</a>
+                    <button id="copy-cert-img-btn" class="modal-btn cancel">${vspTx('victory.copy', '📋 Copy Image')}</button>
                 </div>
             </div>
         `;
@@ -1065,14 +1171,14 @@ function generateCertificateImage(isAuto, timeStr, movesVal, playerName) {
                                 new ClipboardItem({ [blob.type]: blob })
                             ]);
                             const prevTxt = copyImgBtn.innerHTML;
-                            copyImgBtn.innerHTML = "✅ Copied Image!";
+                            copyImgBtn.innerHTML = vspTx('victory.copied', '✅ Copied Image!');
                             setTimeout(() => copyImgBtn.innerHTML = prevTxt, 2000);
                         } catch (err) {
-                            showToast("Clipboard restricted. Please tap and hold or right click the certificate below to copy!");
+                            showToast(vspTx('toast.clipboard', 'Clipboard restricted. Please tap and hold or right click the certificate below to copy!'));
                         }
                     }, 'image/png');
                 } catch (e) {
-                    showToast("Could not copy directly. Please download the image!");
+                    showToast(vspTx('toast.copyFail', 'Could not copy directly. Please download the image!'));
                 }
             };
         }
@@ -1131,7 +1237,7 @@ function resetStopwatch() {
     }
 
     const pauseBtn = document.getElementById('pause-btn');
-    if (pauseBtn) pauseBtn.innerHTML = '⏸ Pause';
+    if (pauseBtn) pauseBtn.innerHTML = vspTx('ws.pause', '⏸ Pause');
 
     const overlay = document.getElementById('pause-modal-overlay');
     if (overlay) overlay.classList.remove('show');
@@ -1147,7 +1253,7 @@ function updateTimerDisplay() {
 function updateMovesDisplay() {
     const movesNode = document.getElementById('move-display');
     if (movesNode) {
-        movesNode.textContent = `Moves: ${movesCount}`;
+        movesNode.textContent = vspTx('ws.moves', 'Moves: {count}', { count: movesCount });
     }
 }
 
@@ -1156,7 +1262,7 @@ function updateRankPanel() {
     const label = document.getElementById('rank-grid-label');
     const rowsN = (typeof gridRows === 'number' && gridRows >= 3) ? gridRows : 3;
     const colsN = (typeof gridCols === 'number' && gridCols >= 3) ? gridCols : 3;
-    if (label) label.textContent = `This grid: ${rowsN}×${colsN}`;
+    if (label) label.textContent = vspTx('rank.gridLabel', 'This grid: {rows}×{cols}', { rows: rowsN, cols: colsN });
     if (!body) return;
 
     const fallback = {
@@ -1164,7 +1270,7 @@ function updateRankPanel() {
         silver: { time: 480, moves: 160 },
         bronze: { time: 1200, moves: 400 }
     };
-    const t = (typeof vspRankThresholds === 'function') ? vspRankThresholds(rowsN, colsN) : fallback;
+    const caps = (typeof vspRankThresholds === 'function') ? vspRankThresholds(rowsN, colsN) : fallback;
     const fmt = (typeof vspFormatRankTime === 'function')
         ? vspFormatRankTime
         : (sec) => {
@@ -1172,9 +1278,9 @@ function updateRankPanel() {
             return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
         };
     const rows = [
-        { rank: 3, name: 'Gold', time: t.gold.time, moves: t.gold.moves },
-        { rank: 2, name: 'Silver', time: t.silver.time, moves: t.silver.moves },
-        { rank: 1, name: 'Bronze', time: t.bronze.time, moves: t.bronze.moves }
+        { rank: 3, name: vspTx('rank.gold', 'Gold'), time: caps.gold.time, moves: caps.gold.moves },
+        { rank: 2, name: vspTx('rank.silver', 'Silver'), time: caps.silver.time, moves: caps.silver.moves },
+        { rank: 1, name: vspTx('rank.bronze', 'Bronze'), time: caps.bronze.time, moves: caps.bronze.moves }
     ];
     const keys = ['gold', 'silver', 'bronze'];
     body.innerHTML = rows.map((row, i) => {
@@ -1208,12 +1314,12 @@ function togglePauseGame() {
 
     if (isPaused) {
         pauseStopwatch();
-        if (pauseBtn) pauseBtn.innerHTML = '▶ Resume';
+        if (pauseBtn) pauseBtn.innerHTML = vspTx('ws.resume', '▶ Resume');
         if (pauseOverlay) pauseOverlay.classList.add('show');
         pieces.forEach(p => p.style.opacity = '0');
     } else {
         startStopwatch();
-        if (pauseBtn) pauseBtn.innerHTML = '⏸ Pause';
+        if (pauseBtn) pauseBtn.innerHTML = vspTx('ws.pause', '⏸ Pause');
         if (pauseOverlay) pauseOverlay.classList.remove('show');
         pieces.forEach(p => p.style.opacity = '1');
     }
@@ -1263,7 +1369,7 @@ function triggerPeek() {
     const overlay = document.getElementById('peek-overlay');
     const img = document.getElementById('peek-image');
     if (!overlay || !img) {
-        showToast('Reference overlay missing.');
+        showToast(vspTx('toast.peekMissing', 'Reference overlay missing.'));
         return;
     }
     img.src = fullImageURL;
@@ -1362,7 +1468,7 @@ function hideModificationModal() {
 function submitGridModification() {
     const size = pendingGridSize | 0;
     if (size < 3 || size > 8) {
-        showToast('Pick a grid size first.');
+        showToast(vspTx('grid.pickFirst', 'Pick a grid size first.'));
         return;
     }
 
@@ -1373,8 +1479,7 @@ function submitGridModification() {
         const featured = vspTodayFeatured();
         if (!featured || featured.rows !== size || featured.cols !== size) {
             isDailyRun = false;
-            const titleNode = document.getElementById('game-title');
-            if (titleNode) titleNode.innerHTML = wrapEmojis(currentTheme.title);
+            vspSetGameTitle();
         }
     }
 
@@ -1415,7 +1520,7 @@ function setupVictoryModalMinimizeButton() {
         const minBtn = document.createElement('button');
         minBtn.id = 'minimize-victory-btn';
         minBtn.className = 'modal-btn cancel';
-        minBtn.innerHTML = 'View Board 🖼️';
+        minBtn.innerHTML = vspTx('victory.viewBoard', 'View Board 🖼️');
         minBtn.addEventListener('click', () => {
             const overlay = document.getElementById('victory-modal-overlay');
             if (overlay) {
@@ -1440,7 +1545,7 @@ function showRestoreButton() {
         restoreBtn.style.zIndex = '100001';
         restoreBtn.style.boxShadow = `0 0 15px ${currentTheme.color}`;
         restoreBtn.style.borderColor = currentTheme.color;
-        restoreBtn.innerHTML = '🏆 Show Victory Menu';
+        restoreBtn.innerHTML = vspTx('victory.showMenu', '🏆 Show Victory Menu');
         restoreBtn.addEventListener('click', () => {
             const overlay = document.getElementById('victory-modal-overlay');
             if (overlay) {

@@ -4,44 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocaloid Puzzle Gallery</title>
-    <link rel="stylesheet" href="style_sheet.css?v=square1">
+    <link rel="stylesheet" href="style_sheet.css?v=i18n2">
     <link rel="preload" as="image" href="BG-themes/miku-original.webp">
     <link rel="preload" as="image" href="icons/trophy-gold.png">
 </head>
 <body class="gallery-page">
+    <button type="button" id="lang-toggle" class="lang-toggle" data-i18n="meta.langToggle" data-i18n-attr="aria-label" aria-label="Switch language">
+        <span class="lang-opt is-active" data-lang="en" aria-pressed="true">EN</span>
+        <span class="lang-opt" data-lang="ja" aria-pressed="false">日本語</span>
+    </button>
     <div id="bgImageLayerA" class="bg-image-layer active" style="background-image:url('BG-themes/miku-original.webp')"></div>
     <div id="bgImageLayerB" class="bg-image-layer"></div>
     <div class="bg-wash" aria-hidden="true"></div>
 
 
     <header>
-        <h1>VOCALOID PUZZLE GALLERY</h1>
-        <p>Pick a character, then an illustration. Clears and personal bests stay on this browser.</p>
+        <h1 data-i18n="gallery.heading">VOCALOID PUZZLE GALLERY</h1>
+        <p data-i18n="gallery.tagline">Pick a character, then an illustration. Clears and personal bests stay on this browser.</p>
         <p id="gallery-progress" class="gallery-progress">Cleared 0 / 29</p>
     </header>
 
-    <section id="week-tally" class="week-tally" aria-label="This week's trophy collection">
-        <p class="week-tally-kicker">This week’s ranks</p>
+    <section id="week-tally" class="week-tally" data-i18n="week.aria" data-i18n-attr="aria-label" aria-label="This week's trophy collection">
+        <p class="week-tally-kicker" data-i18n="week.kicker">This week’s ranks</p>
         <p id="week-tally-range" class="week-tally-range"></p>
         <ul class="week-tally-row">
-            <li class="rank-row-gold"><img class="trophy-icon week-trophy" src="icons/trophy-gold.png?v=crop2" width="28" height="28" alt=""> Gold <strong id="week-gold">0</strong></li>
-            <li class="rank-row-silver"><img class="trophy-icon week-trophy" src="icons/trophy-silver.png?v=crop2" width="28" height="28" alt=""> Silver <strong id="week-silver">0</strong></li>
-            <li class="rank-row-bronze"><img class="trophy-icon week-trophy" src="icons/trophy-bronze.png?v=crop2" width="28" height="28" alt=""> Bronze <strong id="week-bronze">0</strong></li>
+            <li class="rank-row-gold"><img class="trophy-icon week-trophy" src="icons/trophy-gold.png?v=crop2" width="28" height="28" alt=""> <span data-i18n="rank.gold">Gold</span> <strong id="week-gold">0</strong></li>
+            <li class="rank-row-silver"><img class="trophy-icon week-trophy" src="icons/trophy-silver.png?v=crop2" width="28" height="28" alt=""> <span data-i18n="rank.silver">Silver</span> <strong id="week-silver">0</strong></li>
+            <li class="rank-row-bronze"><img class="trophy-icon week-trophy" src="icons/trophy-bronze.png?v=crop2" width="28" height="28" alt=""> <span data-i18n="rank.bronze">Bronze</span> <strong id="week-bronze">0</strong></li>
         </ul>
-        <p class="week-tally-reset">Total is reset every Monday(weekly), new month, & new year (time zone varies). Total of trophy types will be totaled at the end of the month and at the end of the year (Dec. 31).</p>
+        <p class="week-tally-reset" data-i18n="week.reset">Total is reset every Monday(weekly), new month, & new year (time zone varies). Total of trophy types will be totaled at the end of the month and at the end of the year (Dec. 31).</p>
         <div id="week-tally-notices" class="rank-notices"></div>
         <div id="week-tally-downloads" class="rank-downloads"></div>
     </section>
 
-    <section id="daily-stage" class="daily-stage" aria-label="Today's featured puzzle">
+    <section id="daily-stage" class="daily-stage" data-i18n="daily.aria" data-i18n-attr="aria-label" aria-label="Today's featured puzzle">
         <div class="daily-copy">
-            <p class="daily-kicker">Today’s stage</p>
-            <h2 id="daily-title">Loading…</h2>
+            <p class="daily-kicker" data-i18n="daily.kicker">Today’s stage</p>
+            <h2 id="daily-title" data-i18n="daily.loading">Loading…</h2>
             <p id="daily-meta" class="daily-meta"></p>
-            <a id="daily-play" class="daily-play" href="#">Play today’s puzzle</a>
+            <a id="daily-play" class="daily-play" href="#" data-i18n="daily.play">Play today’s puzzle</a>
         </div>
         <div class="daily-art-wrap">
-            <img id="daily-art" class="daily-art" alt="Today’s featured illustration">
+            <img id="daily-art" class="daily-art" data-i18n="daily.artAlt" data-i18n-attr="alt" alt="Today’s featured illustration">
         </div>
     </section>
 
@@ -49,7 +53,7 @@
 
         <article class="character-panel theme-miku-original">
             <div class="character-box miku-original-card">
-                <div class="card-title">Hatsune Miku</div>
+                <div class="card-title" data-i18n="char.original">Hatsune Miku</div>
             </div>
             <div class="thumbnail-row">
                 <a data-preview="previews/Hatsune-Miku__Hatsune-Miku-images__Cyber-Miku-Revamped2-1.webp" href="workspace_template.html?char=miku-original&puzzle=Cyber-Miku-Revamped2-1.jpg" class="thumb-link">
@@ -87,7 +91,7 @@
 
         <article class="character-panel theme-miku-supreme">
             <div class="character-box miku-supreme-card">
-                <div class="card-title">Supreme</div>
+                <div class="card-title" data-i18n="char.supreme">Supreme</div>
             </div>
             <div class="thumbnail-row">
                 <a data-preview="previews/Hatsune-Miku__Supreme-images__Supreme-V3.webp" href="workspace_template.html?char=miku-supreme&puzzle=Supreme-V3.jpg" class="thumb-link">
@@ -107,7 +111,7 @@
 
         <article class="character-panel theme-miku-honey">
             <div class="character-box miku-honey-card">
-                <div class="card-title">Honey Whip</div>
+                <div class="card-title" data-i18n="char.honey">Honey Whip</div>
             </div>
             <div class="thumbnail-row">
                 <a data-preview="previews/Hatsune-Miku__Honey-Whip-images__Honey_Whip-1.webp" href="workspace_template.html?char=miku-honey&puzzle=Honey_Whip-1.png" class="thumb-link">
@@ -130,7 +134,7 @@
 
         <article class="character-panel theme-miku-25ji">
             <div class="character-box miku-25ji-card">
-                <div class="card-title">25-ji</div>
+                <div class="card-title" data-i18n="char.nightcord">25-ji</div>
             </div>
             <div class="thumbnail-row">
                 <a data-preview="previews/Hatsune-Miku__25-ji-images__25-ji-Miku-Moonlight-V1.webp" href="workspace_template.html?char=miku-25ji&puzzle=25-ji-Miku-Moonlight-V1.jpg" class="thumb-link">
@@ -153,7 +157,7 @@
 
         <article class="character-panel theme-vflower">
             <div class="character-box vflower-card">
-                <div class="card-title">VFlower V3</div>
+                <div class="card-title" data-i18n="char.vflower">VFlower V3</div>
             </div>
             <div class="thumbnail-row">
                 <a data-preview="previews/VFlower-V3__Black_Window_VFlower1.webp" href="workspace_template.html?char=vflower&puzzle=Black_Window_VFlower1.jpg" class="thumb-link">
@@ -176,8 +180,8 @@
 
     </main>
     <footer class="site-footer">
-        <p class="footer-kicker">Credits</p>
-        <p>Unofficial fan work. Characters belong to their owners.</p>
+        <p class="footer-kicker" data-i18n="footer.credits">Credits</p>
+        <p data-i18n="footer.unofficial">Unofficial fan work. Characters belong to their owners.</p>
         <p>
             <a href="https://magnific.com" rel="noopener noreferrer" target="_blank">magnific.com</a>
             ·
@@ -187,8 +191,9 @@
             <a href="https://www.flaticon.com/free-icons/gold-trophy" title="gold trophy icons">Gold trophy icons created by Md Tanvirul Haque - Flaticon</a>
         </p>
     </footer>
-    <script src="records.js?v=square1"></script>
-    <script src="ambient.js?v=square1"></script>
-    <script src="gallery-preview.js?v=square1" defer></script>
+    <script src="records.js?v=i18n2"></script>
+    <script src="i18n.js?v=i18n2"></script>
+    <script src="ambient.js?v=i18n2"></script>
+    <script src="gallery-preview.js?v=i18n2" defer></script>
 </body>
 </html>

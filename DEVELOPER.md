@@ -19,7 +19,8 @@ Live builds:
 | `engine_logic.js` | All game logic (one file, sectioned with `====` banners). |
 | `style_sheet.css` | All styling: gallery, board, modals, certificate preview, responsive / itch-friendly media queries. |
 | `gallery-preview.js` | Hover preview, daily banner, gallery PB badges. |
-| `records.js` | Shared catalog, `localStorage` records, daily hash, star math. |
+| `records.js` | Shared catalog, `localStorage` records, daily hash, star math. Catalog entries include `titleJa`. |
+| `i18n.js` | English / Japanese copy, `t()`, `vspSetLang`, `vsp-lang` in `localStorage`. Large **EN \| 日本語** toggle (top-left). |
 | `ambient.js` | Home-page background crossfade + color wash. Same layer on the puzzle page, locked to the selected character. |
 | `name-picker.js` | Manual-clear name picker (lock / reroll / submit). |
 | `icons/` | Shared gold / silver / bronze trophy PNGs. |
@@ -102,6 +103,20 @@ Grid Settings offers square sizes only (`3×3` … `8×8`) as rounded square but
 Three uses per board setup (same reset as hints: new shuffle / Play Again / Apply Grid). Shows `#peek-overlay` for 1.2s. If the stopwatch interval is running, it **pauses** for that window (`pausedForPeek`) and the board does not accept moves (`peekActive`). Overlay uses `pointer-events: auto` so clicks do not hit tiles. Timer resumes when the overlay hides, unless Pause or Grid Settings is holding it.
 
 Footer credits live on both `index.html` and `workspace_template.html`: [magnific.com](https://magnific.com), [pixabay.com](https://pixabay.com), and [Gold trophy icons created by Md Tanvirul Haque - Flaticon](https://www.flaticon.com/free-icons/gold-trophy).
+
+### Language (EN / JP)
+
+`i18n.js` is the dictionary. Load order on both pages: `records.js` → `i18n.js` → page scripts. The toggle is a two-segment **EN | 日本語** control, `position: fixed; top: 12px; left: 12px; z-index: 250000`, min-height ~52px so it is easy to see. Choice is stored in `localStorage` key `vsp-lang`. `vspApplyI18n()` fills `[data-i18n]` / `[data-i18n-attr]` / `[data-i18n-html]`. Dynamic strings (daily title, rank table, pause/resume, victory copy, certificate canvas, name-picker lock labels) listen for `vsp-langchange`.
+
+**Katakana freeze — do not “fix” these later:**
+
+| English | Japanese (keep) |
+|---|---|
+| Supreme | スプリーム |
+| Honey Whip | ハニーホイップ |
+| VFlower V3 | ブイフラワー V3 |
+
+Hatsune Miku → 初音ミク. 25-ji → 25時. Catalog `titleJa` and theme `titleJa` already follow this. Japanese UI uses **Noto Sans JP** (Orbitron cannot draw kana).
 
 Player README screenshots (3×3 grid) live in `screenshots/`: `home-page.png`, `puzzle-selection.png`, `hint.png`, `peek-reference.png`, `grid-size-selection.png`, `name-picker.png`, `certificate-download-window.png`, `player-certificate.png`, `trophy-collection.png`. `auto-solver.png` is kept alongside for Auto Solve.
 
@@ -256,8 +271,9 @@ When adding a puzzle: create ≈168×100 WebP under `thumbs/` and point the gall
 2. Generate a small WebP thumb under `thumbs/` (≈168×100).  
 3. Theme entry in `engine_logic.js` `themes`:
    ```js
-   'my-key': { title: 'Display Name 🎵', color: '#hex', img: 'Puzzles/My-Folder/' }
+   'my-key': { title: 'Display Name 🎵', titleJa: '表示名 🎵', color: '#hex', img: 'Puzzles/My-Folder/' }
    ```
+   Keep スプリーム / ハニーホイップ / ブイフラワー V3 as written. Add `titleJa` on the `VSP_CATALOG` row in `records.js`.
 4. Gallery card + links in `index.html`:
    - `href` → `workspace_template.html?char=my-key&puzzle=filename.jpg`  
    - `img src` → `thumbs/....webp`  
@@ -301,6 +317,7 @@ Place PNGs in `screenshots/` for the player READMEs. Current set (3×3 grid in `
 
 - A\* is strong on small/medium grids; large grids may use the recorded-path fallback.  
 - Certificate “security status” is visual only.  
+- Language copy lives in `i18n.js`. Do not replace スプリーム / ハニーホイップ / ブイフラワー V3.  
 - Themes / paths are still partly hard-coded; a single config object would be a future cleanup.  
 - One JS file on purpose — static drop-in, no bundler.  
 - Owner commits and pushes to GitHub; external tools should not push as a contributor without explicit owner action.  

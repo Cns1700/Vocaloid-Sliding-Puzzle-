@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sliding Puzzle Workspace</title>
-    <link rel="stylesheet" href="style_sheet.css?v=square1">
+    <link rel="stylesheet" href="style_sheet.css?v=i18n2">
     <link rel="preload" as="image" href="icons/trophy-gold.png?v=crop2">
     <link rel="preload" as="image" href="icons/trophy-silver.png?v=crop2">
     <link rel="preload" as="image" href="icons/trophy-bronze.png?v=crop2">
 </head>
 <body class="workspace-page">
+    <button type="button" id="lang-toggle" class="lang-toggle" data-i18n="meta.langToggle" data-i18n-attr="aria-label" aria-label="Switch language">
+        <span class="lang-opt is-active" data-lang="en" aria-pressed="true">EN</span>
+        <span class="lang-opt" data-lang="ja" aria-pressed="false">日本語</span>
+    </button>
     <div id="bgImageLayerA" class="bg-image-layer active"></div>
     <div id="bgImageLayerB" class="bg-image-layer"></div>
     <div class="bg-wash" aria-hidden="true"></div>
@@ -19,27 +23,27 @@
         <h1 id="game-title">Loading Puzzle...</h1>
     </header>
 
-    <main class="controls" aria-label="Game controls and stats">
-        <a href="index.html" class="back-btn">Back to Gallery</a>
-        <button class="size-btn" onclick="showModificationModal()" aria-haspopup="dialog" aria-controls="mod-modal-overlay">Grid Settings</button>
-        <div id="timer-display" class="timer-banner" role="status" aria-live="polite" aria-label="Elapsed Time">00:00:00</div>
-        <div id="move-display" class="timer-banner" role="status" aria-live="polite" aria-label="Moves Count">Moves: 0</div>
-        <button id="pause-btn" class="size-btn" onclick="togglePauseGame()">Pause</button>
-        <button id="hint-btn" class="size-btn" onclick="triggerHint()">Hint (<span id="hints-count">3</span>)</button>
-        <button id="peek-btn" class="size-btn" onclick="triggerPeek()">Peek (<span id="peeks-count">3</span>)</button>
-        <button id="solve-btn" class="size-btn" onclick="triggerAutoSolve()">Auto Solve</button>
+    <main class="controls" data-i18n="ws.controlsAria" data-i18n-attr="aria-label" aria-label="Game controls and stats">
+        <a href="index.html" class="back-btn" data-i18n="ws.back">Back to Gallery</a>
+        <button class="size-btn" onclick="showModificationModal()" aria-haspopup="dialog" aria-controls="mod-modal-overlay" data-i18n="ws.gridSettings">Grid Settings</button>
+        <div id="timer-display" class="timer-banner" role="status" aria-live="polite" data-i18n="ws.timerAria" data-i18n-attr="aria-label" aria-label="Elapsed Time">00:00:00</div>
+        <div id="move-display" class="timer-banner" role="status" aria-live="polite" data-i18n="ws.movesAria" data-i18n-attr="aria-label" aria-label="Moves Count">Moves: 0</div>
+        <button id="pause-btn" class="size-btn" onclick="togglePauseGame()" data-i18n="ws.pause">⏸ Pause</button>
+        <button id="hint-btn" class="size-btn" onclick="triggerHint()"><span data-i18n="ws.hint">Hint</span> (<span id="hints-count">3</span>)</button>
+        <button id="peek-btn" class="size-btn" onclick="triggerPeek()"><span data-i18n="ws.peek">Peek</span> (<span id="peeks-count">3</span>)</button>
+        <button id="solve-btn" class="size-btn" onclick="triggerAutoSolve()" data-i18n="ws.autoSolve">Auto Solve</button>
     </main>
 
     <div class="workspace-stage">
-        <aside id="rank-panel" class="rank-panel" aria-label="Rank requirements for this grid">
-            <h2>Ranks</h2>
+        <aside id="rank-panel" class="rank-panel" data-i18n="rank.panelAria" data-i18n-attr="aria-label" aria-label="Rank requirements for this grid">
+            <h2 data-i18n="rank.heading">Ranks</h2>
             <p id="rank-grid-label" class="rank-grid-label">This grid: 3×3</p>
             <table class="rank-table">
                 <thead>
                     <tr>
-                        <th scope="col">Trophy</th>
-                        <th scope="col">Time</th>
-                        <th scope="col">Moves</th>
+                        <th scope="col" data-i18n="rank.trophy">Trophy</th>
+                        <th scope="col" data-i18n="rank.time">Time</th>
+                        <th scope="col" data-i18n="rank.moves">Moves</th>
                     </tr>
                 </thead>
                 <tbody id="rank-table-body">
@@ -60,21 +64,21 @@
                     </tr>
                 </tbody>
             </table>
-            <p class="rank-note">Hit both the time and the move cap for that trophy. Bronze is any manual finish. Auto Solve stays unranked.</p>
+            <p class="rank-note" data-i18n="rank.note">Hit both the time and the move cap for that trophy. Bronze is any manual finish. Auto Solve stays unranked.</p>
         </aside>
-        <div id="puzzle-container" role="grid" aria-label="Sliding Puzzle Grid Board"></div>
+        <div id="puzzle-container" role="grid" data-i18n="ws.boardAria" data-i18n-attr="aria-label" aria-label="Sliding Puzzle Grid Board"></div>
     </div>
 
     <div id="peek-overlay" class="peek-overlay" aria-hidden="true">
-        <img id="peek-image" alt="Full illustration reference">
-        <p class="peek-caption">Reference</p>
+        <img id="peek-image" data-i18n="peek.alt" data-i18n-attr="alt" alt="Full illustration reference">
+        <p class="peek-caption" data-i18n="peek.caption">Reference</p>
     </div>
 
     <div id="mod-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="mod-modal-title" aria-describedby="mod-modal-desc" aria-hidden="true">
         <div class="modal-card" id="mod-modal-card">
-            <h2 id="mod-modal-title">Grid Size</h2>
-            <p id="mod-modal-desc">Pick a square grid. The timer stays paused while this is open.</p>
-            <div class="grid-size-picker" role="group" aria-label="Grid size">
+            <h2 id="mod-modal-title" data-i18n="grid.title">Grid Size</h2>
+            <p id="mod-modal-desc" data-i18n="grid.desc">Pick a square grid. The timer stays paused while this is open.</p>
+            <div class="grid-size-picker" role="group" data-i18n="grid.groupAria" data-i18n-attr="aria-label" aria-label="Grid size">
                 <button type="button" class="grid-size-btn" data-size="3" aria-pressed="false" onclick="selectGridSize(3)">3×3</button>
                 <button type="button" class="grid-size-btn" data-size="4" aria-pressed="false" onclick="selectGridSize(4)">4×4</button>
                 <button type="button" class="grid-size-btn" data-size="5" aria-pressed="false" onclick="selectGridSize(5)">5×5</button>
@@ -83,67 +87,67 @@
                 <button type="button" class="grid-size-btn" data-size="8" aria-pressed="false" onclick="selectGridSize(8)">8×8</button>
             </div>
             <div class="modal-actions">
-                <button class="modal-btn cancel" onclick="hideModificationModal()">Cancel</button>
-                <button class="modal-btn confirm" onclick="submitGridModification()">Apply Grid</button>
+                <button class="modal-btn cancel" onclick="hideModificationModal()" data-i18n="grid.cancel">Cancel</button>
+                <button class="modal-btn confirm" onclick="submitGridModification()" data-i18n="grid.apply">Apply Grid</button>
             </div>
         </div>
     </div>
 
     <div id="pause-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pause-modal-title" aria-describedby="pause-modal-desc" aria-hidden="true">
         <div class="modal-card">
-            <h2 id="pause-modal-title">Paused</h2>
-            <p id="pause-modal-desc">Timer is frozen and the board is hidden. Reset shuffles a new board at this grid size.</p>
+            <h2 id="pause-modal-title" data-i18n="pauseModal.title">Paused</h2>
+            <p id="pause-modal-desc" data-i18n="pauseModal.desc">Timer is frozen and the board is hidden. Reset shuffles a new board at this grid size.</p>
             <div class="modal-actions">
-                <button class="modal-btn retry" type="button" onclick="resetPuzzleFromPause()">Reset Puzzle</button>
-                <button class="modal-btn confirm" type="button" onclick="togglePauseGame()">Resume</button>
+                <button class="modal-btn retry" type="button" onclick="resetPuzzleFromPause()" data-i18n="pauseModal.reset">Reset Puzzle</button>
+                <button class="modal-btn confirm" type="button" onclick="togglePauseGame()" data-i18n="pauseModal.resume">Resume</button>
             </div>
         </div>
     </div>
 
     <div id="victory-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="victory-title" aria-describedby="victory-message" aria-hidden="true">
         <div class="modal-card" id="victory-modal-card" style="width: 550px; max-width: 95%;">
-            <h2 id="victory-title">Clear!</h2>
-            <p id="victory-message">You finished the sliding puzzle.</p>
+            <h2 id="victory-title" data-i18n="victory.clear">Clear!</h2>
+            <p id="victory-message" data-i18n="victory.finished">You finished the sliding puzzle.</p>
             <div id="certificate-render-area" style="margin: 20px 0;"></div>
             <div class="modal-actions">
-                <a href="index.html" class="modal-btn confirm" style="text-decoration: none; text-align: center;">Back to Gallery</a>
-                <button class="modal-btn retry" onclick="restartCurrentPuzzle()">Play Again</button>
+                <a href="index.html" class="modal-btn confirm" style="text-decoration: none; text-align: center;" data-i18n="ws.back">Back to Gallery</a>
+                <button class="modal-btn retry" onclick="restartCurrentPuzzle()" data-i18n="victory.playAgain">Play Again</button>
             </div>
             <div class="social-share-strip">
-                <h3>Download or copy the certificate if you want to keep the result.</h3>
+                <h3 data-i18n="victory.share">Download or copy the certificate if you want to keep the result.</h3>
             </div>
         </div>
     </div>
 
     <div id="name-picker-overlay" class="modal-overlay name-picker-overlay" role="dialog" aria-modal="true" aria-labelledby="name-picker-title" aria-describedby="name-picker-desc" aria-hidden="true">
         <div class="modal-card name-picker-card" id="name-picker-card">
-            <p class="name-picker-kicker">Stage Clear</p>
-            <h2 id="name-picker-title">Pick your name</h2>
-            <p id="name-picker-desc" class="name-picker-desc">Tap a word to lock it in place.<br>Reroll unlocked words, then submit.</p>
+            <p class="name-picker-kicker" data-i18n="name.kicker">Stage Clear</p>
+            <h2 id="name-picker-title" data-i18n="name.title">Pick your name</h2>
+            <p id="name-picker-desc" class="name-picker-desc" data-i18n="name.desc" data-i18n-html>Tap a word to lock it in place.<br>Reroll unlocked words, then submit.</p>
             <p class="name-picker-preview" id="name-picker-preview" aria-live="polite">Neon Synth Rabbit</p>
             <div class="name-picker-slots">
                 <div class="name-slot" id="name-slot-0" role="button" tabindex="0" aria-pressed="false">
-                    <span class="name-slot-label">Adjective</span>
+                    <span class="name-slot-label" data-i18n="name.adjective">Adjective</span>
                     <span class="name-slot-word" id="name-slot-word-0">Neon</span>
                     <span class="name-slot-lock" id="name-slot-lock-0">Tap to lock</span>
-                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-0">Reroll</button>
+                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-0" data-i18n="name.rerollSlot">Reroll</button>
                 </div>
                 <div class="name-slot" id="name-slot-1" role="button" tabindex="0" aria-pressed="false">
-                    <span class="name-slot-label">Theme</span>
+                    <span class="name-slot-label" data-i18n="name.theme">Theme</span>
                     <span class="name-slot-word" id="name-slot-word-1">Synth</span>
                     <span class="name-slot-lock" id="name-slot-lock-1">Tap to lock</span>
-                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-1">Reroll</button>
+                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-1" data-i18n="name.rerollSlot">Reroll</button>
                 </div>
                 <div class="name-slot" id="name-slot-2" role="button" tabindex="0" aria-pressed="false">
-                    <span class="name-slot-label">Noun</span>
+                    <span class="name-slot-label" data-i18n="name.noun">Noun</span>
                     <span class="name-slot-word" id="name-slot-word-2">Rabbit</span>
                     <span class="name-slot-lock" id="name-slot-lock-2">Tap to lock</span>
-                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-2">Reroll</button>
+                    <button type="button" class="name-slot-reroll" id="name-slot-reroll-2" data-i18n="name.rerollSlot">Reroll</button>
                 </div>
             </div>
             <div class="name-picker-actions">
-                <button type="button" class="modal-btn name-reroll" id="name-reroll-btn">🎲 Reroll Name</button>
-                <button type="button" class="modal-btn confirm name-submit" id="name-submit-btn">💾 Submit Score</button>
+                <button type="button" class="modal-btn name-reroll" id="name-reroll-btn" data-i18n="name.rerollName">🎲 Reroll Name</button>
+                <button type="button" class="modal-btn confirm name-submit" id="name-submit-btn" data-i18n="name.submit">💾 Submit Score</button>
             </div>
         </div>
     </div>
@@ -151,8 +155,8 @@
     <div id="toast-notification" class="toast-container" role="alert" aria-live="assertive"></div>
 
     <footer class="site-footer">
-        <p class="footer-kicker">Credits</p>
-        <p>Unofficial fan work. Characters belong to their owners.</p>
+        <p class="footer-kicker" data-i18n="footer.credits">Credits</p>
+        <p data-i18n="footer.unofficial">Unofficial fan work. Characters belong to their owners.</p>
         <p>
             <a href="https://magnific.com" rel="noopener noreferrer" target="_blank">magnific.com</a>
             ·
@@ -163,9 +167,10 @@
         </p>
     </footer>
 
-    <script src="records.js?v=square1"></script>
-    <script src="name-picker.js?v=square1"></script>
-    <script src="ambient.js?v=square1"></script>
-    <script src="engine_logic.js?v=square1"></script>
+    <script src="records.js?v=i18n2"></script>
+    <script src="i18n.js?v=i18n2"></script>
+    <script src="name-picker.js?v=i18n2"></script>
+    <script src="ambient.js?v=i18n2"></script>
+    <script src="engine_logic.js?v=i18n2"></script>
 </body>
 </html>

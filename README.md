@@ -4,7 +4,7 @@
 
 A free, unofficial sliding-puzzle gallery of Hatsune Miku (a handful of her modules) and VFlower V3. You pick a character, pick a picture, and slide the tiles until the illustration comes back together.
 
-It runs in the browser. Nothing to install, no account, no ads. Clears and personal bests stay on this computer.
+It runs in the browser. Nothing to install, no account, no ads. Clears and personal bests stay on this computer. A large **EN | 日本語** button in the top-left corner switches the UI; the choice is remembered in this browser.
 
 **Play:** [GitHub Pages](https://cns1700.github.io/Vocaloid-Sliding-Puzzle-/) · [itch.io](https://mizuchisylph.itch.io/vocaloid-sliding-puzzle)
 
@@ -24,6 +24,8 @@ It runs in the browser. Nothing to install, no account, no ads. Clears and perso
 ## What’s here
 
 Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Grids go from 3×3 up to 8×8 in even squares. The gallery is a stacked list of character rows — not the old dice layout.
+
+Japanese labels keep **Supreme**, **Honey Whip**, and **VFlower V3** in katakana as **スプリーム**, **ハニーホイップ**, and **ブイフラワー V3**. Those spellings stay as-is.
 
 The home page slowly crossfades through each character’s background, the same way Miku Fever does. Open a puzzle and that character’s scene stays put, with a little motion in the lights behind the board.
 

@@ -310,8 +310,9 @@ Place PNGs in `screenshots/` for the player READMEs. Current set (3×3 grid in `
 - Fullscreen: **on**  
 - Scroll: **on** (mainly helps the gallery)  
 - Viewport example that works: **1280 × 800** (or 720)  
-- Ship `thumbs/` in the zip; exclude `.xcf`, `screenshots/`, `DEVELOPER.md`, and nested zip files  
+- Ship `thumbs/` and `i18n.js` in the zip; exclude `.xcf`, `screenshots/`, `DEVELOPER.md`, and nested zip files  
 - Daily stage is always a square (`3×3`–`6×6`) from Grid Settings  
+- Language toggle is top-left; itch embed must allow `localStorage` (default) so EN/JP and records persist in that browser 
 
 ---
 

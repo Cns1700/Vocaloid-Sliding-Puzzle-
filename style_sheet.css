@@ -84,6 +84,11 @@ html[lang="ja"] .name-picker-preview {
     font-size: clamp(1.02rem, 3.2vw, 1.4rem);
 }
 
+html[lang="ja"] .peek-caption {
+    font-family: 'Noto Sans JP', 'Share Tech Mono', sans-serif;
+    letter-spacing: 0.04em;
+}
+
 .lang-toggle {
     position: fixed;
     top: 12px;
@@ -342,6 +347,10 @@ header p {
 .miku-original-card .card-title {
     font-family: 'Orbitron', sans-serif;
     font-weight: 900;
+    font-size: clamp(1.35rem, 12.2cqi, 2.1rem);
+    padding: 0 10px;
+    max-width: 100%;
+    box-sizing: border-box;
     background: linear-gradient(180deg, #ffffff 30%, #a3fff2 100%);
     background-clip: text;
     -webkit-background-clip: text;

@@ -94,9 +94,10 @@ if (isDailyRun && typeof vspTodayFeatured === 'function') {
     if (!isNaN(urlRows) || !isNaN(urlCols)) applySquareGridSize(urlRows, urlCols);
 }
 
-// Helper: wrap emojis so text-shadow / effects do not recolor them
+// Helper: wrap real emoji so text-shadow / gradients do not recolor them.
+// Do not use a wide BMP range — U+3040–U+30FF is hiragana/katakana and must keep the glow.
 function wrapEmojis(text) {
-    const emojiRegex = /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/g;
+    const emojiRegex = /(\p{Extended_Pictographic}\uFE0F?(?:\u200D\p{Extended_Pictographic}\uFE0F?)*)/gu;
     return String(text).replace(emojiRegex, '<span class="plain-emoji">$1</span>');
 }
 

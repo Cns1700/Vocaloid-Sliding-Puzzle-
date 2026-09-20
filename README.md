@@ -33,7 +33,7 @@ There’s a timer, a move counter, pause, numbered hints, and a **Peek** that sh
 
 When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a trophy, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
 
-On a win you can download or copy a result certificate. Manual clears rank Gold, Silver, or Bronze using the same cup trophy (gold / silver / bronze color only). Auto Solve is marked unranked. After a manual clear, pick a generated name for **Achieved By** on the certificate. The puzzle page shows the time and move caps for the current grid. Weekly trophy counts and week/month/year collection downloads live on the home page and reset every Monday.
+On a win you can download or copy a result certificate. Manual clears rank Gold, Silver, or Bronze using the same cup trophy (gold / silver / bronze color only). Auto Solve is marked unranked. After a manual clear, pick a generated Vocaloid-themed name for **Achieved By**. English or Japanese follows the language toggle; the lists live in the game (no internet). Producer names — stage names or real names — are never used, so a certificate cannot look like a real Vocaloid producer played. The puzzle page shows the time and move caps for the current grid. Weekly trophy counts and week/month/year collection downloads live on the home page and reset every Monday.
 
 ## How to play
 

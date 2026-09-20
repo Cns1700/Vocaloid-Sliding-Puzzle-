@@ -64,6 +64,26 @@ html[lang="ja"] .week-tally-kicker {
     text-transform: none;
 }
 
+html[lang="ja"] .name-picker-kicker,
+html[lang="ja"] .name-picker-preview,
+html[lang="ja"] .name-slot-label,
+html[lang="ja"] .name-slot-word,
+html[lang="ja"] .name-slot-lock {
+    font-family: 'Noto Sans JP', 'Share Tech Mono', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: none;
+}
+
+html[lang="ja"] .name-slot-word {
+    font-size: 1.02rem;
+    line-height: 1.3;
+    word-break: keep-all;
+}
+
+html[lang="ja"] .name-picker-preview {
+    font-size: clamp(1.02rem, 3.2vw, 1.4rem);
+}
+
 .lang-toggle {
     position: fixed;
     top: 12px;

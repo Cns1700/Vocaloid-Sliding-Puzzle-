@@ -22,7 +22,7 @@ Live builds:
 | `records.js` | Shared catalog, `localStorage` records, daily hash, star math. Catalog entries include `titleJa`. |
 | `i18n.js` | English / Japanese copy, `t()`, `vspSetLang`, `vsp-lang` in `localStorage`. Large **EN \| 日本語** toggle (top-left). |
 | `ambient.js` | Home-page background crossfade + color wash. Same layer on the puzzle page, locked to the selected character. |
-| `name-picker.js` | Manual-clear name picker (lock / reroll / submit). |
+| `name-picker.js` | Manual-clear name picker (lock / reroll / submit). Dual EN/JP Vocaloid-themed lexicons; no live APIs. |
 | `icons/` | Shared gold / silver / bronze trophy PNGs. |
 | `BG-themes/` | Compressed WebP illustrations for the ambient layers. |
 | `Puzzles/` | Full-resolution illustrations (loaded only when a puzzle is opened). |
@@ -92,7 +92,9 @@ Caps scale with `cells × max(rows,cols)` from a 3×3 baseline of **3:00 / 70 mo
 
 `vspComputeStars(...)` returns 3 / 2 / 1 / 0 for gold / silver / bronze / unranked. Shown as the shared PNG cups (`icons/trophy-gold.png`, `icons/trophy-silver.png`, `icons/trophy-bronze.png`) on the rank table, home week tally, gallery thumbs, victory copy, puzzle certificate RANK row, and collection certificates. Markup helper: `vspTrophyMarkup`. Canvas helper: `vspDrawTrophyCup` (`drawImage` of the preloaded PNG).
 
-Manual clears open `name-picker.js` before the certificate. Names are `Adjective Theme Noun` from curated arrays (no free text). Lock a slot, reroll unlocked words, then **Submit Score**. The last name is stored in `localStorage` (`vsp-player-name`) and written as **Achieved By** on the certificate. Auto Solve skips the picker and stays `Auto Solver System`.
+Manual clears open `name-picker.js` before the certificate. Names are `Adjective Theme Noun` from **local** curated lexicons (no free text, no website/dictionary fetch — itch packs are offline). `VSP_NAME_POOLS.en` / `VSP_NAME_POOLS.ja` follow the language toggle. Lock a slot, reroll unlocked words, then **Submit Score**. Last name is stored per language in `localStorage` key `vsp-player-name` (`v: 2`, `{ en, ja }`) and written as **Achieved By**. Auto Solve skips the picker and stays `Auto Solver System` / `オートソルバーシステム`.
+
+**Do not generate producer identities.** Never add a Vocaloid producer’s stage name or legal name, `*P` / `〜P` / `〜ピー` handles, or producer circles (livetune, supercell, HoneyWorks, etc.). Official character personal names (Miku, Luka, 初音, …) are also blocked so a download cannot look like a real producer or a Crypton character submitted the score. `vspNameLooksLikeProducer()` is a safety net on pick and submit — keep `VSP_NAME_BAN_EXACT` / `VSP_NAME_BAN_SUBSTR` updated if the pools change. Tropes (leek, headset, ネギ, 歌姫) are fine; 調声 / composer / producer are not.
 
 The puzzle-result stats box is sized to four rows with even line spacing (no empty band under RANK). RANK draws a small cup immediately left of GOLD / SILVER / BRONZE, sized to the rank text so it stays on that line.
 
@@ -106,7 +108,7 @@ Footer credits live on both `index.html` and `workspace_template.html`: [magnifi
 
 ### Language (EN / JP)
 
-`i18n.js` is the dictionary. Load order on both pages: `records.js` → `i18n.js` → page scripts. The toggle is a two-segment **EN | 日本語** control, `position: fixed; top: 12px; left: 12px; z-index: 250000`, min-height ~52px so it is easy to see. Choice is stored in `localStorage` key `vsp-lang`. `vspApplyI18n()` fills `[data-i18n]` / `[data-i18n-attr]` / `[data-i18n-html]`. Dynamic strings (daily title, rank table, pause/resume, victory copy, certificate canvas, name-picker lock labels) listen for `vsp-langchange`.
+`i18n.js` is the dictionary. Load order on both pages: `records.js` → `i18n.js` → page scripts. The toggle is a two-segment **EN | 日本語** control, `position: fixed; top: 12px; left: 12px; z-index: 250000`, min-height ~52px so it is easy to see. Choice is stored in `localStorage` key `vsp-lang`. `vspApplyI18n()` fills `[data-i18n]` / `[data-i18n-attr]` / `[data-i18n-html]`. Dynamic strings (daily title, rank table, pause/resume, victory copy, certificate canvas, name-picker lock labels **and name lexicon**) listen for `vsp-langchange`.
 
 **Katakana freeze — do not “fix” these later:**
 

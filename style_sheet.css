@@ -924,20 +924,6 @@ box-shadow: inset 0 0 15px var(--modal-theme-color, #00ffcc);
     bottom: 30px;
 }
 
-/* Particle Systems */
-.particle {
-    position: absolute;
-    pointer-events: none;
-    border-radius: 50%;
-    animation: floatOut 0.6s ease-out forwards;
-    z-index: 2000;
-}
-
-@keyframes floatOut {
-    0% { transform: translate(0, 0) scale(1); opacity: 1; }
-    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
-}
-
 /* ==========================================================================
    Responsive gallery — tuned for itch.io embeds (e.g. 1280×720) and smaller
    ========================================================================== */

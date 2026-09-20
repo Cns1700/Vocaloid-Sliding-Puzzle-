@@ -67,14 +67,32 @@ const themes = {
 
 const urlParams = new URLSearchParams(window.location.search);
 const activeKey = urlParams.get('char') || 'miku-original';
-const puzzleFile = urlParams.get('puzzle') || 'Cyber_Miku_1.jpg';
+const puzzleFile = urlParams.get('puzzle') || 'Cyber-Miku-Revamped2-1.jpg';
 const currentTheme = themes[activeKey] || themes['miku-original'];
 const fullImageURL = `${currentTheme.img}${puzzleFile}`;
 isDailyRun = urlParams.get('daily') === '1';
-const urlRows = parseInt(urlParams.get('rows'), 10);
-const urlCols = parseInt(urlParams.get('cols'), 10);
-if (!isNaN(urlRows) && urlRows >= 3 && urlRows <= 8) gridRows = urlRows;
-if (!isNaN(urlCols) && urlCols >= 3 && urlCols <= 8) gridCols = urlCols;
+
+function applySquareGridSize(rows, cols) {
+    const r = rows | 0;
+    const c = cols | 0;
+    let size = 3;
+    if (r >= 3 && r <= 8 && r === c) size = r;
+    else if (r >= 3 && r <= 8 && c >= 3 && c <= 8) size = Math.min(r, c);
+    else if (r >= 3 && r <= 8) size = r;
+    else if (c >= 3 && c <= 8) size = c;
+    gridRows = size;
+    gridCols = size;
+    pendingGridSize = size;
+}
+
+if (isDailyRun && typeof vspTodayFeatured === 'function') {
+    const featured = vspTodayFeatured();
+    if (featured) applySquareGridSize(featured.rows, featured.cols);
+} else {
+    const urlRows = parseInt(urlParams.get('rows'), 10);
+    const urlCols = parseInt(urlParams.get('cols'), 10);
+    if (!isNaN(urlRows) || !isNaN(urlCols)) applySquareGridSize(urlRows, urlCols);
+}
 
 // Helper: wrap emojis so text-shadow / effects do not recolor them
 function wrapEmojis(text) {
@@ -191,6 +209,9 @@ function setupSlidingPuzzle() {
 
         buildGrid(viewWidth, viewHeight);
         if (typeof updateRankPanel === 'function') updateRankPanel();
+    };
+    targetImage.onerror = function () {
+        showToast('Could not load that illustration.');
     };
     targetImage.src = fullImageURL;
 }

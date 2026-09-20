@@ -27,7 +27,7 @@ Five themed sets: Original Miku, Supreme, Honey Whip, 25-ji, and VFlower V3. Gri
 
 The home page slowly crossfades through each character’s background, the same way Miku Fever does. Open a puzzle and that character’s scene stays put, with a little motion in the lights behind the board.
 
-There’s a timer, a move counter, pause, numbered hints, and a **Peek** that shows the finished picture (the timer freezes while it’s up). Each day has a **featured stage** — one illustration and one grid that everyone in that timezone gets.
+There’s a timer, a move counter, pause, numbered hints, and a **Peek** that shows the finished picture (the timer freezes while it’s up). Each day has a **featured stage** — one illustration and one square grid (3×3, 4×4, 5×5, or 6×6) that everyone in that timezone gets.
 
 When you clear a puzzle yourself, the gallery remembers it. Finished thumbs pick up a trophy, and a personal best (time and moves) is saved in this browser. Auto Solve can finish a board for you, but those clears aren’t ranked.
 

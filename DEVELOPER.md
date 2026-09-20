@@ -87,7 +87,7 @@ The gallery paints a trophy badge on cleared thumbs and a short PB line (`4x4 ·
 | Silver | ≤ looser cap | ≤ looser cap |
 | Bronze | any manual finish | any manual finish |
 
-Caps scale with `cells × max(rows,cols)` from a 3×3 baseline of about **2:00 / 80 moves** (gold) and **~5:00 / 190 moves** (silver). Both time **and** moves must land in the band. Auto Solve is unranked.
+Caps scale with `cells × max(rows,cols)` from a 3×3 baseline of **3:00 / 70 moves** (gold), **8:00 / 160 moves** (silver), and **20:00 / 400 moves** (bronze, shown on the table; any manual finish still counts as bronze). Both time **and** moves must land in the band. Auto Solve is unranked.
 
 `vspComputeStars(...)` returns 3 / 2 / 1 / 0 for gold / silver / bronze / unranked. Shown as the shared PNG cups (`icons/trophy-gold.png`, `icons/trophy-silver.png`, `icons/trophy-bronze.png`) on the rank table, home week tally, gallery thumbs, victory copy, puzzle certificate RANK row, and collection certificates. Markup helper: `vspTrophyMarkup`. Canvas helper: `vspDrawTrophyCup` (`drawImage` of the preloaded PNG).
 
@@ -95,7 +95,7 @@ Manual clears open `name-picker.js` before the certificate. Names are `Adjective
 
 The puzzle-result stats box is sized to four rows with even line spacing (no empty band under RANK). RANK draws a small cup immediately left of GOLD / SILVER / BRONZE, sized to the rank text so it stays on that line.
 
-Grid Settings offers square sizes only (`3×3` … `8×8`) as rounded square buttons. Timer still pauses while the modal is open. Daily stages may still use a rectangular grid from `vspTodayFeatured()`; changing size there drops the daily flag.
+Grid Settings offers square sizes only (`3×3` … `8×8`) as rounded square buttons. Timer still pauses while the modal is open. Daily stages pick a square from `3×3` / `4×4` / `5×5` / `6×6`. Changing size there drops the daily flag.
 
 ### Peek
 
@@ -107,7 +107,7 @@ Player README screenshots (3×3 grid) live in `screenshots/`: `home-page.png`, `
 
 ### Daily stage
 
-`vspTodayFeatured()` hashes the local calendar date (`YYYY-MM-DD`) against `VSP_CATALOG` and a small grid list (`3×3`, `3×4`, `4×4`, `4×5`). Same day → same stage for everyone in that timezone.
+`vspTodayFeatured()` hashes the local calendar date (`YYYY-MM-DD`) against `VSP_CATALOG` and a square-grid list (`3×3`, `4×4`, `5×5`, `6×6`). Same day → same stage for everyone in that timezone. `7×7` and `8×8` stay in Grid Settings but are not used as a forced daily. Old rectangular daily links (`3×4`, `4×5`) are coerced to a square when opened.
 
 Play link: `workspace_template.html?char=…&puzzle=…&daily=1&rows=…&cols=…`
 
@@ -143,8 +143,8 @@ Changing the grid on a daily run drops the daily flag, so a custom size is not c
 
 `setupSlidingPuzzle()` sizes the board to fit a **shared play area**, not “fixed width then unlimited height”:
 
-- `maxW = min(92% of window width, 640)`  
-- `maxH = min(62% of window height, 560)`  
+- `maxW = min(72% of window width, 600)`  
+- `maxH = min(58% of window height, 520)`  
 - `scale = min(maxW / imageWidth, maxH / imageHeight)`  
 - Board pixel size = image size × scale  
 
@@ -269,14 +269,20 @@ No build step — refresh and re-upload.
 
 ## Screenshots for the README
 
-Place four PNGs in `screenshots/`:
+Place PNGs in `screenshots/` for the player READMEs. Current set (3×3 grid in `README.md` / `README.ja.md`):
 
 | File | Content |
 |---|---|
-| `gallery.png` | Character select |
-| `workspace.png` | Mid-game board + controls |
-| `hint.png` | Hint numbers visible |
-| `victory.png` | Victory modal + certificate |
+| `home-page.png` | Gallery, week ranks, today’s stage |
+| `puzzle-selection.png` | Character rows + hover preview |
+| `hint.png` | Numbered tiles on the board |
+| `peek-reference.png` | Full-picture Peek overlay |
+| `grid-size-selection.png` | Square 3×3–8×8 picker |
+| `name-picker.png` | Achieved By lock / reroll |
+| `certificate-download-window.png` | Victory modal + download |
+| `player-certificate.png` | Result certificate RANK |
+| `trophy-collection.png` | Week collection on home |
+| `auto-solver.png` | Auto Solve (kept, not in the 3×3 grid) |
 
 ---
 
@@ -286,7 +292,8 @@ Place four PNGs in `screenshots/`:
 - Fullscreen: **on**  
 - Scroll: **on** (mainly helps the gallery)  
 - Viewport example that works: **1280 × 800** (or 720)  
-- Ship `thumbs/` in the zip; exclude `.xcf` and review files  
+- Ship `thumbs/` in the zip; exclude `.xcf`, `screenshots/`, `DEVELOPER.md`, and nested zip files  
+- Daily stage is always a square (`3×3`–`6×6`) from Grid Settings  
 
 ---
 

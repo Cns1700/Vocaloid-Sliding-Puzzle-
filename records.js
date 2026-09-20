@@ -177,14 +177,11 @@ function vspTodayFeatured() {
     const dateKey = vspLocalDateKey();
     const h = vspHash(dateKey + '|vsp-daily');
     const item = VSP_CATALOG[h % VSP_CATALOG.length];
-    const grids = [
-        { rows: 3, cols: 3 },
-        { rows: 3, cols: 4 },
-        { rows: 4, cols: 4 },
-        { rows: 4, cols: 5 }
-    ];
-    const grid = grids[h % grids.length];
-    return { dateKey, ...item, ...grid };
+    // Daily stages use the same square sizes as Grid Settings.
+    // 7×7 / 8×8 stay in the picker but are too punishing as a forced daily.
+    const sizes = [3, 4, 5, 6];
+    const size = sizes[h % sizes.length];
+    return { dateKey, ...item, rows: size, cols: size };
 }
 
 function vspFormatShortTime(totalSeconds) {
